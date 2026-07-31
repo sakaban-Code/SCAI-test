@@ -1,0 +1,6 @@
+anthropic
+google-genai
+tavily-python
+feedparser
+matplotlib
+numpy

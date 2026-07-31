@@ -1,0 +1,55 @@
+{
+  "_meta": {
+    "title": "SCAI-Agent 每週資料物件標準結構（pipeline.py 與儀表板的共用契約）",
+    "source_of_truth": "憲法 v2.1（cowork/CLAUDE.md）＋ data/kdf_config.json（25 KDF 凍結正本＝提案書 1–25 編號）",
+    "note": "25 KDF 順序凍結；新增項目或改變順序＝破壞性變更，需人工批准。data/weeks.json 為趨勢唯一真實來源（append-only），儀表板 WEEKS 陣列由 pipeline.py 整批注入。W1–W4 由 Cowork 人工判定回填；W5 起由雲端管線自動產出。",
+    "axes": {
+      "x": { "name": "地緣與供應鏈聚合程度", "min": "−1 碎裂 Fragmentation", "max": "+1 聚合 Integration" },
+      "y": { "name": "產業營運資源與政策充沛度", "min": "−1 匱乏 Scarcity", "max": "+1 充沛 Ample" }
+    },
+    "scenarios": {
+      "情境一：全球共榮的盛夏 (Spring)":     "X+ 聚合、Y+ 充沛",
+      "情境二：溫室裡的舞者 (Crossroads)":   "X− 碎裂、Y+ 充沛",
+      "情境三：孤島韌性突圍 (Adaptation)":   "X+ 聚合、Y− 匱乏",
+      "情境四：末日求生戰役 (Inferno)":      "X− 碎裂、Y− 匱乏"
+    },
+    "kdf_and_dimensions": "見 data/kdf_config.json（凍結正本，勿在本檔重複維護）"
+  },
+
+  "weekObject": {
+    "week": "string，如 W5（pipeline 依 data/weeks.json 筆數自動遞增；W1–W4 回填資料已正規化為字串）",
+    "range": "string，如 2026/07/06–07/13",
+    "gen": "string（YYYY-MM-DD），產生日期",
+    "scenario": "string，四情境中文名（情境N：…）",
+    "scenarioEn": "string，Spring|Crossroads|Adaptation|Inferno",
+    "scenarioDesc": "string，判定理由（結論先行）【推斷】",
+    "xy": { "x": "number −1~+1【推斷】", "y": "number −1~+1【推斷】" },
+    "w": "array，恰 25 個 0–100 整數【推斷】（中性 50；▲≥58、▼≤42），順序＝kdf_config.json 1–25，不可錯位",
+    "events": [
+      {
+        "title": "string 事件標題", "summary": "string 80字內繁中摘要",
+        "category": "string（地緣政治|供應鏈|政策|需求|大廠動態|能源天災；W1–W4 回填資料可能無此欄）",
+        "xImpact": "string，↑|↓|→", "yImpact": "string，↑|↓|→",
+        "source": "string 媒體名", "date": "YYYY-MM-DD", "url": "string 可追溯來源"
+      }
+    ],
+    "decisionTrace": [
+      {
+        "event": "string", "keywords": ["string"],
+        "xDelta": "number", "yDelta": "number",
+        "kdfChanges": [
+          { "id": "number（kdf_config.json 之 1–25）", "name": "string", "from": "number", "to": "number", "reason": "string" }
+        ]
+      }
+    ],
+    "confidence": "string，高｜低（W5 起雙模型一致→高、不一致→低；W1–W4 無此欄）",
+    "crossCheck": {
+      "agreement": "boolean", "opus": "string", "gemini": "string",
+      "flag": "string，不一致時為【建議查證】警語（W1–W4 無此欄）"
+    },
+    "topMovers": [{ "kdf": "string", "delta": "string +N/-N", "reason": "string" }],
+    "reasoning": "string，120 字內推理鏈摘要（W1–W4 無此欄）",
+    "riskRadar": "array（選配，憲法 LAYER 10 H+6 風險雷達；W3 起 Cowork 產出）",
+    "selfAudit": "object（選配，憲法 LAYER 10 決策四問自審）"
+  }
+}

@@ -1,0 +1,987 @@
+[
+  {
+    "week": "W1",
+    "range": "2026/06/11–06/17",
+    "gen": "2026-06-20",
+    "scenario": "情境二：溫室裡的舞者",
+    "scenarioEn": "Crossroads",
+    "scenarioDesc": "結論：本週定位為情境二「溫室裡的舞者／Crossroads」，X=−0.35（偏碎裂）、Y=+0.40（偏充沛）【推斷】。理由（需求面，Y 正）：AI 晶片與 HBM／DRAM 記憶體超級循環推升需求與報價、SK 海力士 2026 年產能售罄，加上 CHIPS 補助到位與台灣供電獲政府保證，營運資源與政策呈充沛。理由（地緣面，X 負）：台灣研擬收緊對中 AI 晶片出口管制以對齊美國、關鍵礦物（鎵、鍺）維持出口許可制、Intel–Apple 在地化代工推進供應鏈區域化，聚合度轉為碎裂。對策主軸：需求旺盛但陣營分化，須精準選邊與布局——優先強化 AI 晶片產品掌握度、緊盯管制政策與供應鏈重組風險，並以技術策略聯盟卡位先進製程。【基準週，無上週數值可對比，趨勢自 W2 起成形｜資料不足】",
+    "xy": {
+      "x": -0.35,
+      "y": 0.4
+    },
+    "w": [
+      50,
+      56,
+      64,
+      66,
+      72,
+      64,
+      60,
+      58,
+      50,
+      64,
+      56,
+      62,
+      60,
+      52,
+      56,
+      56,
+      70,
+      60,
+      72,
+      54,
+      50,
+      64,
+      42,
+      60,
+      54
+    ],
+    "events": [
+      {
+        "title": "台灣研擬收緊對中 AI 晶片出口管制以對齊美國",
+        "source": "Bloomberg／Taipei Times",
+        "date": "2026-06-10",
+        "url": "https://www.taipeitimes.com/News/biz/archives/2026/06/10/2003858815",
+        "summary": "賴政府研擬給予執法與主管機關更明確法源，針對運算力逾門檻之 AI 晶片（如搭載輝達晶片之 AI 伺服器）收緊對中出口，以對齊美國管制、遏止轉運；細節待雙方高層核定。屬碎裂訊號。",
+        "xImpact": "↓",
+        "yImpact": "→"
+      },
+      {
+        "title": "Intel 開始 18A-P 風險試產，逼近 Apple 代工協議",
+        "source": "CNBC",
+        "date": "2026-06-16",
+        "url": "https://www.cnbc.com/2026/06/16/intel-begins-production-of-18a-p-inches-closer-to-possible-apple-deal.html",
+        "summary": "Intel 最先進節點 18A-P 進入風險試產，朝為 Apple 代工部分晶片邁進，將成 TSMC 之外的次要代工來源；美國在地化製程推進供應鏈區域化，同時擴充先進產能。",
+        "xImpact": "↓",
+        "yImpact": "↑"
+      },
+      {
+        "title": "美國商務部與 SandboxAQ 簽 5 億美元 CHIPS R&D 協議，加速 AI 材料探索",
+        "source": "NIST／PR Newswire",
+        "date": "2026-06-17",
+        "url": "https://www.nist.gov/news-events/news/2026/06/department-commerce-announces-definitive-agreement-sandboxaq-500-million",
+        "summary": "CHIPS 研發辦公室與 SandboxAQ 簽定 5 億美元協議，以 AI 驅動材料探索化解半導體材料瓶頸，含 PFAS 替代、稀土無磁鐵與廠房備援電池化學；政府取得少數非控股股權。政策補助充沛訊號。",
+        "xImpact": "↓",
+        "yImpact": "↑"
+      },
+      {
+        "title": "KLA 10 拆 1 股票分割於 6/11 收盤後生效，反映前段檢測設備需求強勁",
+        "source": "ts2.tech 產業彙整／公司公告",
+        "date": "2026-06-11",
+        "url": "https://ts2.tech/en/june-2026-semiconductor-news-roundup-u-s-chip-controls-sandboxaq-funding-and-intel-18a-p/",
+        "summary": "前段製程檢測／量測設備龍頭 KLA 完成 10 拆 1 股票分割，6/11 收盤後生效，反映先進製程資本支出與設備需求暢旺、市場信心偏多。",
+        "xImpact": "→",
+        "yImpact": "↑"
+      },
+      {
+        "title": "記憶體超級循環延續：Samsung 示警短缺、SK 海力士 2026 產能售罄、HBM／DRAM 大漲",
+        "source": "Network World／CNBC",
+        "date": "2026-05-25",
+        "url": "https://www.cnbc.com/2026/05/25/memory-stocks-cyclical-boom-bust-samsung-sk-hynix.html",
+        "summary": "結構性背景延續至本週：AI 需求驅動 HBM3E 報價 2026 年調漲近 20%、傳統 DRAM 首季合約價估漲 55–60%、SK 海力士 HBM／DRAM／NAND 2026 產能售罄；需求充沛但供給吃緊，須留意循環性風險。",
+        "xImpact": "→",
+        "yImpact": "↑"
+      }
+    ],
+    "decisionTrace": [
+      {
+        "event": "台灣研擬收緊對中 AI 晶片出口管制",
+        "keywords": [
+          "出口管制",
+          "AI晶片",
+          "對中",
+          "賴政府",
+          "對齊美國"
+        ],
+        "xDelta": -0.25,
+        "yDelta": 0,
+        "kdfChanges": [
+          {
+            "id": 19,
+            "name": "管制政策發展",
+            "from": 50,
+            "to": 72,
+            "reason": "新增對中 AI 晶片出口管制法源，管制密度升至本週最高優先"
+          },
+          {
+            "id": 17,
+            "name": "全球供應鏈重組",
+            "from": 50,
+            "to": 70,
+            "reason": "管制與轉運防堵迫使供應鏈再區域化"
+          },
+          {
+            "id": 22,
+            "name": "開放境外投資／保護主義",
+            "from": 50,
+            "to": 64,
+            "reason": "保護主義端升溫，須優先因應"
+          },
+          {
+            "id": 24,
+            "name": "外交因素（境外投資保護）",
+            "from": 50,
+            "to": 60,
+            "reason": "台美對齊、對中摩擦升高外交權重"
+          },
+          {
+            "id": 23,
+            "name": "自由貿易協定",
+            "from": 50,
+            "to": 42,
+            "reason": "陣營分化抑制自由貿易動能，方向轉降▼"
+          },
+          {
+            "id": 2,
+            "name": "智慧財產權保護",
+            "from": 50,
+            "to": 56,
+            "reason": "管制時代技術外溢防護需求上升"
+          }
+        ]
+      },
+      {
+        "event": "Intel 開始 18A-P 風險試產，逼近 Apple 代工",
+        "keywords": [
+          "Intel 18A-P",
+          "風險試產",
+          "Apple 代工",
+          "先進製程",
+          "在地化"
+        ],
+        "xDelta": -0.05,
+        "yDelta": 0.05,
+        "kdfChanges": [
+          {
+            "id": 4,
+            "name": "次世代技術量產",
+            "from": 50,
+            "to": 66,
+            "reason": "最先進節點進入風險試產，量產競賽白熱化"
+          },
+          {
+            "id": 10,
+            "name": "領導公司策略",
+            "from": 50,
+            "to": 64,
+            "reason": "Intel／Apple 大廠策略動向牽動格局"
+          },
+          {
+            "id": 3,
+            "name": "技術策略聯盟",
+            "from": 50,
+            "to": 64,
+            "reason": "Intel–Apple 代工結盟，聯盟卡位重要性升"
+          },
+          {
+            "id": 8,
+            "name": "垂直整合能力",
+            "from": 50,
+            "to": 58,
+            "reason": "Intel IDM＋代工垂直整合再起"
+          },
+          {
+            "id": 11,
+            "name": "新興競爭者形成",
+            "from": 50,
+            "to": 56,
+            "reason": "Intel 重返先進代工，第二供應來源成形"
+          }
+        ]
+      },
+      {
+        "event": "美國 CHIPS 5 億美元補助 SandboxAQ 加速 AI 材料探索",
+        "keywords": [
+          "CHIPS補助",
+          "AI材料探索",
+          "稀土替代",
+          "政府持股",
+          "關鍵材料"
+        ],
+        "xDelta": -0.02,
+        "yDelta": 0.1,
+        "kdfChanges": [
+          {
+            "id": 18,
+            "name": "研發減免稅賦",
+            "from": 50,
+            "to": 60,
+            "reason": "CHIPS 補助到位，政策資源充沛"
+          },
+          {
+            "id": 6,
+            "name": "先進技術研發",
+            "from": 50,
+            "to": 64,
+            "reason": "AI 驅動研發加速、官方加碼投入"
+          },
+          {
+            "id": 7,
+            "name": "量子及材料技術突破",
+            "from": 50,
+            "to": 60,
+            "reason": "AI 材料探索平台針對材料瓶頸，突破權重升"
+          },
+          {
+            "id": 25,
+            "name": "注重環保（ESG）",
+            "from": 50,
+            "to": 54,
+            "reason": "PFAS 替代與綠色材料納入研發主軸"
+          }
+        ]
+      },
+      {
+        "event": "KLA 股票分割生效，前段檢測設備需求強勁",
+        "keywords": [
+          "KLA",
+          "股票分割",
+          "製程檢測",
+          "前段設備",
+          "市場信心"
+        ],
+        "xDelta": 0,
+        "yDelta": 0.07,
+        "kdfChanges": [
+          {
+            "id": 12,
+            "name": "市場競爭力",
+            "from": 50,
+            "to": 62,
+            "reason": "先進製程資本支出暢旺，設備端競爭力指標走強"
+          },
+          {
+            "id": 15,
+            "name": "相關產業發展",
+            "from": 50,
+            "to": 56,
+            "reason": "檢測／量測等前段相關產業同步受惠"
+          }
+        ]
+      },
+      {
+        "event": "記憶體超級循環延續，AI 需求推升 HBM／DRAM",
+        "keywords": [
+          "HBM",
+          "DRAM",
+          "漲價",
+          "AI需求",
+          "產能售罄",
+          "超級循環"
+        ],
+        "xDelta": -0.03,
+        "yDelta": 0.18,
+        "kdfChanges": [
+          {
+            "id": 5,
+            "name": "掌握主流及替代產品（AI晶片）",
+            "from": 50,
+            "to": 72,
+            "reason": "AI 晶片與 HBM 為需求核心，列本週最高優先"
+          },
+          {
+            "id": 13,
+            "name": "市場穩定成長",
+            "from": 50,
+            "to": 60,
+            "reason": "需求強勁帶動成長，惟須留意循環性風險"
+          },
+          {
+            "id": 16,
+            "name": "經濟情勢",
+            "from": 50,
+            "to": 56,
+            "reason": "報價上揚反映景氣偏多，但通膨壓力並存"
+          },
+          {
+            "id": 20,
+            "name": "穩定供水與供電",
+            "from": 50,
+            "to": 54,
+            "reason": "台灣供電獲政府保證以支援強勁需求擴張，充沛訊號"
+          },
+          {
+            "id": 14,
+            "name": "掌握未來市場（Meta/6G）",
+            "from": 50,
+            "to": 52,
+            "reason": "AI 外溢效應略增未來市場關注"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "week": "W2",
+    "range": "2026/06/18–06/24",
+    "gen": "2026-06-22",
+    "scenario": "情境二：溫室裡的舞者",
+    "scenarioEn": "Crossroads",
+    "scenarioDesc": "結論：本週續處情境二「溫室裡的舞者／Crossroads」，X=−0.33、Y=+0.45【推斷】，較上週（−0.35／+0.40）微幅右上移——充沛度上升、碎裂略緩。理由（Y 升）：SK 海力士領先排程出貨 12 層 HBM4E 樣品、AI 記憶體與運算需求延燒（延續上週 Nvidia 250 億美元發債、AI 資本支出狂潮），需求動能更強。理由（X 略緩）：本週主調為夥伴與在地化建置（Apple–Intel 美國製造、TSMC–Amkor 亞利桑那封裝測試）而非新增出口管制，碎裂壓力較上週和緩；惟蘋果分散台積電產能、製造回流美國，仍屬供應鏈區域化訊號，X 維持負值。對策：需求旺盛、陣營分化持續，宜把握 AI 晶片與先進封裝測試在地化商機，並持續緊盯管制風險。【趨勢：相對 W1，技術與研發、企業競爭兩維度同步走強；本週為第二筆，折線趨勢開始成形】",
+    "xy": {
+      "x": -0.33,
+      "y": 0.45
+    },
+    "w": [
+      50,
+      56,
+      66,
+      68,
+      74,
+      66,
+      62,
+      62,
+      50,
+      66,
+      58,
+      64,
+      62,
+      52,
+      60,
+      56,
+      72,
+      60,
+      68,
+      54,
+      50,
+      62,
+      42,
+      60,
+      54
+    ],
+    "events": [
+      {
+        "title": "川普宣布 Apple 與 Intel 合作在美國設計製造晶片，Intel 大漲逾一成",
+        "source": "CNBC",
+        "date": "2026-06-18",
+        "url": "https://www.cnbc.com/amp/2026/06/18/trump-intel-apple-chip-design-deal.html",
+        "summary": "川普宣布 Apple 同意與 Intel 在美國設計製造晶片，Intel 股價開盤後漲約 10.5%；庫克同時表示 iPhone 售價將上漲。為 Intel 代工部門重大客戶斬獲，並使 Apple 分散對台積電依賴——供應鏈區域化訊號。",
+        "xImpact": "↓",
+        "yImpact": "→"
+      },
+      {
+        "title": "SK 海力士領先排程出貨 12 層 HBM4E 樣品，股價創高",
+        "source": "PR Newswire／SK hynix",
+        "date": "2026-06-18",
+        "url": "https://www.prnewswire.com/news-releases/sk-hynix-ships-samples-of-12-layer-next-gen-hbm4e-302803714.html",
+        "summary": "SK 海力士提前向主要客戶出貨 12 層、48GB HBM4E 樣品，速度達 16Gbps/pin、能效較前代提升逾 20%（採 MR-MUF 先進封裝）；Samsung 已於 5/29 送樣，AI 記憶體競賽白熱化。需求與技術雙強訊號。",
+        "xImpact": "→",
+        "yImpact": "↑"
+      },
+      {
+        "title": "TSMC 與 Amkor 簽亞利桑那 10 年先進封裝測試協議（本週持續發酵）",
+        "source": "TrendForce／Amkor",
+        "date": "2026-06-16",
+        "url": "https://www.trendforce.com/news/2026/06/17/news-tsmc-amkor-forge-10-year-arizona-advanced-packaging-partnership-to-complete-the-u-s-chip-supply-chain/",
+        "summary": "TSMC 將向 Amkor 位於亞利桑那 Peoria 的廠採購整套先進封裝與測試服務，使客戶在美國境內即可完成從前段製造到封裝測試的全流程；補上美國供應鏈關鍵後段，Amkor 股價單日大漲。與測試／前段直接相關。",
+        "xImpact": "↓",
+        "yImpact": "↑"
+      }
+    ],
+    "decisionTrace": [
+      {
+        "event": "川普宣布 Apple–Intel 美國製造晶片協議",
+        "keywords": [
+          "Apple",
+          "Intel",
+          "美國製造",
+          "代工",
+          "在地化"
+        ],
+        "xDelta": -0.02,
+        "yDelta": 0,
+        "kdfChanges": [
+          {
+            "id": 3,
+            "name": "技術策略聯盟",
+            "from": 64,
+            "to": 66,
+            "reason": "Apple–Intel 代工結盟強化，聯盟卡位再升"
+          },
+          {
+            "id": 8,
+            "name": "垂直整合能力",
+            "from": 58,
+            "to": 62,
+            "reason": "Intel IDM＋代工、美國前後段整合深化"
+          },
+          {
+            "id": 10,
+            "name": "領導公司策略",
+            "from": 64,
+            "to": 66,
+            "reason": "Apple／Intel／TSMC 大廠策略動向密集"
+          },
+          {
+            "id": 11,
+            "name": "新興競爭者形成",
+            "from": 56,
+            "to": 58,
+            "reason": "Intel 代工再獲重量級客戶，第二供應來源成形"
+          },
+          {
+            "id": 17,
+            "name": "全球供應鏈重組",
+            "from": 70,
+            "to": 72,
+            "reason": "製造回流美國推進供應鏈區域化"
+          }
+        ]
+      },
+      {
+        "event": "SK 海力士出貨 12 層 HBM4E 樣品",
+        "keywords": [
+          "HBM4E",
+          "SK海力士",
+          "12層",
+          "AI記憶體",
+          "樣品"
+        ],
+        "xDelta": 0,
+        "yDelta": 0.03,
+        "kdfChanges": [
+          {
+            "id": 5,
+            "name": "掌握主流及替代產品（AI晶片）",
+            "from": 72,
+            "to": 74,
+            "reason": "AI 記憶體世代躍進，需求核心更穩固"
+          },
+          {
+            "id": 4,
+            "name": "次世代技術量產",
+            "from": 66,
+            "to": 68,
+            "reason": "HBM4E 提前送樣，次世代量產競賽加速"
+          },
+          {
+            "id": 7,
+            "name": "量子及材料技術突破",
+            "from": 60,
+            "to": 62,
+            "reason": "MR-MUF 先進封裝材料與散熱突破"
+          },
+          {
+            "id": 6,
+            "name": "先進技術研發",
+            "from": 64,
+            "to": 66,
+            "reason": "記憶體大廠研發競速加劇"
+          },
+          {
+            "id": 13,
+            "name": "市場穩定成長",
+            "from": 60,
+            "to": 62,
+            "reason": "AI 記憶體需求延燒帶動成長"
+          }
+        ]
+      },
+      {
+        "event": "TSMC–Amkor 亞利桑那封裝測試 10 年協議",
+        "keywords": [
+          "TSMC",
+          "Amkor",
+          "先進封裝",
+          "測試",
+          "亞利桑那"
+        ],
+        "xDelta": -0.01,
+        "yDelta": 0.02,
+        "kdfChanges": [
+          {
+            "id": 15,
+            "name": "相關產業發展",
+            "from": 56,
+            "to": 60,
+            "reason": "封裝測試後段在地化，前段／測試相關產業受惠"
+          },
+          {
+            "id": 12,
+            "name": "市場競爭力",
+            "from": 62,
+            "to": 64,
+            "reason": "美國境內全流程能力提升整體競爭力"
+          }
+        ]
+      },
+      {
+        "event": "本週無新出口管制升級（相對 W1 台灣管制提案）【推斷觀察】",
+        "keywords": [
+          "管制趨緩",
+          "夥伴關係",
+          "在地化建置"
+        ],
+        "xDelta": 0.05,
+        "yDelta": 0,
+        "kdfChanges": [
+          {
+            "id": 19,
+            "name": "管制政策發展",
+            "from": 72,
+            "to": 68,
+            "reason": "本週主調轉為夥伴與建置，管制密度相對和緩，仍屬高檔"
+          },
+          {
+            "id": 22,
+            "name": "開放境外投資／保護主義",
+            "from": 64,
+            "to": 62,
+            "reason": "無新增保護主義措施，壓力略減"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "week": "W3",
+    "range": "2026/06/25–07/01",
+    "gen": "2026-06-29",
+    "scenario": "情境二：溫室裡的舞者",
+    "scenarioEn": "Crossroads",
+    "scenarioDesc": "結論：本週續處情境二「溫室裡的舞者／Crossroads」，X=−0.38、Y=+0.42【推斷】，較上週（−0.33／+0.45）略往左下移——碎裂加深、樂觀微收，但仍穩居充沛側。理由（X 更碎裂）：中國將 10 家美企（含稀土礦商）列入出口管制清單、反制意味濃；TSMC 股價一週重挫約 7.55%、選擇權偏空，市場開始定價跨海峽地緣風險。理由（Y 略收但仍充沛）：AI 需求基本面未變——Nvidia Vera Rubin 平台 HBM4 認證三星／SK 海力士／美光、要求 16-Hi HBM4 於下半年供貨、SK 海力士 2026 產能售罄，券商續調高 TSMC 目標價（估 2026–27 營收年增近 40%）；惟本週屬估值消化與避險，市場情緒由熱轉穩。對策：基本面仍強、宜守住 AI 晶片與先進製程布局，但須提高對地緣（出口管制反制、跨海峽風險）與估值波動的避險權重。【趨勢 W1→W3：技術研發維度持續走強；全球供應鏈維度因地緣升溫而上行；企業競爭維度因本週股市回檔略降】",
+    "xy": {
+      "x": -0.38,
+      "y": 0.42
+    },
+    "w": [
+      50,
+      56,
+      66,
+      70,
+      74,
+      66,
+      64,
+      62,
+      50,
+      66,
+      58,
+      62,
+      58,
+      52,
+      60,
+      52,
+      74,
+      60,
+      72,
+      54,
+      50,
+      66,
+      42,
+      64,
+      54
+    ],
+    "events": [
+      {
+        "title": "中國將 10 家美企（含稀土礦商）列入出口管制清單",
+        "source": "Al Jazeera",
+        "date": "2026-06-22",
+        "url": "https://www.aljazeera.com/news/2026/6/22/china-adds-10-us-firms-including-rare-earth-miner-to-export-control-list",
+        "summary": "中國商務部將 10 家美國企業（含一家稀土礦商）列入出口管制清單，反制意味濃；延續至本週發酵，強化供應鏈碎裂與關鍵材料風險。屬碎裂訊號。",
+        "xImpact": "↓",
+        "yImpact": "↓"
+      },
+      {
+        "title": "半導體股回檔：TSMC 一週重挫約 7.55%，AI 股避險升溫",
+        "source": "TipRanks",
+        "date": "2026-06-27",
+        "url": "https://www.tipranks.com/news/weekend-updates/tsmc-stock-slides-as-traders-hedge-massive-ai-bet",
+        "summary": "TSMC 股價一週跌約 7.55%、盤中一度探 421 美元，選擇權賣權多於買權、避險升溫，市場開始定價跨海峽地緣風險；惟券商續調高目標價、AI 需求基本面未變，屬估值消化而非基本面轉壞。",
+        "xImpact": "↓",
+        "yImpact": "↓"
+      },
+      {
+        "title": "AI 記憶體需求延續：Nvidia Vera Rubin 平台 HBM4 認證、16-Hi HBM4 下半年推進",
+        "source": "Korea Herald／Yahoo Finance",
+        "date": "2026-06-05",
+        "url": "https://www.koreaherald.com/article/10645471",
+        "summary": "Nvidia 認證三星／SK 海力士／美光供 Vera Rubin 平台 HBM4，並要求業者於下半年（Q4）交付 16-Hi HBM4；SK 海力士 2026 產能售罄。AI 記憶體需求結構性延續，支撐充沛面。",
+        "xImpact": "→",
+        "yImpact": "↑"
+      }
+    ],
+    "decisionTrace": [
+      {
+        "event": "中國將 10 家美企列入出口管制清單",
+        "keywords": [
+          "出口管制清單",
+          "中國反制",
+          "稀土",
+          "雙重用途",
+          "地緣"
+        ],
+        "xDelta": -0.04,
+        "yDelta": -0.01,
+        "kdfChanges": [
+          {
+            "id": 19,
+            "name": "管制政策發展",
+            "from": 68,
+            "to": 72,
+            "reason": "中國反制式出口管制，管制風險回升"
+          },
+          {
+            "id": 22,
+            "name": "開放境外投資／保護主義",
+            "from": 62,
+            "to": 66,
+            "reason": "雙邊保護主義對峙再升溫"
+          },
+          {
+            "id": 24,
+            "name": "外交因素（境外投資保護）",
+            "from": 60,
+            "to": 64,
+            "reason": "中美對峙、跨海峽張力升高外交權重"
+          },
+          {
+            "id": 7,
+            "name": "量子及材料技術突破",
+            "from": 62,
+            "to": 64,
+            "reason": "稀土等關鍵材料受制，提升替代材料突破優先度"
+          }
+        ]
+      },
+      {
+        "event": "半導體股回檔，TSMC 重挫、市場避險",
+        "keywords": [
+          "半導體賣壓",
+          "TSMC",
+          "避險",
+          "估值消化",
+          "跨海峽風險"
+        ],
+        "xDelta": -0.01,
+        "yDelta": -0.04,
+        "kdfChanges": [
+          {
+            "id": 16,
+            "name": "經濟情勢",
+            "from": 56,
+            "to": 52,
+            "reason": "股市回檔與避險升溫，景氣面情緒由熱轉穩"
+          },
+          {
+            "id": 13,
+            "name": "市場穩定成長",
+            "from": 62,
+            "to": 58,
+            "reason": "估值消化與賣壓，成長的『穩定性』受質疑"
+          },
+          {
+            "id": 12,
+            "name": "市場競爭力",
+            "from": 64,
+            "to": 62,
+            "reason": "龍頭股價承壓，短線競爭力指標略降"
+          },
+          {
+            "id": 17,
+            "name": "全球供應鏈重組",
+            "from": 72,
+            "to": 74,
+            "reason": "跨海峽風險與股權出售消息攪動供應鏈，重組權重再升"
+          }
+        ]
+      },
+      {
+        "event": "AI 記憶體需求延續（Vera Rubin HBM4／16-Hi）",
+        "keywords": [
+          "HBM4",
+          "VeraRubin",
+          "16-Hi",
+          "AI需求",
+          "Nvidia"
+        ],
+        "xDelta": 0,
+        "yDelta": 0.02,
+        "kdfChanges": [
+          {
+            "id": 4,
+            "name": "次世代技術量產",
+            "from": 68,
+            "to": 70,
+            "reason": "Nvidia 要求 16-Hi HBM4 下半年供貨，次世代量產競賽再加碼"
+          }
+        ]
+      }
+    ],
+    "riskRadar": [
+      {
+        "risk": "AI／HBM 集中度與週期性：測試載量高度綁 AI 資本支出，若進入消化期稼動率下滑",
+        "signal": "AI 股回檔（本週 TSMC −7.55%）、雲端資本支出成長率放緩、記憶體現貨價鬆動",
+        "kdf": 13,
+        "mitigation": "拉高車用／工控／RF 等非 AI 營收占比，與客戶簽長約鎖測試產能"
+      },
+      {
+        "risk": "先進封裝測試技術轉軌落後：AI 測試價值移向 HBM 堆疊測試、KGD、系統級測試（SLT）、chiplet",
+        "signal": "客戶封裝路線圖轉向 2.5D/3D、對 SLT／堆疊測試需求詢問增加",
+        "kdf": 4,
+        "mitigation": "優先投資 SLT／堆疊測試與 chiplet 測試能力，卡位 AI 測試主成長"
+      },
+      {
+        "risk": "在地化外溢：封測隨晶圓製造回流美國（TSMC–Amkor 亞利桑那），純台灣布局成缺口",
+        "signal": "關鍵客戶要求境外／美國測試、OSAT 於美擴充封測產能",
+        "kdf": 17,
+        "mitigation": "評估海外測試據點或與美國封測廠結盟"
+      },
+      {
+        "risk": "地緣管制反制波及關鍵材料與設備：中國反制清單擴大、稀土/耗材受限",
+        "signal": "出口管制清單再擴增、測試耗材/備品交期拉長或漲價",
+        "kdf": 19,
+        "mitigation": "分散耗材供應來源、提高安全庫存、監控管制清單動態"
+      }
+    ],
+    "selfAudit": [
+      {
+        "judgment": "X 由 −0.33 下修至 −0.38（碎裂加深）",
+        "meaning": "決定是否提高地緣避險權重與供應鏈分散布局",
+        "basis": "X 軸；中國 10 家美企管制清單（Al Jazeera 6/22）＋TSMC 定價跨海峽風險（TipRanks 6/27）",
+        "action": "提高 #17 供應鏈重組、#19 管制政策之戰略關注，啟動耗材/據點分散評估",
+        "downside": "若中美於下季再度緩和則過度避險、錯失聚合紅利；領先訊號＝新一輪關稅豁免或高層會談"
+      },
+      {
+        "judgment": "Y 僅小幅下修至 +0.42（仍充沛）",
+        "meaning": "決定是否維持 AI 晶片與先進製程的積極布局",
+        "basis": "Y 軸；本週回檔屬估值消化非基本面轉壞（HBM4 認證、產能售罄、目標價續調升）",
+        "action": "守住 #5 AI晶片、#4 次世代量產布局，不因股價波動撤守",
+        "downside": "若為基本面反轉（訂單能見度下滑）則誤判；領先訊號＝雲端資本支出下修、HBM 訂單遞延"
+      }
+    ]
+  },
+  {
+    "week": "W4",
+    "range": "2026/06/29–07/05",
+    "gen": "2026-07-06",
+    "scenario": "情境二：溫室裡的舞者",
+    "scenarioEn": "Crossroads",
+    "scenarioDesc": "結論：本週續處情境二「溫室裡的舞者／Crossroads」，X=−0.36、Y=+0.38【推斷】，較上週（−0.38／+0.42）略向右下移——碎裂結構持平微解、但充沛面因成本端壓力而略收，仍穩居「碎裂＋充沛」象限。理由（Y 略降，成本端壓力浮現）：AI 記憶體排擠效應外溢至消費性電子，Apple 於 6/25 因記憶體短缺調漲 MacBook／iPad／Apple TV 等產品售價達 17%–54%，官方明言為 AI 資料中心記憶體需求暴增所致，屬明確通膨／匱乏訊號；TSMC 同步對 7 奈米以下所有先進製程調漲晶圓報價 5%–10%（占其晶圓營收 74%），反映先進產能持續吃緊、成本轉嫁壓力浮現，惟 AI 需求基本面未變。理由（X 微升，未見新一輪管制升級）：三星、SK 海力士向南韓基板供應商施壓 2026 下半年降價，以及其約 8,000 億韓元擴產計畫排擠 TSMC、Intel 晶圓設備產能，均屬供應鏈內部議價與競速性質，本週未觀察到新一輪政府層級出口管制或關稅升級動作，短期碎裂壓力未再加劇。對策：AI 晶片與先進製程需求基本面仍強，惟成本轉嫁、消費性電子降溫與設備產能瓶頸風險同步升高，宜將通膨／材料成本波動與次世代量產排程延宕風險列入優先避險項目。【趨勢 W3→W4：技術研發與企業競爭維度微升，反映 AI 資本支出競賽延續；政策營運維度走弱，反映通膨與成本轉嫁疑慮；全球供應鏈維度微升，反映供應鏈內部重組動能；制度規範維度持平】",
+    "xy": {
+      "x": -0.36,
+      "y": 0.38
+    },
+    "w": [
+      50,
+      56,
+      66,
+      74,
+      76,
+      64,
+      64,
+      64,
+      50,
+      68,
+      60,
+      65,
+      53,
+      52,
+      60,
+      47,
+      76,
+      60,
+      72,
+      52,
+      50,
+      66,
+      42,
+      64,
+      54
+    ],
+    "events": [
+      {
+        "title": "TSMC 對 7 奈米以下先進製程全面調漲晶圓報價 5%–10%",
+        "source": "TradingKey",
+        "date": "2026-07-01",
+        "url": "https://www.tradingkey.com/news/market-movers/262004408-market-movers-tsm-20260701",
+        "summary": "TSMC 股價 7/1 因獲利了結與技術性整理下跌 3.51%；報導指出公司已對先進製程（7nm 以下，占晶圓營收 74%）全面調漲報價，加上 2026 年資本支出上看 520–560 億美元擴充 3nm／2nm 產能，反映先進產能持續吃緊與成本轉嫁壓力，惟 AI 需求基本面未變、法人續看多。",
+        "xImpact": "→",
+        "yImpact": "↓"
+      },
+      {
+        "title": "Apple 因記憶體短缺調漲 MacBook／iPad／Apple TV 售價 17%–54%",
+        "source": "TradingKey",
+        "date": "2026-06-25",
+        "url": "https://www.tradingkey.com/analysis/stocks/us-stocks/262010568-apple-raises-product-price-due-memory-shortage-affect-financial-statements-iphone-tradingkey",
+        "summary": "Apple 6/25 宣布近年最大規模調價：MacBook Air 512GB 由 1,099 美元漲至 1,299 美元、iPad Air 599→749 美元、Apple TV 129→199 美元（漲幅最高達 54%）。官方聲明指出 AI 資料中心對記憶體與儲存需求暴增，「從未見過零組件價格漲得如此快、如此多」，屬明確匱乏／通膨訊號，公告後股價單日重挫逾 6%。",
+        "xImpact": "→",
+        "yImpact": "↓"
+      },
+      {
+        "title": "三星、SK 海力士向基板供應商施壓 2026 下半年降價",
+        "source": "DIGITIMES",
+        "date": "2026-07-04",
+        "url": "https://www.digitimes.com/news/a20260703PD232/samsung-sk-hynix-substrate-2026-copper.html",
+        "summary": "報導指出，即便記憶體需求仍處超級循環（Super Cycle），三星與 SK 海力士仍向南韓半導體基板供應商施壓，要求 2026 下半年降價；原物料成本居高不下，基板廠警告獲利將遭侵蝕，供應鏈內部議價與利潤分配壓力升溫。",
+        "xImpact": "↑",
+        "yImpact": "→"
+      },
+      {
+        "title": "三星、SK 海力士約 8,000 億韓元擴產排擠晶圓設備產能，牽動 TSMC、Intel",
+        "source": "TrendForce",
+        "date": "2026-06-30",
+        "url": "https://www.trendforce.com/news/2026/06/30/news-samsung-sk-hynix-800-trillion-won-expansion-strains-chipmaking-tool-supply-potentially-pressures-tsmc-and-intel/",
+        "summary": "三星與 SK 海力士合計投入約 8,000 億韓元於韓國西南部新建四座晶圓廠，另投入 81 兆韓元建置封裝樞紐；設備供應商警告 EUV、蝕刻、光罩、CMP、沉積等關鍵設備產能將趨於緊張，可能排擠 TSMC 與 Intel 先進製程擴產與 sub-2nm 排程。",
+        "xImpact": "↑",
+        "yImpact": "↑"
+      }
+    ],
+    "decisionTrace": [
+      {
+        "event": "TSMC 對 7 奈米以下先進製程全面調漲晶圓報價 5%–10%",
+        "keywords": [
+          "晶圓報價調漲",
+          "先進製程",
+          "資本支出",
+          "獲利了結",
+          "成本轉嫁"
+        ],
+        "xDelta": 0,
+        "yDelta": -0.02,
+        "kdfChanges": [
+          {
+            "id": 4,
+            "name": "次世代技術量產",
+            "from": 70,
+            "to": 72,
+            "reason": "資本支出上看 520–560 億美元擴充 3nm／2nm 產能，次世代量產競賽延續"
+          },
+          {
+            "id": 12,
+            "name": "市場競爭力",
+            "from": 62,
+            "to": 65,
+            "reason": "先進製程占晶圓營收 74%，調漲報價顯示對客戶議價力／定價權提升"
+          },
+          {
+            "id": 13,
+            "name": "市場穩定成長",
+            "from": 58,
+            "to": 56,
+            "reason": "4–5 月營收成長 24% 略低於市場預期 35%，投資人轉趨謹慎，成長穩定性受質疑"
+          },
+          {
+            "id": 16,
+            "name": "經濟情勢",
+            "from": 52,
+            "to": 50,
+            "reason": "先進製程報價全面調漲，成本轉嫁壓力對整體晶片供應鏈形成通膨疑慮"
+          }
+        ]
+      },
+      {
+        "event": "Apple 因記憶體短缺調漲產品售價 17%–54%",
+        "keywords": [
+          "記憶體短缺",
+          "DRAM",
+          "消費性電子調價",
+          "通膨",
+          "AI排擠效應"
+        ],
+        "xDelta": 0,
+        "yDelta": -0.03,
+        "kdfChanges": [
+          {
+            "id": 16,
+            "name": "經濟情勢",
+            "from": 50,
+            "to": 47,
+            "reason": "終端品牌因記憶體短缺大幅調漲售價 17%–54%，通膨與匱乏訊號更趨明確"
+          },
+          {
+            "id": 13,
+            "name": "市場穩定成長",
+            "from": 56,
+            "to": 53,
+            "reason": "終端產品大幅漲價恐抑制消費性電子出貨量，成長動能面臨下行風險"
+          },
+          {
+            "id": 5,
+            "name": "掌握主流及替代產品（AI晶片）",
+            "from": 74,
+            "to": 76,
+            "reason": "AI 資料中心持續排擠記憶體產能，再度印證 AI 相關產品需求主導地位"
+          }
+        ]
+      },
+      {
+        "event": "三星、SK 海力士向基板供應商施壓降價",
+        "keywords": [
+          "基板",
+          "降價施壓",
+          "超級循環",
+          "供應鏈議價",
+          "利潤壓力"
+        ],
+        "xDelta": 0.01,
+        "yDelta": 0,
+        "kdfChanges": [
+          {
+            "id": 8,
+            "name": "垂直整合能力",
+            "from": 62,
+            "to": 64,
+            "reason": "記憶體大廠運用規模優勢向上游基板供應商施壓降價，垂直議價力提升"
+          },
+          {
+            "id": 17,
+            "name": "全球供應鏈重組",
+            "from": 74,
+            "to": 76,
+            "reason": "供應鏈內部利潤重新分配，屬供應鏈重組動能之一環"
+          },
+          {
+            "id": 11,
+            "name": "新興競爭者形成",
+            "from": 58,
+            "to": 60,
+            "reason": "基板供應商獲利遭侵蝕，可能加速中小型供應商整併或退出，競爭版圖生變"
+          }
+        ]
+      },
+      {
+        "event": "三星、SK 海力士擴產排擠晶圓設備產能",
+        "keywords": [
+          "800兆韓元",
+          "設備產能吃緊",
+          "EUV",
+          "TSMC",
+          "Intel"
+        ],
+        "xDelta": 0.01,
+        "yDelta": 0.01,
+        "kdfChanges": [
+          {
+            "id": 4,
+            "name": "次世代技術量產",
+            "from": 72,
+            "to": 74,
+            "reason": "三星、SK 海力士鉅額擴產計畫加劇次世代量產競賽"
+          },
+          {
+            "id": 10,
+            "name": "領導公司策略",
+            "from": 66,
+            "to": 68,
+            "reason": "8,000 億韓元擴產與封裝樞紐布局，反映龍頭廠商積極卡位策略"
+          },
+          {
+            "id": 6,
+            "name": "先進技術研發",
+            "from": 66,
+            "to": 64,
+            "reason": "EUV、蝕刻等關鍵設備產能吃緊，可能延緩 TSMC、Intel 先進研發排程"
+          },
+          {
+            "id": 20,
+            "name": "穩定供水與供電",
+            "from": 54,
+            "to": 52,
+            "reason": "新建四座晶圓廠對區域水電資源分配形成額外壓力"
+          }
+        ]
+      }
+    ]
+  }
+]
