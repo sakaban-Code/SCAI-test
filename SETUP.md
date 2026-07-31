@@ -29,11 +29,11 @@ tokens，直接對應決賽「Token 使用量說明」20% 評分項。
    新增 `ANTHROPIC_API_KEY`、`GEMINI_API_KEY`、`TAVILY_API_KEY`。
 
 4. **儀表板與歷史資料已內建**：`dashboard/SCAI-Agent_週報儀表板.html` 與
-   `data/weeks.json` 已回填 Cowork 人工判定之 W1–W4（含 decisionTrace），
-   管線將自動從 **W5** 接續編號。定義正本＝`data/kdf_config.json`
-   （憲法 v2.0／提案書 1–25 編號），欄位契約見 `data/week_schema.json`。
-   W1–W4 無 `confidence`/`crossCheck` 欄位（當時無雙模型交叉驗證），儀表板會
-   顯示「Cowork 人工判定」；W5 起自動帶入。
+   `data/weeks.json` 已回填 Cowork 人工判定之 W1–W6（含 decisionTrace；
+   W3/W5/W6 另含 riskRadar／selfAudit），管線將自動從 **W7** 接續編號。
+   定義正本＝`data/kdf_config.json`（憲法 v2.0／提案書 1–25 編號），
+   欄位契約見 `data/week_schema.json`。W1–W6 無 `confidence`/`crossCheck`
+   欄位（當時無雙模型交叉驗證），儀表板會顯示「Cowork 人工判定」；W7 起自動帶入。
 
 5. **手動跑第一次**：repo → Actions → SCAI-Agent Weekly Pipeline →
    Run workflow。確認 commit 產出後，之後每週一自動執行。
