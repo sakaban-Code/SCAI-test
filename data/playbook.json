@@ -1,0 +1,136 @@
+{
+  "_comment": "SCAI-Agent 觸發式劇本（Contingency Playbook）。每週由 plan_engine.py 比對本週 X/Y 座標、KDF 權重與事件關鍵字，判定哪些劇本被觸發，輸出欣銓專屬規畫。",
+  "_integrity": "所有觸發判定與建議動作均為【推斷】，非投資建議；數量級（如庫存月數、capex 比例）為建議區間，實際值須由公司依內部財務與產能資料決定。",
+  "version": "v1.0",
+  "updated": "2026-08-01",
+  "horizons": {
+    "H1Q": "H+1 季｜立即行動（庫存、產能切換）",
+    "H6M": "H+6 月｜風險雷達對應",
+    "H1_3Y": "H+1~3 年｜capex、技術、據點",
+    "H2036": "→2036｜中長期情境路徑"
+  },
+  "playbooks": [
+    {
+      "id": "PB-01",
+      "title": "地緣滑向 Inferno：關鍵測試耗材斷供防禦",
+      "trigger": { "logic": "AND", "conditions": [
+        { "type": "axis", "axis": "x", "op": "<=", "value": -0.40 },
+        { "type": "kdf", "id": 7, "op": ">=", "value": 62 },
+        { "type": "keyword", "any": ["稀土", "鎢", "鎵", "鍺", "出口管制", "列管", "禁令", "斷供"] }
+      ]},
+      "_threshold_note": "v1.1 調整：原門檻 X≤−0.55 過嚴，W6（X=−0.45）稀土禁令升級卻未觸發，形成『該預警未預警』漏接。改以材料 KDF#7 為主要條件，更貼近實質斷供風險。",
+      "horizon": "H1Q",
+      "lever": "inventory",
+      "action": "啟動鎢靶材、CMP 漿料等關鍵測試耗材之安全庫存拉高至 6 個月；同步啟動非中國來源供應商認證。",
+      "kdf": [7, 19],
+      "success_metric": "關鍵耗材備援涵蓋率達 6 個月、且至少 2 家非中國來源完成認證",
+      "stop_loss": "若管制於次季解除且現貨價回落逾 15%，回歸常態庫存水位以釋放營運資金",
+      "cost_note": "須評估額外營運資金占用；金額由公司依實際耗用量估算"
+    },
+    {
+      "id": "PB-02",
+      "title": "AI 週期反轉：測試產能彈性切換",
+      "trigger": { "logic": "AND", "conditions": [
+        { "type": "axis", "axis": "y", "op": "<=", "value": 0.20 },
+        { "type": "kdf", "id": 13, "op": "<=", "value": 55 }
+      ]},
+      "horizon": "H1Q",
+      "lever": "capacity",
+      "action": "將 AI／ASIC 測試產能之一定比例，於 48 小時內可切換至車用、工控、網通測試；預先完成機台程式與治具的跨產品驗證。",
+      "kdf": [13, 5, 15],
+      "success_metric": "具備 48 小時內可切換之產能比例達 15%；非 AI 終端營收占比不低於既定下限",
+      "stop_loss": "若 AI 需求兩季內回升且稼動率回到 75% 以上，回復原產能配置",
+      "cost_note": "切換準備成本主要為工程工時與治具驗證"
+    },
+    {
+      "id": "PB-03",
+      "title": "AI 資本支出泡沫確認：capex 節奏調整",
+      "trigger": { "logic": "AND", "conditions": [
+        { "type": "axis", "axis": "y", "op": "<=", "value": 0.0 },
+        { "type": "keyword", "any": ["capex 下修", "資本支出下修", "泡沫", "訂單遞延", "產能過剩"] }
+      ]},
+      "horizon": "H1_3Y",
+      "lever": "capex",
+      "action": "龍潭廠增建節奏由『每年三層無塵室』改為依訂單能見度分階段釋出（實質選擇權），優先保留可逆的機台租賃／緩交選項。",
+      "kdf": [16, 4],
+      "success_metric": "維持負債比不高於現行水準；已簽約機台具備緩交條款",
+      "stop_loss": "若訂單能見度回到 2 季以上，恢復原增建節奏",
+      "cost_note": "緩交／租賃可能墊高單位成本，換取下檔保護"
+    },
+    {
+      "id": "PB-04",
+      "title": "先進封裝測試轉軌：技術能力卡位",
+      "trigger": { "logic": "OR", "conditions": [
+        { "type": "kdf", "id": 4, "op": ">=", "value": 70 },
+        { "type": "keyword", "any": ["HBM", "CoWoS", "chiplet", "SLT", "系統級測試", "先進封裝"] }
+      ]},
+      "horizon": "H1_3Y",
+      "lever": "tech",
+      "action": "優先投資系統級測試（SLT）、堆疊／KGD 測試與矽光子測試能力，並與策略 Foundry 客戶共同定義測試規格以卡位規格制定。",
+      "kdf": [4, 5, 7],
+      "success_metric": "取得至少一項先進封裝測試之量產導入專案",
+      "stop_loss": "若兩季內無客戶導入承諾，改以合作／委外方式降低沉沒成本",
+      "cost_note": "屬高投入、高回報之技術賭注，宜採階段性投入"
+    },
+    {
+      "id": "PB-05",
+      "title": "客戶在地化外溢：海外測試據點評估",
+      "trigger": { "logic": "AND", "conditions": [
+        { "type": "kdf", "id": 17, "op": ">=", "value": 72 },
+        { "type": "keyword", "any": ["在地化", "亞利桑那", "美國設廠", "境外測試", "回流"] }
+      ]},
+      "horizon": "H1_3Y",
+      "lever": "site",
+      "action": "啟動海外測試據點可行性評估（自建 vs 與美／日封測廠結盟），優先鎖定關鍵客戶已宣示之在地化聚落。",
+      "kdf": [17, 22, 24],
+      "success_metric": "完成可行性報告並取得至少一家關鍵客戶之意向確認",
+      "stop_loss": "若客戶未提出境外測試要求且成本差距逾可承受範圍，暫緩並改以結盟備案",
+      "cost_note": "海外據點資本與人力成本顯著高於台灣，須客戶承諾支撐"
+    },
+    {
+      "id": "PB-06",
+      "title": "管制波及中系客戶：客戶結構分散",
+      "trigger": { "logic": "AND", "conditions": [
+        { "type": "kdf", "id": 19, "op": ">=", "value": 70 },
+        { "type": "keyword", "any": ["實體清單", "中系", "華為", "禁止代工", "合規限制"] }
+      ]},
+      "horizon": "H6M",
+      "lever": "customer",
+      "action": "盤點中系設計公司訂單占比與合規暴險，預先規劃替代客戶承接產能；同步強化出口管制合規審查流程。",
+      "kdf": [19, 22, 2],
+      "success_metric": "完成客戶合規分級；單一受管制客群占比控制在可承受上限內",
+      "stop_loss": "若管制範圍明確不及於測試服務，回復常態接單",
+      "cost_note": "須法務與合規資源投入；涉法規解釋應由法務確認"
+    },
+    {
+      "id": "PB-07",
+      "title": "能源與水電風險：營運持續計畫",
+      "trigger": { "logic": "OR", "conditions": [
+        { "type": "kdf", "id": 20, "op": "<=", "value": 45 },
+        { "type": "keyword", "any": ["限電", "缺水", "電價調漲", "能源危機", "停電"] }
+      ]},
+      "horizon": "H6M",
+      "lever": "capacity",
+      "action": "檢視龍潭與新竹廠之供電備援與用水回收方案；高耗能測試站排程避開尖峰電價時段。",
+      "kdf": [20, 25],
+      "success_metric": "關鍵測試站具備備援供電；單位產出耗能較基準年下降",
+      "stop_loss": "—（韌性投資具長期效益，不設回撤）",
+      "cost_note": "與 ESG 目標一致，可合併評估"
+    },
+    {
+      "id": "PB-08",
+      "title": "情境轉為 Spring：擴張窗口",
+      "trigger": { "logic": "AND", "conditions": [
+        { "type": "axis", "axis": "x", "op": ">=", "value": 0.0 },
+        { "type": "axis", "axis": "y", "op": ">=", "value": 0.30 }
+      ]},
+      "horizon": "H1_3Y",
+      "lever": "capex",
+      "action": "地緣與資源同時轉佳為稀有擴張窗口：加速龍潭增建、擴大高階測試機台採購與工程人才招募。",
+      "kdf": [4, 13, 21],
+      "success_metric": "產能擴充如期達標且稼動率維持 80% 以上",
+      "stop_loss": "若 X 軸回落至 −0.2 以下，暫停未簽約之擴充",
+      "cost_note": "擴張期須留意負債比上限"
+    }
+  ]
+}

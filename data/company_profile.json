@@ -1,0 +1,107 @@
+{
+  "_comment": "SCAI-Agent 企業畫像（Company Profile）。用途：將產業級情境判定，轉譯為欣銓專屬的公司規畫。對應提案書 Step 5『策略建議生成』之強化層。",
+  "_integrity": "【重要】本檔僅採用『公開可追溯資料』（法說會、月營收公告、公開報導）。凡標記 needsConfirm=true 之欄位為【推斷】或未公開，須經欣銓確認後方可作為決策依據，嚴禁以估計值冒充內部數據（憲法 P1）。",
+  "version": "v1.0",
+  "updated": "2026-08-01",
+  "company": {
+    "name": "欣銓科技",
+    "ticker": "3264.TWO",
+    "industry": "半導體專業測試服務（中游 OSAT／獨立測試廠）",
+    "positioning": "台灣第三方專業 IC 測試廠，涵蓋晶圓測試（CP）、成品測試（FT）、工程與特性分析測試；非晶圓代工、非封裝為主",
+    "peers": ["京元電子", "矽格", "日月光（測試部門）", "Amkor（測試部門）"],
+    "moat": "工程測試與特性分析黏著度高、客戶轉換成本高；多元終端應用分散單一市場風險"
+  },
+  "baseline": {
+    "_note": "以最新公開財報／法說會為準",
+    "revenue_q2_2026": {
+      "value_ntd": 4530000000,
+      "qoq": "+13.8%",
+      "yoy": "+32.4%",
+      "note": "2026Q2 營收 45.3 億元，創單季新高",
+      "source": "2026-07-24 法說會",
+      "needsConfirm": false
+    },
+    "gross_margin_q2_2026": {
+      "value": "40.2%",
+      "qoq": "+1.8pp",
+      "yoy": "+3.9pp",
+      "source": "2026-07-24 法說會",
+      "needsConfirm": false
+    },
+    "revenue_2026_forecast": {
+      "value_ntd": 17700000000,
+      "note": "外部研究預估全年上看 177 億元；管理層指引為雙位數成長",
+      "source": "CMoney 研究報導／法說會指引",
+      "needsConfirm": true
+    },
+    "capex_1h_2026": {
+      "value_ntd": 7000000000,
+      "note": "上半年資本支出約 70 億元，主投龍潭廠高階測試設備；負債比升至約 53%",
+      "source": "法說會",
+      "needsConfirm": true
+    },
+    "utilization": {
+      "value": ">70%",
+      "note": "2026-05 法說會揭露整體稼動率逾七成；龍潭廠 7 月正式量產",
+      "source": "2026-05-04 法說會",
+      "needsConfirm": true
+    },
+    "revenue_mix": {
+      "_note": "公開資訊僅揭露成長動能來源，未見精確占比；占比數字須向公司確認",
+      "drivers": ["AI／ASIC 測試", "車用 IC", "通訊／網通", "工控／安控", "高階晶圓測試"],
+      "ai_asic_share": { "value": "【待公司確認】", "needsConfirm": true },
+      "automotive_share": { "value": "【待公司確認】", "needsConfirm": true },
+      "consumer_share": { "value": "【待公司確認】", "needsConfirm": true },
+      "source": "月營收新聞稿與法說會定性描述",
+      "needsConfirm": true
+    },
+    "customer_concentration": {
+      "value": "【待公司確認】",
+      "note": "法說會提及『策略 Foundry 客戶』ASIC 測試需求，但未公開前十大客戶占比",
+      "needsConfirm": true
+    },
+    "sites": {
+      "value": ["新竹（主要廠區）", "龍潭廠（高階 ASIC 測試，2026/07 量產）"],
+      "overseas": "【待公司確認】",
+      "note": "海外測試據點布局為地緣風險關鍵變數，須確認",
+      "needsConfirm": true
+    }
+  },
+  "strategic_assets": [
+    { "item": "龍潭廠高階 ASIC 測試產能", "status": "2026/07 量產，未來兩年每年增建三層無塵室", "kdf": 4, "source": "2026-07-24 法說會" },
+    { "item": "AI 與矽光子測試布局", "status": "重兵布局中", "kdf": 5, "source": "2026-07-24 法說會" },
+    { "item": "工程測試與特性分析能力", "status": "既有優勢、客戶黏著度高", "kdf": 12, "needsConfirm": true },
+    { "item": "多元終端應用（車用／網通／工控）", "status": "分散 AI 單一依賴", "kdf": 15, "source": "月營收新聞稿" }
+  ],
+  "vulnerabilities": [
+    { "item": "capex 高檔與負債比上升（約 53%）", "exposure": "若需求反轉，折舊與利息壓力放大", "kdf": 16, "needsConfirm": true },
+    { "item": "AI／ASIC 需求集中度上升", "exposure": "AI 資本支出週期反轉將直接衝擊稼動率", "kdf": 13, "needsConfirm": true },
+    { "item": "測試耗材與關鍵材料（鎢靶材、CMP 漿料、稀土相關）依賴進口", "exposure": "中國出口管制擴大恐斷供", "kdf": 7, "needsConfirm": true },
+    { "item": "據點集中台灣", "exposure": "跨海峽地緣風險、客戶在地化要求（如 TSMC–Amkor 亞利桑那模式）", "kdf": 17, "needsConfirm": true },
+    { "item": "先進封裝測試技術轉軌（HBM 堆疊、KGD、SLT、chiplet）", "exposure": "落後則錯失 AI 測試主成長", "kdf": 4, "needsConfirm": true }
+  ],
+  "decision_levers": [
+    { "id": "capacity", "name": "產能配置", "desc": "AI／ASIC 與車用、工控、網通之間的測試產能切換", "speed": "週～月", "owner": "營運" },
+    { "id": "capex", "name": "資本支出時點與規模", "desc": "龍潭廠增建節奏、機台採購時點", "speed": "季～年", "owner": "財務／營運" },
+    { "id": "customer", "name": "客戶組合", "desc": "策略 Foundry 客戶 vs 分散型客戶結構", "speed": "季～年", "owner": "業務" },
+    { "id": "tech", "name": "技術投資", "desc": "SLT／堆疊測試／矽光子／chiplet 測試能力", "speed": "季～年", "owner": "研發／工程" },
+    { "id": "inventory", "name": "關鍵耗材庫存策略", "desc": "鎢靶材、CMP 漿料等安全庫存月數與供應來源分散", "speed": "週～季", "owner": "採購" },
+    { "id": "site", "name": "據點布局", "desc": "海外測試據點或與海外封測廠結盟", "speed": "年～多年", "owner": "策略／董事會" },
+    { "id": "talent", "name": "人才與工程能量", "desc": "高階測試工程師招募與留任", "speed": "季～年", "owner": "人資／工程" }
+  ],
+  "scenario_stance": {
+    "_note": "四情境下欣銓的預設戰略姿態【推斷】，作為規畫引擎的基準",
+    "Spring": "積極擴張：加速龍潭增建、擴大 AI／ASIC 產能與人才招募",
+    "Crossroads": "選邊與韌性並行：守住 AI 測試布局，同時分散耗材來源與客戶結構、評估海外據點",
+    "Adaptation": "效率優先：放緩非核心 capex、提升稼動率與節能製程、鞏固既有客戶",
+    "Inferno": "保衛與避險：啟動關鍵材料緩衝庫存、暫緩擴產、產能轉向非受管制終端市場"
+  },
+  "confirm_checklist": [
+    "營收組合各終端占比（AI/ASIC、車用、網通、工控、消費）",
+    "前十大客戶集中度與策略 Foundry 客戶占比",
+    "2026 全年 capex 實際金額與 2027 規劃",
+    "關鍵測試耗材（鎢靶材、CMP 漿料）現行安全庫存月數與供應來源國別",
+    "海外據點或結盟之現況與規劃",
+    "SLT／堆疊測試／chiplet 測試能力之現有機台與導入時程"
+  ]
+}

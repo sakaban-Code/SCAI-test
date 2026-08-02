@@ -38,8 +38,10 @@ tokens，直接對應決賽「Token 使用量說明」20% 評分項。
 5. **手動跑第一次**：repo → Actions → SCAI-Agent Weekly Pipeline →
    Run workflow。確認 commit 產出後，之後每週一自動執行。
 
-6. **（選配）GitHub Pages**：Settings → Pages → 指到 `dashboard/`，
-   取得公開網址，決賽簡報直接放連結。
+6. **（選配）GitHub Pages**：Settings → Pages → Deploy from a branch →
+   `main` ＋ **`/docs`**（GitHub 僅提供 `/` 或 `/docs` 兩種選項）。
+   公開網站 `docs/index.html` 由 `src/build_site.py` 產出，管線每週自動重建；
+   公開網址格式 `https://<帳號>.github.io/<repo>/`，決賽簡報直接放連結。
 
 ## 決賽 Demo 建議
 

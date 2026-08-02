@@ -10,6 +10,7 @@ Step E  更新儀表板 WEEKS（append-only）＋ 產出 report.md
 import json, os, re, datetime, pathlib
 import anthropic
 from google import genai
+import plan_engine  # 公司規畫層（提案書 Step 5）：情境 × 企業畫像 → 觸發式劇本
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
@@ -76,7 +77,8 @@ def reason_scenario(client, events: dict, prev_week: dict | None) -> dict:
     system = ("你是 SCAI-Agent 首席情境分析師。依四象限情境框架與 25 項 KDF 動態權重進行本週判定。"
               f"{AXES_DEF}。{SCENARIOS_DEF}。權重 0–100，中性=50。"
               "所有判斷屬【推斷】，只回傳 JSON。KDF 順序嚴格依給定清單（提案書 1–25 編號正本），嚴禁增刪改序。"
-              "每則事件必須留下 decisionTrace（Observability 憲法要求，省略即違規）。")
+              "每則事件必須留下 decisionTrace（Observability 憲法要求，省略即違規）；"
+              "另須輸出 H+6 風險雷達（憲法 LAYER 10-2：未來六個月 3–5 項，以欣銓／測試廠視角）。")
     user = f"""本週事件：
 {json.dumps(events, ensure_ascii=False)}
 
@@ -96,6 +98,7 @@ KDF 固定順序清單（id 1–25）：
  "top_movers":[{{"kdf":"...","delta":"+N或-N","reason":"..."}}],
  "decisionTrace":[{{"event":"事件標題","keywords":["關鍵字"],"xDelta":0.0,"yDelta":0.0,
    "kdfChanges":[{{"id":1,"name":"KDF名稱","from":50,"to":55,"reason":"..."}}]}}],
+ "riskRadar":[{{"risk":"風險描述（3–5 項）","signal":"觸發/領先訊號","kdf":7,"mitigation":"規避動作"}}],
  "reasoning":"120字內推理鏈摘要"}}"""
     return call_claude(client, OPUS, "B_情境推理(Opus)", system, user, 6000)
 
@@ -148,7 +151,7 @@ def append_dashboard(week_obj: dict):
             print("[warn] 儀表板中找不到 WEEKS 陣列，僅更新 weeks.json")
 
 # ---------------------------------------------------------------- Step E-2
-def write_report(wd: pathlib.Path, events, opus, verdict, rng):
+def write_report(wd: pathlib.Path, events, opus, verdict, rng, week_obj=None):
     week = opus["week"]
     dims = {   # 五大維度對 KDF 索引（0-based；憲法 v2.0：5/7/4/6/3）
         "技術與研發能力": [3, 4, 5, 6, 13],
@@ -163,6 +166,16 @@ def write_report(wd: pathlib.Path, events, opus, verdict, rng):
         for e in events["events"])
     movers = "\n".join(f"- {m['kdf']}：{m['delta']}（{m['reason']}）" for m in opus.get("top_movers", []))
     flag_line = f"\n> ⚠️ {verdict['flag']}\n" if verdict["flag"] else ""
+    risks_md = "\n".join(
+        f"| {r.get('risk','')} | {r.get('signal','')} | #{r.get('kdf','—')} | {r.get('mitigation','')} |"
+        for r in opus.get("riskRadar", [])) or "| 本週無風險雷達資料 | | | |"
+    plan = (week_obj or {}).get("companyPlan")
+    if plan:
+        fired_md = "\n".join(f"- **[{f['id']}] {f['title']}**：{f['action']}（停損：{f['stop_loss']}）"
+                             for f in plan["firedPlaybooks"]) or "本週各劇本觸發門檻均未達成。"
+        plan_md = f"情境姿態：{plan['scenarioStance']}\n\n{fired_md}"
+    else:
+        plan_md = "（無公司規畫資料）"
     report = f"""# SCAI-Agent 週報 {week}（{rng}）
 
 ## 一、執行摘要
@@ -188,8 +201,16 @@ def write_report(wd: pathlib.Path, events, opus, verdict, rng):
 ## 六、不確定項目
 {verdict['flag'] or '本週雙模型判定一致，無額外查證項目。'}
 
+## 七、H+6 風險雷達（欣銓／測試廠視角）【推斷】
+| 風險 | 領先訊號 | KDF | 規避動作 |
+|---|---|---|---|
+{risks_md}
+
+## 八、對欣銓的公司規畫（觸發式劇本）【推斷】
+{plan_md}
+
 ---
-*聲明：X/Y 座標與 25 項 KDF 權重皆為分析性判斷【推斷】，非企業官方數據，建議與半導體專家研判交叉驗證。*
+*聲明：X/Y 座標、25 項 KDF 權重、風險雷達與公司規畫皆為分析性判斷【推斷】，非企業官方數據亦非投資建議，建議與半導體專家研判交叉驗證。*
 """
     out_dir = ROOT / "reports"
     out_dir.mkdir(exist_ok=True)
@@ -217,7 +238,7 @@ if __name__ == "__main__":
     (wd / "cross_check.json").write_text(
         json.dumps({"gemini": gem, "verdict": verdict}, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    append_dashboard({
+    week_obj = {
         "week": opus["week"], "range": raw["range"],
         "gen": datetime.date.today().isoformat(),
         "scenario": opus["scenario"], "scenarioEn": opus.get("scenarioEn", ""),
@@ -232,9 +253,18 @@ if __name__ == "__main__":
         "reasoning": opus.get("reasoning", ""),
         "events": events["events"],                      # 完整事件（title/source/date/url/summary/xImpact/yImpact）
         "decisionTrace": opus.get("decisionTrace", []),  # Observability（憲法 LAYER 9，不可省略）
-    })
+        "riskRadar": opus.get("riskRadar", []),          # H+6 風險雷達（憲法 LAYER 10-2）
+    }
 
-    write_report(wd, events, opus, verdict, raw["range"])
+    # 公司規畫層（提案書 Step 5）：比對 X/Y、KDF、關鍵字 → 觸發式劇本 companyPlan
+    prof = json.loads((ROOT / "data" / "company_profile.json").read_text(encoding="utf-8"))
+    playbook = json.loads((ROOT / "data" / "playbook.json").read_text(encoding="utf-8"))
+    week_obj["companyPlan"] = plan_engine.build_plan(week_obj, prof, playbook)
+    print(f"[ok] 公司規畫：觸發 {len(week_obj['companyPlan']['firedPlaybooks'])} 條劇本")
+
+    append_dashboard(week_obj)
+
+    write_report(wd, events, opus, verdict, raw["range"], week_obj)
 
     (wd / "token_usage.json").write_text(
         json.dumps(token_log, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -37,11 +37,12 @@ jobs:
           python src/fetch.py
           python src/pipeline.py
           python src/make_charts.py
+          python src/build_site.py
 
       - name: Commit results (Observability 留痕)
         run: |
           git config user.name  "scai-agent-bot"
           git config user.email "bot@scai-agent"
-          git add data/ weekly/ charts/ reports/ dashboard/
+          git add data/ weekly/ charts/ reports/ dashboard/ docs/
           git diff --cached --quiet || git commit -m "chore(weekly): $(date -u +%F) 自動週報產出"
           git push
