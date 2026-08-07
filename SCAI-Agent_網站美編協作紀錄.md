@@ -201,3 +201,29 @@ git add -A; git commit -m "說明"; git push
 - Git commit：見本輪推送 commit（feat: 整合 GPT 圖像素材）。
 - Pages 線上確認：推送後 curl 驗證 assets 與 og meta（見下輪或本輪補記）。
 - 未完成與後續工作：`index_offline.html` 重製（待人類確認整體美編定案）；底紋強度如需增減（目前 .55 於近白圖上屬克制），一行 CSS 可調。
+
+---
+
+## 2026-08-08｜第 4 輪：內容與互動全面升級（S/A/B 十四項）
+
+- 人類需求：「我覺得網站還能再更新，但不知道有哪些」→ Claude 提出三檔選單 →「全做」。
+- 執行者：Claude Code（Fable 5）
+- 修改前狀態：第 3 輪素材整合完成；站上尚無交叉驗證徽章、token 稽核、風險命中追蹤、累積敘事、導覽與備援機制。
+- 修改檔案：`src/site_template.html`（同步 cowork 副本）、`src/pipeline.py`（週物件加 `tokenUsage`）、`docs/assets/chart.umd.min.js`（新增本地備援）、重建 `docs/index.html`。
+- 實作內容（S＝評分項、A＝展演、B＝小而美）：
+  - S1 雙模型交叉驗證徽章：hero 顯示「雙模型一致 ✓／✕｜信心 高/低」chip＋不一致警示條——**條件渲染，W7 資料到自動亮**；W1–W6 人工週不顯示。
+  - S2 Token 稽核：pipeline 週物件新增 `tokenUsage`（byStep＋total）；稽核區渲染逐模型 in/out 表——W7 起自動帶，之前顯示說明文字。
+  - S3 稽核連結：決策軌跡區底部新增「管線稽核」列（repo＋Actions 執行紀錄外連）。
+  - S4 風險命中追蹤 UI：riskRadar 項目支援選填 `status`（hit已應驗/resolved已化解/watching追蹤中）與 `followUp`——**資料由 Cowork 週報判定時補，本輪僅 UI**。
+  - A5 XY 軌跡逐週描繪動畫（per-point delay 160ms，`prefers-reduced-motion` 時停用）。
+  - A6 KDF 橫條 ghost 刻度：灰短線標上週權重位置＋tooltip 顯示「上週→本週」。
+  - A7 六週累積觀察卡：自動計算 W1→當週的雙軸位移、情境跨度、五維最大變動（純算術、無臆測文字）。
+  - A8 30 秒導覽條：header 下三步引導（判定→軌跡→規畫），非 sticky。
+  - A9 Chart.js 本地備援：CDN 失敗自動改載 `assets/chart.umd.min.js`（決賽斷網保險進正式站）。
+  - B：複製本週連結按鈕（clipboard＋fallback prompt）、列印/存 PDF 按鈕（手機隱藏）、事件來源數統計、風險雷達空狀態誠實文案（LAYER 10 導入時點）、五維趨勢 tooltip 顯示該週情境名。
+- 不採納（前輪已議定）：深色模式（Chart.js 色票需 JS 整套跟切、受眾場景價值低）、雷達圖（與五維趨勢線資訊重複）。
+- 遇到的錯誤與原因：無重大錯誤；瀏覽器面板截圖仍受限，驗證改走 DOM 實測。
+- 驗證：py_compile 通過；重建後 14 項功能標記到位（87KB）；本機實測——W1（空狀態文案 ✓、無累積卡 ✓、稽核區 W7 提示 ✓）、W6（三圖 0 失敗、累積卡文字「X 軸由 −0.35 移至 −0.45（碎裂加深 0.10）」正確、導覽條/複製鈕/來源統計/稽核連結 ✓）。
+- Git commit：見本輪推送 commit（feat: 網站內容與互動升級）。
+- Pages 線上確認：推送後背景驗證。
+- 未完成與後續工作：riskRadar 之 status/followUp 資料待 Cowork 每週判定補入；`index_offline.html` 重製仍待美編定案。

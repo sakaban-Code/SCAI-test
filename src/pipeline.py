@@ -254,6 +254,8 @@ if __name__ == "__main__":
         "events": events["events"],                      # 完整事件（title/source/date/url/summary/xImpact/yImpact）
         "decisionTrace": opus.get("decisionTrace", []),  # Observability（憲法 LAYER 9，不可省略）
         "riskRadar": opus.get("riskRadar", []),          # H+6 風險雷達（憲法 LAYER 10-2）
+        "tokenUsage": {"byStep": token_log,              # Token 治理（決賽 20% 評分項），公開站稽核區渲染
+                       "total": sum(v["input_tokens"] + v["output_tokens"] for v in token_log.values())},
     }
 
     # 公司規畫層（提案書 Step 5）：比對 X/Y、KDF、關鍵字 → 觸發式劇本 companyPlan

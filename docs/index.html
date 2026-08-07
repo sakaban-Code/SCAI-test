@@ -20,6 +20,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>window.Chart||document.write('<script src="assets/chart.umd.min.js"><\/script>')</script>
 <style>
 :root{
   --bg:#faf9f7; --surface:#fffefd; --ink:#211f1c; --ink2:#4a4741; --muted:#8b867d;
@@ -90,6 +91,23 @@ section{padding:40px 0 4px}
   padding:1px 7px;font-size:10.5px;font-weight:500;vertical-align:middle}
 .tbc{background:#fdf6ec;border:1px solid #f0dcc0;color:#8a6420;border-radius:5px;
   padding:1px 6px;font-size:10px;font-weight:500;white-space:nowrap}
+.chip.cc{border-color:#bfe0cd;color:var(--ok);background:#eef7f1}
+.chip.cc.lo{border-color:#f0cdc9;color:var(--err);background:#fdf1ef}
+.heroflag{background:#fdf6ec;border:1px solid #f0dcc0;color:#8a6420;border-radius:8px;
+  padding:7px 12px;font-size:12px;margin:0 0 14px;line-height:1.6}
+.guide{background:var(--dim);border-bottom:1px solid var(--line)}
+.guide .wrap{display:flex;gap:14px;align-items:center;padding-top:8px;padding-bottom:8px;
+  font-size:12px;color:var(--ink2);flex-wrap:wrap}
+.guide b{color:var(--ink);font-weight:600}
+.guide a{text-decoration:none;font-weight:500}
+.guide a:hover{text-decoration:underline}
+.audit{margin-top:16px;border-top:1px solid var(--line);padding-top:13px;font-size:12px;color:var(--muted);line-height:1.8}
+.audit table{width:auto;font-size:11.5px;margin-top:6px}
+.audit td,.audit th{padding:4px 14px 4px 0;border-bottom:1px solid var(--line)}
+.audit tr:last-child td{border-bottom:none}
+.trendsum{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px 18px;margin-bottom:16px;font-size:12.5px;color:var(--ink2);line-height:1.7;box-shadow:var(--shadow)}
+.trendsum b{color:var(--ink)}
 
 /* ── hero ── */
 .hero{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;padding-top:24px}
@@ -229,6 +247,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 }
 @media(max-width:560px){
   section{padding:30px 0 2px}
+  .onlydesk{display:none}
   .card{padding:17px 16px}
   .g2 .cbox{height:280px!important}
   td{padding:10px 8px 10px 0}
@@ -258,6 +277,8 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
         <button class="wbtn" id="wprev" aria-label="上一週">‹</button>
         <select id="wsel" aria-label="選擇週次"></select>
         <button class="wbtn" id="wnext" aria-label="下一週">›</button>
+        <button class="wbtn" id="wcopy" aria-label="複製本週連結" title="複製本週連結">⧉</button>
+        <button class="wbtn onlydesk" id="wprint" aria-label="列印或存成 PDF" title="列印／存 PDF">🖨</button>
       </div>
     </div>
   </div>
@@ -274,6 +295,13 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
     </div>
   </nav>
 </header>
+
+<div class="guide"><div class="wrap">
+  <b>30 秒看懂</b>
+  <span>① <a href="#overview">本週判定與行動</a></span>
+  <span>② <a href="#trace">為什麼（決策軌跡）</a></span>
+  <span>③ <a href="#plan">對欣銓的規畫</a></span>
+</div></div>
 
 <main class="wrap" id="main"></main>
 
@@ -308,6 +336,10 @@ sel.value=cur;
 sel.onchange=()=>go(+sel.value);
 $('#wprev').onclick=()=>go(cur-1);
 $('#wnext').onclick=()=>go(cur+1);
+$('#wcopy').onclick=async()=>{const u=location.origin+location.pathname+'#w'+DATA.weeks[cur].week;
+  try{await navigator.clipboard.writeText(u);$('#wcopy').textContent='✓';setTimeout(()=>$('#wcopy').textContent='⧉',1200)}
+  catch(e){prompt('複製此連結：',u)}};
+$('#wprint').onclick=()=>print();
 function go(i){
   if(i<0||i>=DATA.weeks.length)return;
   cur=i;sel.value=i;
@@ -325,6 +357,10 @@ function render(i){
   const dx=p?w.xy.x-p.xy.x:0, dy=p?w.xy.y-p.xy.y:0;
   const plan=w.companyPlan, fired=plan?plan.firedPlaybooks:[];
   const top3=DATA.kdf.map((k,j)=>({...k,v:w.w[j]})).sort((a,b)=>b.v-a.v).slice(0,3);
+  const w0=DATA.weeks[0];
+  const scenSpan=[...new Set(DATA.weeks.slice(0,i+1).map(x=>x.scenarioEn||x.scenario))];
+  const dimTop=p?DATA.dims.map(d=>({n:d.name,a:dimAvg(w0.w,d),b:dimAvg(w.w,d)}))
+    .map(x=>({...x,d:x.b-x.a})).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d))[0]:null;
 
   const acts=fired.slice(0,2).map(f=>`<div class="act y"><span class="i">✓</span><div><b>該做</b>${f.action.split('；')[0]}</div></div>`).join('')
     +(fired[0]?`<div class="act n"><span class="i">✕</span><div><b>停損</b>${fired[0].stop_loss}</div></div>`:'');
@@ -360,7 +396,8 @@ function render(i){
   $('#main').innerHTML=`
   <section class="hero" id="overview">
     <div class="card">
-      <div class="eyebrow">本週情境判定 <span class="chip">推斷</span><span class="chip num">資料區間 ${w.range}</span></div>
+      <div class="eyebrow">本週情境判定 <span class="chip">推斷</span><span class="chip num">資料區間 ${w.range}</span>${w.crossCheck?`<span class="chip cc${w.confidence==='低'?' lo':''}">雙模型${w.crossCheck.agreement?'一致 ✓':'不一致 ✕'}｜信心 ${w.confidence||'—'}</span>`:''}</div>
+      ${w.crossCheck&&w.crossCheck.flag?`<div class="heroflag">⚠️ ${w.crossCheck.flag}</div>`:''}
       <div class="scen"><span class="scen-en">${w.scenarioEn}</span><span class="scen-zh">${w.scenario}</span></div>
       <p class="verdict">${clean(w.scenarioDesc||'').replace(/^結論[：:]\s*/,'').split('。').slice(0,2).join('。')}。</p>
       <div class="axes">
@@ -407,16 +444,21 @@ function render(i){
     <div class="sh"><h2>H+6 風險雷達</h2><span class="sub">未來六個月 · 欣銓／測試廠視角</span><span class="chip">推斷</span></div>
     <div class="card" style="overflow-x:auto">
       <table><thead><tr><th style="width:30%">風險</th><th style="width:28%">領先訊號</th><th style="width:7%">KDF</th><th>規避動作</th></tr></thead><tbody>
-      ${(w.riskRadar||[]).map((r,j)=>`<tr>
-        <td class="risk-t"><span class="sev ${j<2?'h':'m'}"></span>${clean(r.risk)}</td>
-        <td>${clean(r.signal)}</td><td class="kt">#${r.kdf||'—'}</td><td>${clean(r.mitigation)}</td></tr>`).join('')
-        ||'<tr><td colspan="4" style="color:var(--muted)">本週無風險雷達資料</td></tr>'}
+      ${(w.riskRadar||[]).map((r,j)=>{
+        const st=r.status==='hit'?'<span class="tbc" style="background:#fdf1ef;border-color:#f0cdc9;color:#8a2f28">已應驗</span>'
+          :r.status==='resolved'?'<span class="tbc" style="background:#eef7f1;border-color:#bfe0cd;color:#1f5c40">已化解</span>'
+          :r.status==='watching'?'<span class="tbc">追蹤中</span>':'';
+        return `<tr>
+        <td class="risk-t"><span class="sev ${j<2?'h':'m'}"></span>${clean(r.risk)} ${st}${r.followUp?`<div style="color:var(--muted);font-weight:400;font-size:11.5px;margin-top:3px">後續：${clean(r.followUp)}</div>`:''}</td>
+        <td>${clean(r.signal)}</td><td class="kt">#${r.kdf||'—'}</td><td>${clean(r.mitigation)}</td></tr>`}).join('')
+        ||'<tr><td colspan="4" style="color:var(--muted)">本週無風險雷達紀錄——H+6 風險雷達為憲法 LAYER 10 機制（2026-07-10 導入），部分早期週次未回填。</td></tr>'}
       </tbody></table>
     </div>
   </section>
 
   <section id="trend">
     <div class="sh"><h2>情境軌跡與權重</h2><span class="sub">W1–W${w.week} 累積 · 只追加不覆寫</span></div>
+    ${p?`<div class="trendsum">累積觀察（W${w0.week}→W${w.week}）：X 軸由 <b class="num">${fmt(w0.xy.x)}</b> 移至 <b class="num">${fmt(w.xy.x)}</b>（${w.xy.x<w0.xy.x?'碎裂加深':'聚合改善'} ${Math.abs(w.xy.x-w0.xy.x).toFixed(2)}）；Y 軸由 <b class="num">${fmt(w0.xy.y)}</b> 至 <b class="num">${fmt(w.xy.y)}</b>。期間情境${scenSpan.length===1?`維持 ${scenSpan[0]}`:`歷經 ${scenSpan.join(' → ')}`}；五維中累積變動最大＝${dimTop.n}（<b class="num">${dimTop.a.toFixed(1)}→${dimTop.b.toFixed(1)}</b>）。</div>`:''}
     <div class="g2">
       <div class="card"><div class="cbox" style="height:330px"><canvas id="cx" role="img" aria-label="雙軸情境軌跡圖"></canvas></div>
         <div class="cap" id="capx"></div></div>
@@ -426,12 +468,12 @@ function render(i){
     <div class="card" style="margin-top:16px">
       <div class="chips" id="dimchips" role="group" aria-label="依維度篩選"></div>
       <div class="cbox" style="height:560px"><canvas id="ck" role="img" aria-label="25 項 KDF 權重圖"></canvas></div>
-      <div class="cap">25 項 KDF 本週權重，依五大維度著色；虛線＝中性基準 50。<b>滑鼠停留可看各 KDF 定義</b>（出自提案書）；點上方圓鈕可聚焦單一維度。</div>
+      <div class="cap">25 項 KDF 本週權重，依五大維度著色；虛線＝中性基準 50；灰短線＝上週權重位置。<b>滑鼠停留可看各 KDF 定義與週變化</b>（出自提案書）；點上方圓鈕可聚焦單一維度。</div>
     </div>
   </section>
 
   <section id="events">
-    <div class="sh"><h2>本週事件</h2><span class="sub">真實可追溯 · ${(w.events||[]).length} 則</span></div>
+    <div class="sh"><h2>本週事件</h2><span class="sub">真實可追溯 · ${(w.events||[]).length} 則 · ${[...new Set((w.events||[]).map(e=>e.source).filter(Boolean))].length} 個來源</span></div>
     <div class="evgrid">
       ${(w.events||[]).map(e=>`<div class="evc">
         <div class="t">${e.title}</div>
@@ -456,6 +498,7 @@ function render(i){
           ${t.kdfChanges.map(k=>`<div class="kdfc">#${k.id} ${k.name}　<b>${k.from}→${k.to}</b>　<span style="color:var(--muted)">${k.reason}</span></div>`).join('')}
           ${ev.url?`<div class="src">${ev.source||''} · ${ev.date||''} · <a href="${ev.url}" target="_blank" rel="noopener">原文 ↗</a></div>`:''}
         </div></details>`}).join('')}
+    <div class="audit">管線稽核：<a href="https://github.com/sakaban-Code/SCAI-test" target="_blank" rel="noopener">原始碼與資料 repo ↗</a> · <a href="https://github.com/sakaban-Code/SCAI-test/actions/workflows/weekly.yml" target="_blank" rel="noopener">每週自動執行紀錄 ↗</a>${w.tokenUsage?`　·　本週模型用量 <b class="num">${(w.tokenUsage.total||0).toLocaleString()}</b> tokens${w.tokenUsage.byStep?`<table><thead><tr><th>步驟</th><th>模型</th><th>in</th><th>out</th></tr></thead><tbody>${Object.entries(w.tokenUsage.byStep).map(([k,v])=>`<tr><td>${k}</td><td>${v.model||''}</td><td class="num">${(v.input_tokens||0).toLocaleString()}</td><td class="num">${(v.output_tokens||0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:''}`:'　·　自 W7 起由雲端管線自動產出，並於本區附逐模型 token 用量'}</div>
   </section>
 
   <section id="profile">
@@ -492,7 +535,7 @@ function render(i){
   if(typeof Chart==='undefined'){
     $$('.cbox').forEach(b=>b.innerHTML='<div class="nochart">圖表庫載入失敗（需網路連線）</div>');
   }else{
-    drawXY(i);drawTrend(i);drawKDF(w);buildChips(w);
+    drawXY(i);drawTrend(i);drawKDF(w,p);buildChips(w);
   }
   bindSpy();
 }
@@ -507,7 +550,9 @@ function drawXY(idx){
       pointRadius:pts.map((_,i)=>i===pts.length-1?7:4),
       pointBackgroundColor:pts.map((_,i)=>i===pts.length-1?'#a44a24':'#d8d3ca'),
       pointBorderColor:'#fff',pointBorderWidth:1.5}]},
-    options:{maintainAspectRatio:false,animation:{duration:400},
+    options:{maintainAspectRatio:false,
+      animation:matchMedia('(prefers-reduced-motion: reduce)').matches?false
+        :{duration:480,delay:c=>c.type==='data'&&c.mode==='default'?c.dataIndex*160:0},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw.l}（${c.raw.x}, ${c.raw.y}）`}}},
       scales:{x:{min:-1,max:1,grid:{color:'#ece8e1'},ticks:{color:'#8b867d',font:{size:10}},
           title:{display:true,text:'碎裂 ← X 地緣與供應鏈 → 聚合',color:'#8b867d',font:{size:11}}},
@@ -542,7 +587,8 @@ function drawTrend(idx){
         pointRadius:3,pointBackgroundColor:DC[j],pointBorderColor:'#fff',pointBorderWidth:1.5}))},
     options:{maintainAspectRatio:false,animation:{duration:400},
       plugins:{legend:{position:'bottom',labels:{boxWidth:8,boxHeight:8,usePointStyle:true,
-        pointStyle:'circle',font:{size:10.5},color:'#4a4741',padding:12}}},
+        pointStyle:'circle',font:{size:10.5},color:'#4a4741',padding:12}},
+        tooltip:{callbacks:{title:its=>{const wk=ws[its[0].dataIndex];return `W${wk.week}｜${wk.scenarioEn||wk.scenario||''}`}}}},
       scales:{y:{min:40,max:85,grid:{color:'#ece8e1'},ticks:{color:'#8b867d',font:{size:10}}},
         x:{grid:{display:false},ticks:{color:'#8b867d',font:{size:10.5}}}}}}));
 }
@@ -554,7 +600,7 @@ function kdfColors(w){
   });
 }
 function wrapText(s,n){const out=[];let t=s||'';while(t.length>n){out.push(t.slice(0,n));t=t.slice(n)}if(t)out.push(t);return out}
-function drawKDF(w){
+function drawKDF(w,p){
   kdfChart=new Chart($('#ck'),{type:'bar',
     data:{labels:DATA.kdf.map(k=>k.id+'. '+k.name),
       datasets:[{data:w.w,backgroundColor:kdfColors(w),borderRadius:3,barPercentage:.75}]},
@@ -563,13 +609,19 @@ function drawKDF(w){
         tooltip:{callbacks:{
           label:c=>`權重 ${c.raw}　${c.raw>=58?'▲ 升':c.raw<=42?'▼ 降':'▬ 平'}`,
           afterLabel:c=>{const id=DATA.kdf[c.dataIndex].id;
-            const def=DATA.kdfDefs[String(id)];return def?wrapText('定義：'+def,22):''}
+            const out=[];if(p)out.push(`上週 ${p.w[c.dataIndex]} → 本週 ${c.raw}`);
+            const def=DATA.kdfDefs[String(id)];if(def)out.push(...wrapText('定義：'+def,22));return out}
         }}},
       scales:{x:{min:0,max:100,grid:{color:'#ece8e1'},ticks:{color:'#8b867d',font:{size:10}}},
         y:{grid:{display:false},ticks:{color:'#4a4741',font:{size:10.5}}}}},
     plugins:[{id:'b',afterDatasetsDraw(ch){const x=ch.scales.x.getPixelForValue(50);
       ch.ctx.save();ch.ctx.strokeStyle='#a5a099';ch.ctx.setLineDash([4,3]);ch.ctx.beginPath();
-      ch.ctx.moveTo(x,ch.chartArea.top);ch.ctx.lineTo(x,ch.chartArea.bottom);ch.ctx.stroke();ch.ctx.restore();}}]});
+      ch.ctx.moveTo(x,ch.chartArea.top);ch.ctx.lineTo(x,ch.chartArea.bottom);ch.ctx.stroke();ch.ctx.restore();}},
+     {id:'ghost',afterDatasetsDraw(ch){if(!p)return;const m=ch.getDatasetMeta(0);ch.ctx.save();
+      ch.ctx.strokeStyle='#8b867d';ch.ctx.lineWidth=2;
+      m.data.forEach((bar,ix)=>{const gx=ch.scales.x.getPixelForValue(p.w[ix]);
+        ch.ctx.beginPath();ch.ctx.moveTo(gx,bar.y-bar.height/2+1);ch.ctx.lineTo(gx,bar.y+bar.height/2-1);ch.ctx.stroke();});
+      ch.ctx.restore();}}]});
   charts.push(kdfChart);
 }
 function buildChips(w){
