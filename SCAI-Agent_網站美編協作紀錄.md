@@ -153,3 +153,51 @@ git add -A; git commit -m "說明"; git push
 3. **（選配）頁首裝飾底紋**：極淡抽象幾何（雙軸／等高線意象），透明 PNG，透明度低到不干擾文字。
 
 風格硬規則：專業克制、不要吉祥物、不要卡通風、不含任何未公開數據。完成後把檔案交給人類轉交 Claude Code，或直接說明放置於 `docs/assets/` 的檔名，由 Claude Code 嵌入、重建、推送。若對版面有「大膽視覺方向」的提案，寫成文字／示意稿附在交付裡，由 Claude Code 評估落地（紅線 §3 之內都歡迎）。
+
+---
+
+## 2026-08-07｜第 2 輪：GPT 圖像素材交付
+
+- 人類需求：先讀 §0「給接手 AI 的話」與 §3「紅線」，確認本案為 GitHub Pages 靜態站且 GPT 只交圖、不改程式碼；依 §4 設計系統與 §8 委託，產出 logo 深淺兩版、1200×630 OG 分享圖及選配頁首底紋，並將本輪製作紀錄與素材一併打包。
+- 執行者：GPT（ChatGPT／OpenAI image generation）
+- 修改前狀態：第 1 輪版面、字體、間距與配色系統已上線；尚無正式品牌標誌、`og:image` 分享圖與頁首裝飾底紋。
+- 修改檔案：僅新增圖像素材 `scai-logo-light-bg.png`、`scai-logo-dark-bg.png`、`scai-og-1200x630.png`、`scai-header-pattern.png`，並在本協作主檔追加本節；**未修改任何 HTML、CSS、JavaScript、JSON、Python 管線或 `docs/index.html`**。
+- 實作內容：
+  1. **Logo 淺底版**：512×512 透明 PNG；以墨黑 `#211f1c` 為主、深陶土 `#a44a24` 為 accent，將雙軸交會、四象限與雷達訊號抽象為單一幾何符號。
+  2. **Logo 深底版**：512×512 透明 PNG；維持相同幾何語言，主體改用暖白 `#faf9f7`，保留深陶土訊號弧，供深色背景使用。
+  3. **OG 分享圖**：1200×630 PNG；暖白底、左側品牌符號、右側兩行文字「SCAI-Agent」與「半導體前瞻戰略情報」，使用墨黑與深陶土，未放入任何週報數值或未公開資料。
+  4. **頁首底紋**：1600×480 透明 PNG；以極淡雙軸、雷達弧線與等高線構成，視覺重量置於右側，中央與左側保留文字安全區。
+- 遇到的錯誤與原因：工具端無法直接開啟線上 GitHub Pages／GitHub repo（網址安全過濾或存取停用，非網站本身故障）；改以本主檔 §0、§3、§4、§8 的完整規格作為設計正本。原始透明素材先以單色鍵背景生成，需再執行去背與尺寸統一。
+- 修正方式：以色鍵去背流程產生 alpha 通道；Logo 統一輸出為 512×512、OG 精準輸出為 1200×630、底紋裁切為 1600×480；再分別疊於暖白與墨黑背景進行目視 QA。
+- 驗證：兩版 Logo 皆為透明 PNG（RGBA），四角透明且無明顯綠邊；OG 尺寸 1200×630、繁體中文副標正確且文字僅兩行；底紋為透明 PNG、在暖白背景上保持低對比；全套不含吉祥物、卡通元素、虛構數據、未公開數據或中國用語。
+- Git commit：尚未執行；依分工，本輪只交圖檔與方向，不操作 repo。
+- Pages 線上確認：尚未執行；待 Claude Code 嵌入素材、重建並推送後確認。
+- 未完成與後續工作：由 Claude Code 將素材放入 `docs/assets/`，在 `src/site_template.html` 嵌入 Logo／底紋並新增 OG meta，執行 `build_site.py` 重建 `docs/index.html`，同步 cowork 模板、完成桌機與手機驗證、推送 GitHub Pages，最後重製 `index_offline.html` 並在本主檔續寫整合結果與 commit。
+
+### 素材整合建議
+
+- `scai-logo-light-bg.png`：暖白或卡片背景使用。
+- `scai-logo-dark-bg.png`：墨黑或深色區塊使用。
+- `scai-og-1200x630.png`：設定為公開網址的 `og:image`，並確認 Pages 可由絕對 URL 讀取。
+- `scai-header-pattern.png`：建議置於頁首右側或外圍，以約 15–25% 視覺強度疊加；不可降低正文對比或遮住【推斷】等誠實標示。
+
+---
+
+## 2026-08-07｜第 3 輪：素材整合上線（Claude Code）
+
+- 人類需求：「GPT 的」（附素材 zip）——依分工由 Claude Code 嵌入、重建、推送。
+- 執行者：Claude Code（Fable 5）
+- 修改前狀態：第 2 輪素材已交付但未入站；favicon 為內嵌 SVG「SC」、header 為文字方塊 logo、無 og:image。
+- 修改檔案：`docs/assets/`（新增四張 PNG，檔名照 GPT 交付）、`src/site_template.html`（同步 `cowork/scripts/site_template.html`）、本主檔（接受 GPT 第 2 輪 append＋本節）、重建 `docs/index.html`。
+- 實作內容：
+  1. 素材驗收：兩版 logo 512×512 RGBA、OG 1200×630、底紋 1600×480 RGBA，規格與風格（無吉祥物、配色對齊 §4）全數合格；GPT 對主檔為純 append、未觸紅線。
+  2. favicon／apple-touch-icon 改用 `assets/scai-logo-light-bg.png`（取代內嵌 SVG）。
+  3. header 品牌區改為 `<img class="logo">`（34px，`object-fit:contain`）。
+  4. og meta：`og:url`＋`og:image`（絕對網址）＋尺寸＋`twitter:card=summary_large_image`。
+  5. 頁首底紋：`header::before` 右側疊加（`auto 230%` 裁切、`opacity:.55`、`pointer-events:none`），內容以 `header>*` 墊高層級；同步把 header 底色 rgba 校正為第 1 輪的 `#faf9f7` 基調。
+- 遇到的錯誤與原因：本機預覽面板無法截圖（面板未顯示、非網站問題）。
+- 修正方式：改以 DOM 實測驗證（JS 檢查素材載入與樣式生效）。
+- 驗證：logo `naturalWidth=512` 載入成功；`header::before` 背景確認掛上底紋；`og:image` 絕對網址正確；Chart.js 三張 canvas、六週資料、0 個失敗區塊；`/*__DATA__*/` 已替換。
+- Git commit：見本輪推送 commit（feat: 整合 GPT 圖像素材）。
+- Pages 線上確認：推送後 curl 驗證 assets 與 og meta（見下輪或本輪補記）。
+- 未完成與後續工作：`index_offline.html` 重製（待人類確認整體美編定案）；底紋強度如需增減（目前 .55 於近白圖上屬克制），一行 CSS 可調。

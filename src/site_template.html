@@ -8,7 +8,14 @@
 <meta property="og:title" content="SCAI-Agent 半導體前瞻戰略情報">
 <meta property="og:description" content="每週自動判定產業情境、校準 25 項關鍵決策因素、輸出可執行的風險規畫。">
 <meta property="og:type" content="website">
-<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="%23211f1c"/><text x="16" y="21" font-size="12" font-weight="700" font-family="sans-serif" fill="white" text-anchor="middle">SC</text></svg>'>
+<meta property="og:url" content="https://sakaban-code.github.io/SCAI-test/">
+<meta property="og:image" content="https://sakaban-code.github.io/SCAI-test/assets/scai-og-1200x630.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://sakaban-code.github.io/SCAI-test/assets/scai-og-1200x630.png">
+<link rel="icon" type="image/png" href="assets/scai-logo-light-bg.png">
+<link rel="apple-touch-icon" href="assets/scai-logo-light-bg.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
@@ -36,12 +43,14 @@ a{color:var(--c1)}
 .skip:focus{left:0}
 
 /* ── header + nav ── */
-header{position:sticky;top:0;z-index:50;background:rgba(251,251,250,.94);
-  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header{position:sticky;top:0;z-index:50;background:rgba(250,249,247,.94);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);overflow:hidden}
+header::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:url("assets/scai-header-pattern.png") right center/auto 230% no-repeat;opacity:.55}
+header>*{position:relative}
 .hd{display:flex;align-items:center;justify-content:space-between;height:58px;gap:12px}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
-.logo{width:32px;height:32px;border-radius:7px;background:var(--ink);color:#fff;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11.5px;letter-spacing:.5px}
+.logo{width:34px;height:34px;flex-shrink:0;display:block;object-fit:contain}
 .bn{font-weight:700;font-size:14.5px;letter-spacing:-.2px;line-height:1.15;white-space:nowrap}
 .bs{font-size:10.5px;color:var(--muted);white-space:nowrap}
 .hr{display:flex;align-items:center;gap:10px}
@@ -240,7 +249,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 <header>
   <div class="wrap hd">
     <div class="brand">
-      <div class="logo">SC</div>
+      <img class="logo" src="assets/scai-logo-light-bg.png" alt="SCAI-Agent 標誌">
       <div><div class="bn">SCAI-Agent</div><div class="bs">半導體前瞻戰略情報</div></div>
     </div>
     <div class="hr">
