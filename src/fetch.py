@@ -4,7 +4,8 @@ fetch.py — 抓取層（純搜尋 API + RSS，不使用任何模型生成，符
 
 兩種模式：
   一般週跑    python src/fetch.py
-              週次＝weeks.json 筆數+1，區間＝今天往前 7 天
+              週次＝weeks.json 筆數+1；區間起日＝上一週迄日的次日、迄日＝今天
+              （錨定上一週迄日而非 today−7，否則會與前一週重疊一天）
   回補歷史週  python src/fetch.py --week 7 --start 2026-07-21 --end 2026-07-27
               指定週次與區間；Tavily 改用 start_date/end_date 搜該區間，
               **RSS 自動跳過**（feed 不保留歷史，抓到的會是近期新聞＝假證據）
@@ -24,7 +25,7 @@ def resolve_window() -> tuple[str, str, datetime.date, datetime.date, bool]:
     ap.add_argument("--start", help="區間起日 YYYY-MM-DD（回補用，需與 --end 併用）")
     ap.add_argument("--end", help="區間迄日 YYYY-MM-DD（回補用）")
     ap.add_argument("--force", action="store_true",
-                    help="略過「中間有缺漏週次」的防呆，強制以最近 7 天當本週")
+                    help="略過「中間有缺漏週次」的防呆，改以最近 7 天當本週（明示接受與前期不連續）")
     a = ap.parse_args()
 
     if bool(a.start) != bool(a.end):
@@ -47,25 +48,41 @@ def resolve_window() -> tuple[str, str, datetime.date, datetime.date, bool]:
         backfill = True
     else:
         e = datetime.date.today()
-        s = e - datetime.timedelta(days=7)
         backfill = False
-        # 缺漏防呆：若距上一週迄日已超過一週，代表中間有週次沒產出。
-        # 此時照常週跑會把「下一個編號」貼上最近 7 天，週次與日期就此永久錯位。
         last = last_week_entry(existing)
-        if last and not a.force:
+        last_end = None
+        if last:
             try:
                 last_end = parse_range_end(last["range"])
             except ValueError:
                 last_end = None
-            if last_end and (e - last_end).days > 8:
-                gap = (e - last_end).days
+
+        # 缺漏防呆：距上一週迄日超過 8 天代表中間有週次沒產出。
+        # 照常週跑會把「下一個編號」貼上一整段跨越缺漏的區間，週次與日期就此永久錯位。
+        if last_end and not a.force and (e - last_end).days > 8:
+            gap = (e - last_end).days
+            sys.exit(
+                f"[錯誤] 距上一週 {last['week']}（{last['range']}，迄 {last_end}）已 {gap} 天，"
+                f"中間有缺漏週次。\n"
+                f"       直接週跑會把 W{n} 標成 {fmt_range(last_end + datetime.timedelta(days=1), e)}"
+                f"（{gap} 天），造成週次與日期永久錯位。\n"
+                f"       請先回補：python src/backfill.py            （只看計畫）\n"
+                f"                 python src/backfill.py --execute  （實際回補）\n"
+                f"       若確定要略過缺漏直接跑本週，加 --force。")
+
+        # 起日錨定「上一期迄日的次日」，不是 today−7。
+        # 用 today−7 會得到含頭尾 8 天、且與上一期迄日重疊一天的窗口——這正是
+        # W3/W4 重疊 3 天、07/06 落空的同一個成因（窗口接的是產出日而非窗口迄日）。
+        # --force 屬明示略過缺漏，維持「最近 7 天」語意並接受與前期不連續。
+        if last_end and not a.force:
+            s = last_end + datetime.timedelta(days=1)
+            if e < s:
                 sys.exit(
-                    f"[錯誤] 距上一週 {last['week']}（{last['range']}，迄 {last_end}）已 {gap} 天，"
-                    f"中間有缺漏週次。\n"
-                    f"       直接週跑會把 W{n} 標成最近 7 天（{fmt_range(s, e)}），造成週次與日期永久錯位。\n"
-                    f"       請先回補：python src/backfill.py            （只看計畫）\n"
-                    f"                 python src/backfill.py --execute  （實際回補）\n"
-                    f"       若確定要略過缺漏直接跑本週，加 --force。")
+                    f"[錯誤] 上一週 {last['week']} 迄日為 {last_end}，本次觸發於 {e}，"
+                    f"尚無可涵蓋的新區間。\n"
+                    f"       請待窗口累積後再跑，或以 --start/--end 明確指定區間。")
+        else:
+            s = e - datetime.timedelta(days=6)   # 含頭尾 7 天
 
     return f"W{n}", fmt_range(s, e), s, e, backfill
 
