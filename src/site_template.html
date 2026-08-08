@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
@@ -23,7 +23,7 @@
 <script>window.Chart||document.write('<script src="assets/chart.umd.min.js"><\/script>')</script>
 <style>
 :root{
-  --bg:#faf9f7; --surface:#fffefd; --ink:#211f1c; --ink2:#4a4741; --muted:#8b867d;
+  --bg:#faf9f7; --surface:#fffefd; --ink:#211f1c; --ink2:#4a4741; --muted:#736e66;
   --line:#e8e4dd; --line2:#d6d0c6; --dim:#f2efe9;
   --accent:#a44a24; --ok:#2f7050; --warn:#a97b1f; --err:#b03a30;
   --c1:#38547a; --c2:#357355; --c3:#b07a28; --c4:#6f5486; --c5:#9c5058;
@@ -167,8 +167,9 @@ section{padding:40px 0 4px}
 .sh .q{font-size:12.5px;color:var(--ink2);font-weight:500}
 .sh .q::before{content:"問：";color:var(--muted);font-weight:400;letter-spacing:.02em}
 .sh::after{content:"";flex:1 1 32px;height:1px;background:var(--line);align-self:center}
-.mlab{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:10px;letter-spacing:.11em;
-  text-transform:uppercase;color:var(--muted)}
+/* 微標籤標準（等寬、字距、弱化階）——目前套用於企業畫像指標名 .pf .k */
+.mlab,.pf .k{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:10px;
+  letter-spacing:.11em;text-transform:uppercase}
 .card{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r);padding:22px 24px}
 .card,.pb{box-shadow:var(--sh2)}
 .evc,details,.trendsum{box-shadow:none}
@@ -206,7 +207,9 @@ tbody td{transition:background .12s}
 .chip.cc{border-color:#bfe0cd;color:var(--ok);background:#eef7f1}
 .chip.cc.lo{border-color:#f0cdc9;color:var(--err);background:#fdf1ef}
 .heroflag{background:#fdf6ec;border:1px solid #f0dcc0;color:#8a6420;border-radius:8px;
-  padding:7px 12px;font-size:12px;margin:0 0 14px;line-height:1.6}
+  padding:8px 12px;font-size:12px;margin:0 0 14px;line-height:1.6;
+  display:flex;align-items:flex-start;gap:8px}
+.heroflag .wi{flex-shrink:0;margin-top:2px;stroke-width:1.5}
 .guide{background:var(--dim);border-bottom:1px solid var(--line)}
 .guide .wrap{display:flex;gap:14px;align-items:center;padding-top:8px;padding-bottom:8px;
   font-size:12px;color:var(--ink2);flex-wrap:wrap}
@@ -259,8 +262,7 @@ tbody td{transition:background .12s}
 .brief-mast .ix{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:10.5px;font-weight:500;
   color:var(--tx-d2);letter-spacing:.06em;border:1px solid var(--ink-line2);border-radius:4px;
   padding:1px 6px;background:rgba(255,255,255,.05);flex-shrink:0}
-.brief-mast .mt{font-family:"Space Grotesk","Noto Sans TC",sans-serif;font-size:11px;font-weight:700;
-  letter-spacing:.17em;color:#f2efe9;text-transform:uppercase}
+.brief-mast .mt{font-size:12.5px;font-weight:700;letter-spacing:.1em;color:#f2efe9}
 .brief-mast .mn{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:11px;
   color:var(--mut-d);letter-spacing:.03em}
 .brief-mast .sp{flex:1 1 8px}
@@ -287,8 +289,7 @@ tbody td{transition:background .12s}
 .brief.fx .glow{opacity:1}
 .snap{grid-column:span 4;background:var(--ink-surface);color:var(--tx-d);padding:16px 20px;
   border-left:1px solid var(--ink-line);display:flex;flex-direction:column;min-width:0}
-.snap h3{margin:0 0 12px;font-family:"Space Grotesk","Noto Sans TC",sans-serif;font-size:10px;
-  font-weight:700;letter-spacing:.15em;color:#cfc9bd;text-transform:uppercase}
+.snap h3{margin:0 0 12px;font-size:11.5px;font-weight:700;letter-spacing:.08em;color:#cfc9bd}
 .sr-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;
   border-top:1px solid var(--ink-line)}
 .sr-row:first-of-type{border-top:none;padding-top:0}
@@ -705,8 +706,8 @@ function drawCmpXY(A,B,cv){
     options:{maintainAspectRatio:false,animation:{duration:300},
       plugins:{legend:{position:'bottom',labels:{boxWidth:8,usePointStyle:true,font:{size:10.5},color:'#4a4741',padding:10}},
         tooltip:{callbacks:{label:c=>`${c.raw.l||c.dataset.label}（${c.raw.x.toFixed(2)}, ${c.raw.y.toFixed(2)}）`}}},
-      scales:{x:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#8b867d',font:{size:10}}},
-        y:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#8b867d',font:{size:10}}}}}});
+      scales:{x:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}}},
+        y:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}}}}}});
 }
 function drawCmpK(A,B,cv,full){
   const deltas=DATA.kdf.map((k,j)=>({id:k.id,name:k.name,d:B.w[j]-A.w[j]})).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d));
@@ -716,7 +717,7 @@ function drawCmpK(A,B,cv,full){
       backgroundColor:show.map(x=>x.d>=0?'#2f7050':'#b03a30'),borderRadius:3,barPercentage:.72}]},
     options:{indexAxis:'y',maintainAspectRatio:false,animation:{duration:300},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Δ ${c.raw>0?'+':''}${c.raw}`}}},
-      scales:{x:{grid:{color:'#f0ece6'},ticks:{color:'#8b867d',font:{size:10}}},
+      scales:{x:{grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}}},
         y:{grid:{display:false},ticks:{color:'#4a4741',font:{size:10}}}}}});
 }
 function buildCmp(){
@@ -825,7 +826,7 @@ function render(i){
     <div class="brief">
       <div class="brief-mast">
         <span class="ix">§01</span>
-        <span class="mt">Weekly Strategic Brief</span>
+        <span class="mt">本週戰略簡報</span>
         <span class="mn">W${String(w.week).padStart(2,'0')}　${w.range}</span>
         <span class="sp"></span>
         <span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>
@@ -834,7 +835,7 @@ function render(i){
       <div class="brief-body">
         <div class="brief-main">
           <div class="brief-fx" aria-hidden="true"><i class="pat"></i><i class="dots"></i><i class="glow"></i></div>
-          ${w.crossCheck&&w.crossCheck.flag?`<div class="heroflag">⚠️ ${w.crossCheck.flag}</div>`:''}
+          ${w.crossCheck&&w.crossCheck.flag?`<div class="heroflag"><svg class="ic wi" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2.4 1.7 13.6h12.6z"/><path d="M8 6.5v3.1"/><path d="M8 11.7h.01"/></svg><span>${w.crossCheck.flag}</span></div>`:''}
           <div class="scen rise d0"><span class="scen-en">${w.scenarioEn}</span><span class="scen-zh">${w.scenario}</span></div>
           ${S&&sm?`<p class="plain rise d1"><b>這代表什麼：</b>${sm.meaning}</p>`:''}
           <p class="verdict rise d2">${clean(w.scenarioDesc||'').replace(/^結論[：:]\s*/,'').split('。').slice(0,S?1:2).join('。')}。</p>
@@ -852,7 +853,7 @@ function render(i){
           </div>
         </div>
         <aside class="snap rise d4" aria-label="本週決策摘要">
-          <h3>Executive Snapshot</h3>
+          <h3>決策摘要</h3>
           <div class="sr-row"><span class="sr-k">情境判定</span><span class="sr-v">${w.scenarioEn||''}<span class="sm">${w.scenario}</span></span></div>
           <div class="sr-row"><span class="sr-k">X · 地緣供應鏈</span><span class="sr-v">${fmt(w.xy.x)}${p?` <span class="${dx<0?'d':'u'}">${dx<0?'▼':'▲'}${Math.abs(dx).toFixed(2)}</span>`:''}</span></div>
           <div class="sr-row"><span class="sr-k">Y · 資源與政策</span><span class="sr-v">${fmt(w.xy.y)}${p?` <span class="${dy<0?'d':'u'}">${dy<0?'▼':'▲'}${Math.abs(dy).toFixed(2)}</span>`:''}</span></div>
@@ -866,7 +867,7 @@ function render(i){
     </div>
 
     <div class="actband rise d4">
-      <div class="actband-h"><span class="mlab">Action Required</span><b>本週行動建議</b><span class="q">欣銓現在該做什麼？</span></div>
+      <div class="actband-h"><b>本週行動建議</b><span class="q">欣銓現在該做什麼？</span></div>
       <div class="acts">${acts||'<div class="act"><div style="color:var(--muted)">本週無劇本觸發</div></div>'}</div>
       <div class="actband-f">前三大 KDF${S?'（關鍵決策因素）':''}：${top3.map(t=>`#${t.id} ${t.name.replace(/（.*/,'')} <b class="num">${t.v}</b>`).join('　')}</div>
     </div>
@@ -1016,10 +1017,10 @@ function drawXY(idx,cv){
       animation:matchMedia('(prefers-reduced-motion: reduce)').matches?false
         :{duration:480,delay:c=>c.type==='data'&&c.mode==='default'?c.dataIndex*160:0},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw.l}（${c.raw.x}, ${c.raw.y}）`}}},
-      scales:{x:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#8b867d',font:{size:10}},
-          title:{display:true,text:'碎裂 ← X 地緣與供應鏈 → 聚合',color:'#8b867d',font:{size:11}}},
-        y:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#8b867d',font:{size:10}},
-          title:{display:true,text:'匱乏 ← Y 資源與政策 → 充沛',color:'#8b867d',font:{size:11}}}}},
+      scales:{x:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}},
+          title:{display:true,text:'碎裂 ← X 地緣與供應鏈 → 聚合',color:'#736e66',font:{size:11}}},
+        y:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}},
+          title:{display:true,text:'匱乏 ← Y 資源與政策 → 充沛',color:'#736e66',font:{size:11}}}}},
     plugins:[{id:'q',beforeDatasetsDraw(ch){const{ctx,chartArea:a,scales}=ch;
       const x0=scales.x.getPixelForValue(0),y0=scales.y.getPixelForValue(0);ctx.save();
       ctx.globalAlpha=.045;
@@ -1027,7 +1028,7 @@ function drawXY(idx,cv){
       ctx.fillStyle='#a44a24';ctx.fillRect(a.left,a.top,x0-a.left,y0-a.top);
       ctx.fillStyle='#38547a';ctx.fillRect(x0,y0,a.right-x0,a.bottom-y0);
       ctx.fillStyle='#b03a30';ctx.fillRect(a.left,y0,x0-a.left,a.bottom-y0);
-      ctx.globalAlpha=1;ctx.fillStyle='#8b867d';ctx.font='10px "Noto Sans TC",sans-serif';
+      ctx.globalAlpha=1;ctx.fillStyle='#736e66';ctx.font='10px "Noto Sans TC",sans-serif';
       ctx.textAlign='left';ctx.fillText('② Crossroads',a.left+7,a.top+15);
       ctx.textAlign='right';ctx.fillText('① Spring',a.right-7,a.top+15);
       ctx.fillText('③ Adaptation',a.right-7,a.bottom-7);
@@ -1055,8 +1056,8 @@ function drawTrend(idx,cv){
       plugins:{legend:{position:'bottom',labels:{boxWidth:8,boxHeight:8,usePointStyle:true,
         pointStyle:'circle',font:{size:10.5},color:'#4a4741',padding:12}},
         tooltip:{callbacks:{title:its=>{const wk=ws[its[0].dataIndex];return `W${wk.week}｜${wk.scenarioEn||wk.scenario||''}`}}}},
-      scales:{y:{min:40,max:85,grid:{color:'#f0ece6'},ticks:{color:'#8b867d',font:{size:10}}},
-        x:{grid:{display:false},ticks:{color:'#8b867d',font:{size:10.5}}}}}});
+      scales:{y:{min:40,max:85,grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:'#736e66',font:{size:10.5}}}}}});
   if(!cv)charts.push(inst);
   return inst;
 }
@@ -1080,13 +1081,13 @@ function drawKDF(w,p){
             const out=[];if(p)out.push(`上週 ${p.w[c.dataIndex]} → 本週 ${c.raw}`);
             const def=DATA.kdfDefs[String(id)];if(def)out.push(...wrapText('定義：'+def,22));return out}
         }}},
-      scales:{x:{min:0,max:100,grid:{color:'#f0ece6'},ticks:{color:'#8b867d',font:{size:10}}},
+      scales:{x:{min:0,max:100,grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}}},
         y:{grid:{display:false},ticks:{color:'#4a4741',font:{size:10.5}}}}},
     plugins:[{id:'b',afterDatasetsDraw(ch){const x=ch.scales.x.getPixelForValue(50);
       ch.ctx.save();ch.ctx.strokeStyle='#a5a099';ch.ctx.setLineDash([4,3]);ch.ctx.beginPath();
       ch.ctx.moveTo(x,ch.chartArea.top);ch.ctx.lineTo(x,ch.chartArea.bottom);ch.ctx.stroke();ch.ctx.restore();}},
      {id:'ghost',afterDatasetsDraw(ch){if(!p)return;const m=ch.getDatasetMeta(0);ch.ctx.save();
-      ch.ctx.strokeStyle='#8b867d';ch.ctx.lineWidth=2;
+      ch.ctx.strokeStyle='#736e66';ch.ctx.lineWidth=2;
       m.data.forEach((bar,ix)=>{const gx=ch.scales.x.getPixelForValue(p.w[ix]);
         ch.ctx.beginPath();ch.ctx.moveTo(gx,bar.y-bar.height/2+1);ch.ctx.lineTo(gx,bar.y+bar.height/2-1);ch.ctx.stroke();});
       ch.ctx.restore();}}]});

@@ -517,3 +517,32 @@ git add -A; git commit -m "說明"; git push
   - **人類尚未裁示**：三個英文標籤是否中文化；`--muted` 淺底 3.4:1 既有用法是否全面加深；**本輪是否推送**（依人類指示第 10 條，未經確認不推送）。
   - 觀察（未擅自更動）：`heroflag` 的 ⚠️ 仍是 emoji（`crossCheck.flag` 警示列），與 §8 黑名單第 5 條同類，但屬內容語意標記而非裝飾，是否比照改 SVG 待人類決定。
   - `ANTHROPIC_API_KEY` 設定後 Actions 首跑產出 W7。
+
+---
+
+## 2026-08-08｜第 11 輪：標籤中文化、對比全面達標、emoji 全站清零
+
+- 人類需求：對第 10 輪回報末尾列出的三項待決事項回覆「都確認」——(1) 三個英文標籤中文化 (2) `--muted` 淺底對比全面加深 (3) `heroflag` 的 ⚠️ 比照改 SVG；並確認推送。
+- 執行者：Claude Code（Fable 5）
+- 修改前狀態：第 10 輪已提交（`cf2e9a1`，未推送）。介面有三個英文微標籤；`--muted #8b867d` 於淺底僅 3.4:1（第 9 輪審核已列為既有系統性 Medium）；雙模型警示列仍用 ⚠️ emoji。
+- 修改檔案：`src/site_template.html`、`DESIGN.md`（升 v1.2.1）、重建 `docs/index.html` 與 `docs/index_offline.html`、同步 cowork 兩檔。
+- 實作內容：
+  1. **標籤中文化**：`Weekly Strategic Brief` → **「本週戰略簡報」**；`Executive Snapshot` → **「決策摘要」**。兩者原本套 Space Grotesk＋`text-transform:uppercase`＋大字距（為拉丁字設計），中文改為 11.5–12.5px、字距 .08–.1em、不套 uppercase（對中文無效），字級提高以免中文過小。
+     **`Action Required` 直接刪除而非翻譯**——譯成中文（如「立即行動」）會與緊鄰的「本週行動建議」語意重複，正是第 9 輪審核修掉的 High 級問題（§7a 去重硬規則）。刪除後標題與問題標籤各司其職。`.mlab` 規則改與 `.pf .k` 合併，避免產生無用 CSS。
+  2. **`--muted` 全面加深**：`#8b867d` → `#736e66`，共 13 處（CSS 變數 1 處＋Chart.js 座標軸刻度、圖說、四象限標示文字 12 處）。淺底對比由 3.4:1 提升至 **4.8:1**，通過 WCAG AA。
+  3. **⚠️ → SVG**：警示三角形改為三段 `path` 的線性圖示（沿用第 10 輪的 `.ic` 系統，`stroke:currentColor` 隨警示色變化）；`.heroflag` 改 flex 版面、圖示 `flex-shrink:0` 並微調基線對齊，文字另包 `<span>` 以免長文繞排時擠壓圖示。
+  4. **DESIGN.md 升 v1.2.1**：色票表 `--muted` 更新；§7a 新增「標籤一律繁體中文」規則與中文標籤的字級／字距規範，並註明三個英文標籤廢止與 `Action Required` 刪除的理由；抬頭記錄本輪三項變更與「黑名單第 5 條全站零違規」。
+- 遇到的錯誤與原因：
+  1. **驗收腳本假陰性**——PowerShell 單引號字串內 `""` 是兩個引號字元而非跳脫，導致 `class="ic wi"` 檢查誤報 False。**修正**：改用變數存放檢查字串後比對，重驗全部通過。
+  2. **`Executive Snapshot` 檢查項顯示 ✗ 為預期結果**（標籤已中文化），非迴歸；驗收腳本沿用第 10 輪版本未同步更新該項。
+  3. **Chrome 分頁截圖逾時**（`Script injection timed out`）——原分頁在注入假資料重繪後渲染器忙碌。**修正**：另開新分頁載入，截圖恢復正常。
+- 驗證：
+  - **對比實測（線上版，逐元素取實際渲染色）**：`.sh .sub` 4.81:1、`.cap` 5.02:1、`footer` 4.81:1——全數通過 AA 4.5:1。
+  - **警示列（注入假 crossCheck 資料驗證，因 W1–W6 皆無此欄位）**：警示列正常顯示、SVG 三段 path、**無 emoji 殘留**、flex 版面正確；同時驗證「雙模型不一致 ✕｜信心 低」chip 與讀數面板第 7 列（雙模型交叉）皆正確出現。驗證後即刻還原資料，未污染 `weeks.json`。
+  - **雙檔一致性（線上／離線）**：中文標籤兩檔皆有、三個英文標籤兩檔皆無、舊色 `#8b867d` 兩檔皆無、新色 `#736e66` 兩檔皆有、警示列 SVG 與 `.heroflag .wi` 兩檔皆有。
+  - **離線版零外部請求仍成立**：`<script src>`／`<link href>`／`<img src>`／CSS `url()`／`@import` 外部一律 0；`fonts.googleapis`／`fonts.gstatic`／`cdnjs` 各 0；4 組 woff2＋4 處 png data URI＋Chart.js 內嵌完好；827 KB。
+  - **紅線**：佔位符已取代、footer 不確定性聲明、【推斷】chip、【待公司確認】、`rel="noopener"` 來源連結、SVG 列印圖示、emoji 已清除——線上／離線雙檔全通過。
+  - 目視：masthead「§01 本週戰略簡報 W06 2026/07/14–07/20 推斷」、讀數面板「決策摘要」、行動帶「本週行動建議 問：欣銓現在該做什麼？」皆排版正確；加深後的副標與圖說明顯更易讀。
+- Git commit：（見本節末補記）
+- Pages 線上確認：（見本節末補記）
+- 未完成與後續工作：`ANTHROPIC_API_KEY` 設定後 Actions 首跑產出 W7（屆時 `crossCheck` 與警示列會首次帶真實資料，建議人工確認一次外觀）。
