@@ -18,7 +18,7 @@
 <link rel="apple-touch-icon" href="assets/scai-logo-light-bg.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>window.Chart||document.write('<script src="assets/chart.umd.min.js"><\/script>')</script>
 <style>
@@ -27,15 +27,24 @@
   --line:#e8e4dd; --line2:#d6d0c6; --dim:#f2efe9;
   --accent:#a44a24; --ok:#2f7050; --warn:#a97b1f; --err:#b03a30;
   --c1:#38547a; --c2:#357355; --c3:#b07a28; --c4:#6f5486; --c5:#9c5058;
-  --r:10px; --maxw:1080px;
-  --shadow:0 1px 2px rgba(33,31,28,.05);
+  --r:10px; --maxw:1120px; --gut:20px;
+  --line-soft:#f0ede7;
+  --shadow:0 1px 2px rgba(33,31,28,.07),0 6px 20px rgba(33,31,28,.05);
+  --shadow-hover:0 2px 4px rgba(33,31,28,.08),0 16px 36px rgba(33,31,28,.14);
+  --ink-bg:#1e1c19; --ink-surface:#24221e; --ink-line:#35322b; --ink-line2:#413d35;
+  --tx-d:#e8e4db; --tx-d2:#c6c0b4; --mut-d:#9a948a; --accent-br:#cf7a4c;
+  --sh1:0 1px 2px rgba(33,31,28,.05);
+  --sh2:0 1px 2px rgba(33,31,28,.06),0 6px 18px rgba(33,31,28,.045);
+  --sh3:0 2px 6px rgba(33,31,28,.08),0 20px 48px rgba(33,31,28,.10);
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:118px}
 body{margin:0;background:var(--bg);color:var(--ink);
+  background-image:radial-gradient(rgba(33,31,28,.05) 1px,transparent 1px);background-size:22px 22px;
   font-family:"Noto Sans TC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
-.num{font-variant-numeric:tabular-nums}
+.num,.kt,.pb-id,.ev,select{font-family:"IBM Plex Mono","Noto Sans TC",monospace}
+.num{font-variant-numeric:tabular-nums;font-size:.97em}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 a{color:var(--c1)}
@@ -44,36 +53,39 @@ a{color:var(--c1)}
 .skip:focus{left:0}
 
 /* ── header + nav ── */
-header{position:sticky;top:0;z-index:50;background:rgba(250,249,247,.94);
-  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);overflow:hidden}
-header::before{content:"";position:absolute;inset:0;pointer-events:none;
-  background:url("assets/scai-header-pattern.png") right center/auto 230% no-repeat;opacity:.55}
-header>*{position:relative}
+header{position:sticky;top:0;z-index:50;background:var(--ink-bg);
+  background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:20px 20px;
+  border-bottom:1px solid var(--ink-line)}
 .hd{display:flex;align-items:center;justify-content:space-between;height:58px;gap:12px}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
 .logo{width:34px;height:34px;flex-shrink:0;display:block;object-fit:contain}
-.bn{font-weight:700;font-size:14.5px;letter-spacing:-.2px;line-height:1.15;white-space:nowrap}
-.bs{font-size:10.5px;color:var(--muted);white-space:nowrap}
+.bn{font-family:"Space Grotesk","Noto Sans TC",sans-serif;font-weight:700;font-size:14.5px;letter-spacing:0;line-height:1.15;white-space:nowrap;color:#f5f2ec}
+.bs{font-size:10.5px;color:var(--mut-d);white-space:nowrap}
 .hr{display:flex;align-items:center;gap:10px}
-.stat{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);white-space:nowrap}
+.stat{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mut-d);white-space:nowrap}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);position:relative;flex-shrink:0}
 .dot::after{content:"";position:absolute;inset:-3px;border-radius:50%;background:var(--ok);opacity:.18}
 @media (prefers-reduced-motion:no-preference){
   .dot::after{animation:pulse 2.6s ease-out infinite}
   @keyframes pulse{0%{transform:scale(.6);opacity:.3}70%,100%{transform:scale(1.6);opacity:0}}
+  .rise{opacity:0;animation:rise .45s ease-out forwards}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .d0{animation-delay:0ms}.d1{animation-delay:120ms}.d2{animation-delay:200ms}
+  .d3{animation-delay:300ms}.d4{animation-delay:380ms}
 }
 .wnav{display:flex;align-items:center;gap:5px}
-.wbtn{width:28px;height:32px;border:1px solid var(--line2);background:var(--surface);border-radius:7px;
-  cursor:pointer;font-size:13px;color:var(--ink2);display:flex;align-items:center;justify-content:center}
+.wbtn{width:28px;height:32px;border:1px solid var(--ink-line2);background:rgba(255,255,255,.06);border-radius:7px;
+  cursor:pointer;font-size:13px;color:#d8d3c9;display:flex;align-items:center;justify-content:center;
+  transition:border-color .15s,background .15s,color .15s}
 .wbtn:disabled{opacity:.35;cursor:default}
-.wbtn:not(:disabled):hover{border-color:var(--ink2)}
-.vtoggle{display:flex;border:1px solid var(--line2);border-radius:7px;overflow:hidden;flex-shrink:0}
-.vtoggle button{border:none;background:var(--surface);color:var(--muted);font-family:inherit;
-  font-size:12px;font-weight:500;padding:6px 11px;cursor:pointer}
-.vtoggle button.on{background:var(--ink);color:#fff;font-weight:600}
-.vtoggle button:not(.on):hover{color:var(--ink)}
-.ngroup{font-size:10px;color:var(--muted);letter-spacing:.5px;padding:9px 4px 9px 10px;white-space:nowrap;align-self:center}
-.ndiv{width:1px;align-self:stretch;background:var(--line2);margin:8px 6px}
+.wbtn:not(:disabled):hover{border-color:#5a554b;background:rgba(255,255,255,.11);color:#fff}
+.vtoggle{display:flex;border:1px solid var(--ink-line2);border-radius:7px;overflow:hidden;flex-shrink:0}
+.vtoggle button{border:none;background:transparent;color:var(--mut-d);font-family:inherit;
+  font-size:12px;font-weight:500;padding:6px 11px;cursor:pointer;transition:color .15s,background .15s}
+.vtoggle button.on{background:var(--accent);color:#fff;font-weight:600}
+.vtoggle button:not(.on):hover{color:#f2efe9}
+.ngroup{font-size:10px;color:#7d7870;letter-spacing:.5px;padding:9px 4px 9px 10px;white-space:nowrap;align-self:center}
+.ndiv{width:1px;align-self:stretch;background:var(--ink-line2);margin:8px 6px}
 .ev-d{background:none;border:none;padding:0;margin:10px 0 0;box-shadow:none}
 .ev-d summary{display:inline-flex;gap:6px;font-weight:500;font-size:10.5px;color:var(--muted);cursor:pointer}
 .ev-d summary::after{content:"＋";font-size:11px}
@@ -120,25 +132,70 @@ header>*{position:relative}
 .cmp-more:hover{border-color:var(--ink2)}
 @media(max-width:820px){.cmp-g{grid-template-columns:1fr}}
 @media(max-width:560px){.lb{padding:0}.lb-box{width:100vw;height:100vh;border-radius:0}}
-select{font-family:inherit;font-size:12.5px;font-weight:500;padding:6px 9px;border:1px solid var(--line2);
-  border-radius:7px;background:var(--surface);color:var(--ink);cursor:pointer;font-variant-numeric:tabular-nums;max-width:200px}
-nav.secnav{border-top:1px solid var(--line)}
+select{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:12px;font-weight:500;padding:6px 9px;
+  border:1px solid var(--ink-line2);border-radius:7px;background:rgba(255,255,255,.06);color:#f2efe9;
+  cursor:pointer;font-variant-numeric:tabular-nums;max-width:200px;transition:border-color .15s,background .15s}
+select:hover{border-color:#5a554b;background:rgba(255,255,255,.1)}
+select option{background:var(--ink-bg);color:#f2efe9}
+nav.secnav{border-top:1px solid var(--ink-line)}
 .secnav .wrap{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
 .secnav .wrap::-webkit-scrollbar{display:none}
-.secnav a{color:var(--muted);text-decoration:none;font-size:12.5px;font-weight:500;
-  padding:9px 12px;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s}
-.secnav a:hover{color:var(--ink)}
-.secnav a.on{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.secnav a .ni{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:9.5px;
+  color:#8b857b;margin-right:9px;letter-spacing:.05em}
+.secnav a.on .ni{color:var(--accent-br)}
+@media(max-width:1099px){.secnav a .ni{display:none}}
+.secnav a{color:var(--mut-d);text-decoration:none;font-size:12.5px;font-weight:500;
+  padding:9px 12px;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s;position:relative}
+.secnav a::after{content:"";position:absolute;left:12px;right:12px;bottom:-2px;height:2px;
+  background:var(--accent-br);transform:scaleX(0);transform-origin:left;transition:transform .18s ease-out}
+.secnav a:hover{color:#f2efe9}
+.secnav a:not(.on):hover::after{transform:scaleX(1)}
+.secnav a.on{color:#fff;border-bottom-color:var(--accent-br);font-weight:600}
 
 /* ── sections ── */
 main{opacity:1;transition:opacity .18s ease}
 main.fade{opacity:0}
 section{padding:40px 0 4px}
 .sh{display:flex;align-items:baseline;gap:11px;margin-bottom:18px;flex-wrap:wrap}
-.sh h2{font-size:18px;font-weight:700;margin:0;letter-spacing:-.3px}
+.sh h2{font-size:18px;font-weight:700;margin:0;letter-spacing:-.3px;text-wrap:balance}
 .sh .sub{font-size:12px;color:var(--muted)}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px}
-.card,.side,.pb,.evc,details{box-shadow:var(--shadow)}
+.sh .ix{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:10.5px;font-weight:500;
+  color:var(--muted);letter-spacing:.06em;align-self:center;border:1px solid var(--line2);
+  border-radius:4px;padding:1px 6px;background:var(--surface);flex-shrink:0}
+.sh .q{font-size:12.5px;color:var(--ink2);font-weight:500}
+.sh .q::before{content:"問：";color:var(--muted);font-weight:400;letter-spacing:.02em}
+.sh::after{content:"";flex:1 1 32px;height:1px;background:var(--line);align-self:center}
+.mlab{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:10px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r);padding:22px 24px}
+.card,.pb{box-shadow:var(--sh2)}
+.evc,details,.trendsum{box-shadow:none}
+.pb,.evc{position:relative;transition:transform .2s ease-out,box-shadow .2s ease-out,border-color .2s ease-out}
+.pb::before,.evc::before{content:"";position:absolute;left:16px;top:-1px;width:28px;height:2px;
+  background:var(--accent);border-radius:0 0 2px 2px;transform:scaleX(0);transform-origin:left;
+  transition:transform .2s ease-out}
+details,.card:has(.zoombtn){transition:border-color .2s ease-out,box-shadow .2s ease-out}
+@media (hover:hover){
+  .pb:hover,.evc:hover{transform:translateY(-2px);border-color:var(--line2);box-shadow:var(--sh3)}
+  .pb:hover::before,.evc:hover::before{transform:scaleX(1)}
+  details:hover{border-color:var(--line2);box-shadow:var(--sh1)}
+  .card:has(.zoombtn):hover{border-color:var(--line2)}
+  .card:has(.zoombtn):hover .zoombtn{border-color:var(--ink2);color:var(--ink)}
+  tbody tr:hover td{background:#f4eee2}
+  .fchip:hover{transform:translateY(-1px);border-color:var(--ink2)}
+  .src a:hover .arw,.evc .f a:hover .arw{transform:translate(3px,-2px)}
+}
+.fchip{transition:transform .18s ease-out,border-color .18s}
+.fchip:active{transform:translateY(0)}
+.fchip:focus-visible,.zoombtn:focus-visible,.cmp-more:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.zoombtn,.cmp-more{transition:border-color .18s,color .18s}
+.arw{display:inline-block;transition:transform .18s ease-out}
+header :focus-visible{outline-color:var(--accent-br)}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+tbody td{transition:background .12s}
 ::selection{background:rgba(164,74,36,.16)}
 .chip{display:inline-block;border:1px solid var(--line2);color:var(--muted);border-radius:5px;
   padding:1px 7px;font-size:10.5px;font-weight:500;vertical-align:middle}
@@ -163,14 +220,14 @@ section{padding:40px 0 4px}
 .trendsum b{color:var(--ink)}
 
 /* ── hero ── */
-.hero{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;padding-top:24px}
+.hero{display:block;padding-top:22px}
 .eyebrow{font-size:11.5px;color:var(--muted);letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .scen{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
-.scen-en{font-size:clamp(30px,4.2vw,40px);font-weight:900;letter-spacing:-1.2px;color:var(--accent);line-height:1.06}
+.scen-en{font-family:"Space Grotesk","Noto Sans TC",sans-serif;font-size:clamp(30px,4.2vw,40px);font-weight:700;letter-spacing:-.5px;color:var(--accent);line-height:1.06}
 .scen-zh{font-size:14.5px;font-weight:500;color:var(--ink2)}
-.verdict{color:var(--ink2);font-size:13.5px;margin:0 0 19px;line-height:1.7}
+.verdict{color:var(--ink2);font-size:13.5px;margin:0 0 19px;line-height:1.7;max-width:65ch}
 .plain{background:var(--dim);border-radius:8px;padding:9px 13px;font-size:13px;color:var(--ink);
-  margin:0 0 12px;line-height:1.7}
+  margin:0 0 12px;line-height:1.7;max-width:65ch}
 .plain b{color:var(--accent-ink,var(--accent))}
 .axword{display:inline-block;background:var(--dim);border-radius:5px;padding:0 7px;
   font-size:10.5px;font-weight:500;color:var(--ink2);margin-left:5px;vertical-align:1px}
@@ -183,7 +240,7 @@ section{padding:40px 0 4px}
 .bar i{position:absolute;top:0;bottom:0;left:0;border-radius:3px;transition:width .5s ease}
 .bar .mk{position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--line2)}
 .ax-f{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:5px}
-.side{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;display:flex;flex-direction:column}
+.side{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r);padding:18px 20px;display:flex;flex-direction:column}
 .side h3{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.4px;margin:0 0 12px}
 .act{display:flex;gap:10px;margin-bottom:10px;font-size:12.5px;line-height:1.55;color:var(--ink2)}
 .act b{font-weight:650;margin-right:4px}
@@ -191,6 +248,81 @@ section{padding:40px 0 4px}
 .act.y b,.act.y .i{color:var(--ok)}
 .act.n b,.act.n .i{color:var(--err)}
 .side .foot{border-top:1px solid var(--line);margin-top:auto;padding-top:11px;font-size:11px;color:var(--muted);line-height:1.7}
+
+/* ── 第 9 輪｜本週策略簡報封面（Executive Brief）＋ Snapshot 讀數面板 ── */
+.brief{position:relative;background:var(--surface);border:1px solid var(--line-soft);
+  border-radius:12px;box-shadow:var(--sh3);overflow:hidden}
+.brief-mast{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--ink-bg);
+  padding:8px 24px;border-bottom:1px solid var(--ink-line)}
+.brief-mast .ix{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:10.5px;font-weight:500;
+  color:var(--tx-d2);letter-spacing:.06em;border:1px solid var(--ink-line2);border-radius:4px;
+  padding:1px 6px;background:rgba(255,255,255,.05);flex-shrink:0}
+.brief-mast .mt{font-family:"Space Grotesk","Noto Sans TC",sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:.17em;color:#f2efe9;text-transform:uppercase}
+.brief-mast .mn{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:11px;
+  color:var(--mut-d);letter-spacing:.03em}
+.brief-mast .sp{flex:1 1 8px}
+.brief-mast .chip{border-color:var(--ink-line2);color:var(--mut-d);background:rgba(255,255,255,.04)}
+.brief-mast .chip.cc{background:rgba(47,112,80,.16);border-color:#3d5c4b;color:#83c4a2}
+.brief-mast .chip.cc.lo{background:rgba(176,58,48,.14);border-color:#663b36;color:#e39387}
+.brief-body{display:grid;grid-template-columns:repeat(12,minmax(0,1fr))}
+.brief-main{grid-column:span 8;position:relative;padding:24px 24px 20px;min-width:0}
+.brief-main>*{position:relative;z-index:2}
+.brief-fx{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.brief-fx i{position:absolute;inset:0;display:block}
+.brief-fx .pat{background:url("assets/scai-header-pattern.png") right -60px center/auto 165% no-repeat;
+  opacity:.4;transform:translate3d(var(--px,0px),var(--py,0px),0);transition:transform .32s ease-out;
+  /* 硬性限制在右側外圍：左半完全遮掉，確保不干擾文字（人類指示） */
+  -webkit-mask-image:linear-gradient(to left,#000 0,rgba(0,0,0,.45) 26%,transparent 52%);
+  mask-image:linear-gradient(to left,#000 0,rgba(0,0,0,.45) 26%,transparent 52%)}
+.brief-fx .dots{background-image:radial-gradient(rgba(33,31,28,.22) 1px,transparent 1px);
+  background-size:18px 18px;opacity:0;transition:opacity .3s ease-out;
+  -webkit-mask-image:radial-gradient(190px circle at var(--mx,-999px) var(--my,-999px),#000,transparent 72%);
+  mask-image:radial-gradient(190px circle at var(--mx,-999px) var(--my,-999px),#000,transparent 72%)}
+.brief-fx .glow{background:radial-gradient(260px circle at var(--mx,-999px) var(--my,-999px),
+  rgba(164,74,36,.05),rgba(164,74,36,0) 70%);opacity:0;transition:opacity .3s ease-out}
+.brief.fx .dots{opacity:.6}
+.brief.fx .glow{opacity:1}
+.snap{grid-column:span 4;background:var(--ink-surface);color:var(--tx-d);padding:16px 20px;
+  border-left:1px solid var(--ink-line);display:flex;flex-direction:column;min-width:0}
+.snap h3{margin:0 0 12px;font-family:"Space Grotesk","Noto Sans TC",sans-serif;font-size:10px;
+  font-weight:700;letter-spacing:.15em;color:#cfc9bd;text-transform:uppercase}
+.sr-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;
+  border-top:1px solid var(--ink-line)}
+.sr-row:first-of-type{border-top:none;padding-top:0}
+.sr-k{font-size:11px;color:var(--mut-d);white-space:nowrap}
+.sr-v{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:12.5px;font-weight:500;
+  color:#f2efe9;font-variant-numeric:tabular-nums;text-align:right;line-height:1.45}
+.sr-v .u{color:#6fbf95}.sr-v .d{color:#e18f84}
+.sr-v .sm{font-family:"Noto Sans TC",sans-serif;font-size:11px;color:var(--tx-d2);margin-left:5px}
+.snap .note{margin-top:auto;padding-top:10px;border-top:1px solid var(--ink-line);font-size:10.5px;
+  color:var(--mut-d);line-height:1.6}
+
+/* ── 立即行動建議帶（獨立層級，非 hero 側欄） ── */
+.actband{margin-top:14px;background:var(--surface);border:1px solid var(--line-soft);
+  border-radius:var(--r);box-shadow:var(--sh2);overflow:hidden}
+.actband-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 20px;
+  border-bottom:1px solid var(--line);background:#f7f5f1}
+.actband-h b{font-size:13.5px;font-weight:700}
+.actband-h .q{font-size:12.5px;color:var(--ink2);font-weight:500}
+.actband-h .q::before{content:"問：";color:var(--muted);font-weight:400}
+.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.act{display:flex;gap:8px;margin:0;padding:16px 20px;font-size:12.5px;line-height:1.6;
+  color:var(--ink2);border-left:1px solid var(--line)}
+.act:first-child{border-left:none}
+.act b{display:block;font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:10px;
+  font-weight:600;letter-spacing:.1em;color:var(--muted);margin:0 0 3px}
+.act .i{flex-shrink:0;font-size:11px;line-height:1.9}
+.act.y .i{color:var(--ok)}.act.y b{color:var(--ok)}
+.act.n .i{color:var(--err)}.act.n b{color:var(--err)}
+.actband-f{padding:8px 20px;border-top:1px solid var(--line);background:#faf9f7;
+  font-size:11.5px;color:var(--muted);line-height:1.7}
+.actband-f b{color:var(--ink)}
+
+/* ── 觸發依據（✓/✗ 標記強化，判斷內容不變） ── */
+.tk{display:inline-block;font-weight:700;border-radius:3px;padding:0 3px;margin-right:1px}
+.tk.ok{color:#1f5c40;background:#e6f2ea}
+.tk.no{color:#8a2f28;background:#fbeae7}
 
 /* ── movers ── */
 .movers{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -204,8 +336,8 @@ section{padding:40px 0 4px}
 
 /* ── plan ── */
 .plan{display:grid;gap:12px}
-.pb{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
-  padding:17px 19px;border-left:3px solid var(--accent)}
+.pb{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r);
+  padding:17px 19px}
 .pb-h{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:9px}
 .hz{background:var(--dim);border-radius:5px;padding:2px 8px;font-size:10.5px;font-weight:600;color:var(--ink2);white-space:nowrap}
 .pb-t{font-weight:650;font-size:13.5px}
@@ -214,7 +346,8 @@ section{padding:40px 0 4px}
 .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:11px;border-top:1px solid var(--line);padding-top:11px}
 .mi .k{font-size:10.5px;color:var(--muted);margin-bottom:2px}
 .mi .v{font-size:11.5px;color:var(--ink2);line-height:1.5}
-.ev{font-size:10.5px;color:var(--muted);margin-top:10px;font-variant-numeric:tabular-nums}
+.ev{font-size:10.5px;color:var(--muted);margin-top:10px;font-variant-numeric:tabular-nums;
+  background:#f8f6f2;border:1px solid var(--line);border-radius:6px;padding:8px 10px;line-height:1.75}
 
 /* ── tables ── */
 table{width:100%;border-collapse:collapse;font-size:12.5px}
@@ -241,7 +374,7 @@ td.risk-t{color:var(--ink);font-weight:500}
 
 /* ── events ── */
 .evgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:13px}
-.evc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:15px 17px;display:flex;flex-direction:column;gap:8px}
+.evc{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:15px 17px;display:flex;flex-direction:column;gap:8px}
 .evc .t{font-weight:600;font-size:13px;line-height:1.5}
 .evc .s{font-size:12px;color:var(--ink2);line-height:1.6;flex:1}
 .evc .f{display:flex;align-items:center;gap:8px;font-size:10.5px;color:var(--muted);flex-wrap:wrap}
@@ -249,7 +382,7 @@ td.risk-t{color:var(--ink);font-weight:500}
 .imp.d{color:var(--err)}.imp.u{color:var(--ok)}
 
 /* ── trace ── */
-details{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:15px 19px;margin-bottom:9px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:15px 19px;margin-bottom:8px}
 summary{cursor:pointer;font-weight:550;font-size:13px;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
 summary::-webkit-details-marker{display:none}
 summary::after{content:"＋";color:var(--muted);font-size:14px;flex-shrink:0}
@@ -266,21 +399,21 @@ details[open] summary::after{content:"−"}
 
 /* ── profile ── */
 .pf{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
-.pf .it{border:1px solid var(--line);border-radius:8px;padding:13px 15px;background:var(--surface)}
+.pf .it{border:1px solid var(--line-soft);border-radius:8px;padding:13px 15px;background:var(--surface);box-shadow:var(--shadow)}
 .pf .k{font-size:10.5px;color:var(--muted);margin-bottom:4px}
-.pf .v{font-size:16px;font-weight:650;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
+.pf .v{font-family:"Space Grotesk","Noto Sans TC",sans-serif;font-size:16px;font-weight:700;letter-spacing:0;font-variant-numeric:tabular-nums}
 .pf .n{font-size:10.5px;color:var(--muted);margin-top:4px;line-height:1.5}
 
 /* ── methodology ── */
 .mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:13px}
-.sc-card{border:1px solid var(--line);border-radius:var(--r);padding:16px 17px;background:var(--surface)}
+.sc-card{border:1px solid var(--line-soft);border-radius:var(--r);padding:16px 17px;background:var(--surface);box-shadow:var(--shadow)}
 .sc-card.cur{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .sc-card .n{font-weight:650;font-size:13.5px;margin-bottom:2px}
 .sc-card .st{font-size:10.5px;color:var(--muted);margin-bottom:8px}
 .sc-card .m{font-size:11.5px;color:var(--ink2);line-height:1.65}
 .sc-card .now{display:inline-block;background:var(--accent);color:#fff;border-radius:5px;padding:1px 7px;font-size:10px;font-weight:600;margin-left:6px;vertical-align:1px}
 .axbox{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px}
-.axc{border:1px solid var(--line);border-radius:var(--r);padding:15px 17px;background:var(--surface)}
+.axc{border:1px solid var(--line-soft);border-radius:var(--r);padding:15px 17px;background:var(--surface);box-shadow:var(--shadow)}
 .axc .t{font-weight:650;font-size:12.5px;margin-bottom:5px}
 .axc .d{font-size:11.5px;color:var(--ink2);line-height:1.65}
 .dims{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
@@ -296,8 +429,40 @@ details[open] summary::after{content:"−"}
 footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font-size:11.5px;color:var(--muted);line-height:1.75}
 .nochart{display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:12px;background:var(--dim);border-radius:8px}
 
+/* ── B＋F｜側欄辦公佈局：header 轉左側固定欄，週次控制成工具列（DOM 零改動） ── */
+@media(min-width:1100px){
+  body{padding-left:238px}
+  html{scroll-padding-top:24px}
+  header{position:fixed;top:0;left:0;bottom:0;width:238px;display:flex;flex-direction:column;
+    border-bottom:none;border-right:1px solid var(--ink-line);overflow:hidden auto}
+  .hd,.hr{display:contents}
+  .brand{order:1;padding:18px 16px 14px}
+  .wnav{order:2;margin:2px 14px 6px;padding:9px 10px;background:rgba(255,255,255,.05);
+    border:1px solid var(--ink-line);border-radius:8px}
+  #wsel{flex:1;min-width:0;max-width:none}
+  nav.secnav{order:3;flex:1;border-top:1px solid var(--ink-line);margin-top:8px}
+  .secnav .wrap{flex-direction:column;padding:10px 10px 12px;gap:1px;overflow:visible}
+  .secnav a{padding:7px 12px;border-bottom:none;border-left:2px solid transparent;border-radius:0 6px 6px 0}
+  .secnav a::after{display:none}
+  .secnav a:hover{background:rgba(255,255,255,.06)}
+  .secnav a.on{background:rgba(255,255,255,.05);border-left-color:var(--accent-br)}
+  .ngroup{padding:14px 12px 5px;letter-spacing:1px}
+  .ndiv{display:none}
+  .vtoggle{order:4;margin:10px 16px;display:flex}
+  .vtoggle button{flex:1;padding:7px 11px}
+  .stat{order:5;margin:auto 16px 0;padding:12px 2px 16px;border-top:1px solid var(--ink-line)}
+}
+
+@media(max-width:960px){
+  .brief-body{grid-template-columns:1fr}
+  .brief-main,.snap{grid-column:auto}
+  .snap{border-left:none;border-top:1px solid var(--ink-line)}
+}
 @media(max-width:820px){
-  .hero,.g2,.movers,.axbox{grid-template-columns:1fr}
+  .g2,.movers,.axbox{grid-template-columns:1fr}
+  .g2>*,.movers>*,.axbox>*{grid-column:auto}
+  .act{border-left:none;border-top:1px solid var(--line)}
+  .act:first-child{border-top:none}
   .wrap{padding:0 16px}
   .scen-en{font-size:30px}
   .bs,.stat{display:none}
@@ -306,6 +471,8 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 @media(max-width:560px){
   section{padding:30px 0 2px}
   .onlydesk{display:none}
+  .wbtn{width:38px;height:40px}
+  .vtoggle button{padding:9px 12px}
   .card{padding:17px 16px}
   .g2 .cbox{height:280px!important}
   td{padding:10px 8px 10px 0}
@@ -313,9 +480,50 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 }
 @media print{
   header,nav.secnav,#top,.wnav{display:none}
-  body{background:#fff;font-size:12px}
+  body{background:#fff;font-size:12px;padding-left:0}
   .card,.pb,.evc,details{break-inside:avoid;border-color:#bbb}
+  .brief,.actband{box-shadow:none;border-color:#bbb}
+  .brief-mast,.snap{background:#fff!important;border-color:#bbb}
+  .brief-mast *,.snap *{color:#211f1c!important}
+  .brief-fx{display:none}
   section{padding:16px 0 0}
+}
+/* ── 第 9 輪覆蓋層（置於末端，優先於前面的分區規則） ── */
+.g2,.movers,.axbox{grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gut)}
+.g2>*,.movers>*,.axbox>*{grid-column:span 6;min-width:0}
+.trendsum{box-shadow:none;background:#f8f6f2}
+.pf{gap:16px 18px}
+.pf .it{border:none;border-top:2px solid var(--ink);border-radius:0;padding:10px 0 0;
+  background:none;box-shadow:none}
+.pf .k{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:10px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.pf .v{font-size:19px}
+/* 雙軸條窄寬自動單欄（原 1fr 1fr 於窄版會撐破 .brief 的 overflow:hidden 而被裁切） */
+.axes{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.ax-t{flex-wrap:wrap}
+.audit{overflow-x:auto}
+.sr-v .sm{display:block;margin-left:0;line-height:1.5}
+.ngroup{color:#8b857b}
+/* 新增的 10px 微標籤若沿用 --muted 僅 3.4:1，加深至 5:1 以上 */
+.mlab,.pf .k,.sh .ix{color:#6f6a62}
+.ev{padding:8px 12px}
+.pf .it{padding:12px 0 0}
+/* 觸控命中區補到 44px：以透明 ::after 擴大，桌面視覺尺寸完全不變 */
+@media (hover:none){
+  .fchip,.zoombtn,.cmp-more,.wbtn,.vtoggle button,#top{position:relative}
+  .fchip::after,.zoombtn::after,.cmp-more::after,.wbtn::after,
+  .vtoggle button::after,#top::after{content:"";position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-50%);width:max(100%,44px);height:max(100%,44px)}
+  .evc .f a,.src a{padding:6px 0}
+  details summary{padding:5px 0}
+}
+@media(max-width:820px){
+  .g2,.movers,.axbox{grid-template-columns:1fr}
+  .g2>*,.movers>*,.axbox>*{grid-column:auto}
+}
+@media(max-width:640px){
+  .sh::after{display:none}
+  .sh{gap:5px 9px}
 }
 </style>
 </head>
@@ -326,7 +534,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 <header>
   <div class="wrap hd">
     <div class="brand">
-      <img class="logo" src="assets/scai-logo-light-bg.png" alt="SCAI-Agent 標誌">
+      <img class="logo" src="assets/scai-logo-dark-bg.png" alt="SCAI-Agent 標誌">
       <div><div class="bn">SCAI-Agent</div><div class="bs">半導體前瞻戰略情報</div></div>
     </div>
     <div class="hr">
@@ -347,16 +555,16 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
   <nav class="secnav" aria-label="區段導覽">
     <div class="wrap">
       <span class="ngroup">本週結論</span>
-      <a href="#overview" class="on">總覽</a>
-      <a href="#plan">公司規畫</a>
-      <a href="#risk">風險雷達</a>
+      <a href="#overview" class="on"><span class="ni">01</span>總覽</a>
+      <a href="#plan"><span class="ni">02</span>公司規畫</a>
+      <a href="#risk"><span class="ni">03</span>風險雷達</a>
       <span class="ndiv" aria-hidden="true"></span>
       <span class="ngroup">證據與方法</span>
-      <a href="#trend">趨勢圖表</a>
-      <a href="#events">本週事件</a>
-      <a href="#trace">決策軌跡</a>
-      <a href="#profile">企業畫像</a>
-      <a href="#method">方法論</a>
+      <a href="#trend"><span class="ni">04</span>趨勢圖表</a>
+      <a href="#events"><span class="ni">05</span>本週事件</a>
+      <a href="#trace"><span class="ni">06</span>決策軌跡</a>
+      <a href="#profile"><span class="ni">07</span>企業畫像</a>
+      <a href="#method"><span class="ni">08</span>方法論</a>
     </div>
   </nav>
 </header>
@@ -406,6 +614,9 @@ const fmt=n=>(n>0?'+':'')+n.toFixed(2);
 const xWord=v=>v<=-0.4?'明顯碎裂':v<=-0.15?'偏碎裂':v<0.15?'接近中性':v<0.4?'偏聚合':'明顯聚合';
 const yWord=v=>v<=-0.4?'明顯匱乏':v<=-0.15?'偏匱乏':v<0.15?'接近中性':v<0.4?'偏充沛':'明顯充沛';
 const clean=s=>(s||'').replace(/^【推斷】/,'');
+/* 觸發依據標記：僅包裝 ✓／✗ 為可辨識標籤，判斷文字本身不變 */
+const evTag=s=>(s||'').replace(/✓/g,'<span class="tk ok">✓</span>')
+  .replace(/✗/g,'<span class="tk no">✗</span>').replace(/✕/g,'<span class="tk no">✕</span>');
 let charts=[], kdfChart=null, kdfFilter=-1;
 let view='simple';  /* 簡略｜詳細 分流（D3 預設簡略；憲法禁 localStorage，僅存於當次瀏覽） */
 let lbChart=null,popIdx=0,cmpCharts=[],cmpFull=false;
@@ -492,8 +703,8 @@ function drawCmpXY(A,B,cv){
     options:{maintainAspectRatio:false,animation:{duration:300},
       plugins:{legend:{position:'bottom',labels:{boxWidth:8,usePointStyle:true,font:{size:10.5},color:'#4a4741',padding:10}},
         tooltip:{callbacks:{label:c=>`${c.raw.l||c.dataset.label}（${c.raw.x.toFixed(2)}, ${c.raw.y.toFixed(2)}）`}}},
-      scales:{x:{min:-1,max:1,grid:{color:'#ece8e1'},ticks:{color:'#8b867d',font:{size:10}}},
-        y:{min:-1,max:1,grid:{color:'#ece8e1'},ticks:{color:'#8b867d',font:{size:10}}}}}});
+      scales:{x:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#8b867d',font:{size:10}}},
+        y:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#8b867d',font:{size:10}}}}}});
 }
 function drawCmpK(A,B,cv,full){
   const deltas=DATA.kdf.map((k,j)=>({id:k.id,name:k.name,d:B.w[j]-A.w[j]})).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d));
@@ -503,7 +714,7 @@ function drawCmpK(A,B,cv,full){
       backgroundColor:show.map(x=>x.d>=0?'#2f7050':'#b03a30'),borderRadius:3,barPercentage:.72}]},
     options:{indexAxis:'y',maintainAspectRatio:false,animation:{duration:300},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Δ ${c.raw>0?'+':''}${c.raw}`}}},
-      scales:{x:{grid:{color:'#ece8e1'},ticks:{color:'#8b867d',font:{size:10}}},
+      scales:{x:{grid:{color:'#f0ece6'},ticks:{color:'#8b867d',font:{size:10}}},
         y:{grid:{display:false},ticks:{color:'#4a4741',font:{size:10}}}}}});
 }
 function buildCmp(){
@@ -592,7 +803,7 @@ function render(i){
       ${x.why?`<div class="why">${x.why}</div>`:''}</div></div>`;
     if(ups.length||dns.length)moversHTML=`
     <section id="movers" style="padding-top:18px">
-      <div class="sh"><h2>本週最大變動</h2><span class="sub">${S?`相對 W${p.week}｜哪些因素變重要了、為什麼`:`相對 W${p.week} · 附調整理由`}</span></div>
+      <div class="sh"><h2>本週最大變動</h2><span class="q">這週哪些因素變重要了？</span><span class="sub">${S?`相對 W${p.week}｜附每項權重調整理由`:`相對 W${p.week} · 附調整理由`}</span></div>
       <div class="movers">
         <div class="card"><div style="font-size:11px;color:var(--muted);margin-bottom:6px">權重上調</div>${ups.map(row).join('')||'<div class="mv"><div class="body"><div class="why">無顯著上調</div></div></div>'}</div>
         <div class="card"><div style="font-size:11px;color:var(--muted);margin-bottom:6px">權重下調</div>${dns.map(row).join('')||'<div class="mv"><div class="body"><div class="why">無顯著下調</div></div></div>'}</div>
@@ -609,36 +820,60 @@ function render(i){
 
   $('#main').innerHTML=`
   <section class="hero" id="overview">
-    <div class="card">
-      <div class="eyebrow">本週情境判定 <span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span><span class="chip num">資料區間 ${w.range}</span>${w.crossCheck?`<span class="chip cc${w.confidence==='低'?' lo':''}">雙模型${w.crossCheck.agreement?'一致 ✓':'不一致 ✕'}｜信心 ${w.confidence||'—'}</span>`:''}</div>
-      ${w.crossCheck&&w.crossCheck.flag?`<div class="heroflag">⚠️ ${w.crossCheck.flag}</div>`:''}
-      <div class="scen"><span class="scen-en">${w.scenarioEn}</span><span class="scen-zh">${w.scenario}</span></div>
-      ${S&&sm?`<p class="plain"><b>這代表什麼：</b>${sm.meaning}</p>`:''}
-      <p class="verdict">${clean(w.scenarioDesc||'').replace(/^結論[：:]\s*/,'').split('。').slice(0,S?1:2).join('。')}。</p>
-      <div class="axes">
-        <div>
-          <div class="ax-t"><span>X · 地緣與供應鏈聚合</span><span class="ax-v num">${fmt(w.xy.x)}${S?`<span class="axword">${xWord(w.xy.x)}</span>`:''} ${p?`<span class="delta ${dx<0?'dn':'up'}">${dx<0?'▼':'▲'}${Math.abs(dx).toFixed(2)}</span>`:''}</span></div>
-          <div class="bar"><i style="background:var(--c3);width:${(w.xy.x+1)/2*100}%"></i><span class="mk"></span></div>
-          <div class="ax-f"><span>碎裂 −1</span><span>聚合 +1</span></div>
+    <div class="brief">
+      <div class="brief-mast">
+        <span class="ix">§01</span>
+        <span class="mt">Weekly Strategic Brief</span>
+        <span class="mn">W${String(w.week).padStart(2,'0')}　${w.range}</span>
+        <span class="sp"></span>
+        <span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>
+        ${w.crossCheck?`<span class="chip cc${w.confidence==='低'?' lo':''}">雙模型${w.crossCheck.agreement?'一致 ✓':'不一致 ✕'}｜信心 ${w.confidence||'—'}</span>`:''}
+      </div>
+      <div class="brief-body">
+        <div class="brief-main">
+          <div class="brief-fx" aria-hidden="true"><i class="pat"></i><i class="dots"></i><i class="glow"></i></div>
+          ${w.crossCheck&&w.crossCheck.flag?`<div class="heroflag">⚠️ ${w.crossCheck.flag}</div>`:''}
+          <div class="scen rise d0"><span class="scen-en">${w.scenarioEn}</span><span class="scen-zh">${w.scenario}</span></div>
+          ${S&&sm?`<p class="plain rise d1"><b>這代表什麼：</b>${sm.meaning}</p>`:''}
+          <p class="verdict rise d2">${clean(w.scenarioDesc||'').replace(/^結論[：:]\s*/,'').split('。').slice(0,S?1:2).join('。')}。</p>
+          <div class="axes rise d3">
+            <div>
+              <div class="ax-t"><span>X · 地緣與供應鏈聚合</span><span class="ax-v num">${fmt(w.xy.x)}${S?`<span class="axword">${xWord(w.xy.x)}</span>`:''} ${p?`<span class="delta ${dx<0?'dn':'up'}">${dx<0?'▼':'▲'}${Math.abs(dx).toFixed(2)}</span>`:''}</span></div>
+              <div class="bar"><i style="background:var(--c3);width:${(w.xy.x+1)/2*100}%"></i><span class="mk"></span></div>
+              <div class="ax-f"><span>碎裂 −1</span><span>聚合 +1</span></div>
+            </div>
+            <div>
+              <div class="ax-t"><span>Y · 資源與政策充沛</span><span class="ax-v num">${fmt(w.xy.y)}${S?`<span class="axword">${yWord(w.xy.y)}</span>`:''} ${p?`<span class="delta ${dy<0?'dn':'up'}">${dy<0?'▼':'▲'}${Math.abs(dy).toFixed(2)}</span>`:''}</span></div>
+              <div class="bar"><i style="background:var(--c1);width:${(w.xy.y+1)/2*100}%"></i><span class="mk"></span></div>
+              <div class="ax-f"><span>匱乏 −1</span><span>充沛 +1</span></div>
+            </div>
+          </div>
         </div>
-        <div>
-          <div class="ax-t"><span>Y · 資源與政策充沛</span><span class="ax-v num">${fmt(w.xy.y)}${S?`<span class="axword">${yWord(w.xy.y)}</span>`:''} ${p?`<span class="delta ${dy<0?'dn':'up'}">${dy<0?'▼':'▲'}${Math.abs(dy).toFixed(2)}</span>`:''}</span></div>
-          <div class="bar"><i style="background:var(--c1);width:${(w.xy.y+1)/2*100}%"></i><span class="mk"></span></div>
-          <div class="ax-f"><span>匱乏 −1</span><span>充沛 +1</span></div>
-        </div>
+        <aside class="snap rise d4" aria-label="本週決策摘要">
+          <h3>Executive Snapshot</h3>
+          <div class="sr-row"><span class="sr-k">情境判定</span><span class="sr-v">${w.scenarioEn||''}<span class="sm">${w.scenario}</span></span></div>
+          <div class="sr-row"><span class="sr-k">X · 地緣供應鏈</span><span class="sr-v">${fmt(w.xy.x)}${p?` <span class="${dx<0?'d':'u'}">${dx<0?'▼':'▲'}${Math.abs(dx).toFixed(2)}</span>`:''}</span></div>
+          <div class="sr-row"><span class="sr-k">Y · 資源與政策</span><span class="sr-v">${fmt(w.xy.y)}${p?` <span class="${dy<0?'d':'u'}">${dy<0?'▼':'▲'}${Math.abs(dy).toFixed(2)}</span>`:''}</span></div>
+          <div class="sr-row"><span class="sr-k">判定信心</span><span class="sr-v">${w.confidence||'—'}</span></div>
+          ${w.crossCheck?`<div class="sr-row"><span class="sr-k">雙模型交叉</span><span class="sr-v">${w.crossCheck.agreement?'一致':'不一致'}</span></div>`:''}
+          <div class="sr-row"><span class="sr-k">觸發劇本</span><span class="sr-v">${fired.length} 條</span></div>
+          <div class="sr-row"><span class="sr-k">資料更新</span><span class="sr-v">${w.gen}</span></div>
+          <div class="note">本頁 X／Y 座標、KDF 權重與規畫建議均為分析判斷【推斷】，非企業官方數據。</div>
+        </aside>
       </div>
     </div>
-    <div class="side">
-      <h3>本週行動建議</h3>
-      ${acts||'<div class="act"><div style="color:var(--muted)">本週無劇本觸發</div></div>'}
-      <div class="foot">前三大 KDF${S?'（關鍵決策因素）':''}：${top3.map(t=>`#${t.id} ${t.name.replace(/（.*/,'')} <b class="num">${t.v}</b>`).join('　')}</div>
+
+    <div class="actband rise d4">
+      <div class="actband-h"><span class="mlab">Action Required</span><b>本週行動建議</b><span class="q">欣銓現在該做什麼？</span></div>
+      <div class="acts">${acts||'<div class="act"><div style="color:var(--muted)">本週無劇本觸發</div></div>'}</div>
+      <div class="actband-f">前三大 KDF${S?'（關鍵決策因素）':''}：${top3.map(t=>`#${t.id} ${t.name.replace(/（.*/,'')} <b class="num">${t.v}</b>`).join('　')}</div>
     </div>
   </section>
 
   ${moversHTML}
 
   <section id="plan">
-    <div class="sh"><h2>對欣銓的公司規畫</h2><span class="sub">${S?'這週欣銓該做什麼、何時停損':'企業畫像 × 情境 → 觸發式劇本'}</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
+    <div class="sh"><span class="ix">§02</span><h2>對欣銓的公司規畫</h2><span class="q">欣銓現在該做什麼？</span><span class="sub">${S?`共 ${fired.length} 條觸發｜含成功指標與停損訊號`:'企業畫像 × 情境 → 觸發式劇本'}</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
     ${plan?`<div style="font-size:12.5px;color:var(--ink2);margin-bottom:14px">情境姿態：${plan.scenarioStance}</div>`:''}
     <div class="plan">${fired.map(f=>`
       <div class="pb">
@@ -650,13 +885,13 @@ function render(i){
           <div class="mi"><div class="k">成功指標</div><div class="v">${f.success_metric}</div></div>
           <div class="mi"><div class="k">停損訊號</div><div class="v">${f.stop_loss}</div></div>
         </div>
-        ${S?`<details class="ev-d"><summary>觸發依據（✓＝條件成立、✗＝未成立）</summary><div class="ev" style="margin-top:6px">${f.evidence}</div></details>`:`<div class="ev">觸發依據：${f.evidence}</div>`}
+        ${S?`<details class="ev-d"><summary>觸發依據（✓＝條件成立、✗＝未成立）</summary><div class="ev" style="margin-top:6px">${evTag(f.evidence)}</div></details>`:`<div class="ev">觸發依據：${evTag(f.evidence)}</div>`}
       </div>`).join('')||'<div class="card" style="color:var(--muted);font-size:12.5px">本週各劇本觸發門檻均未達成。</div>'}
     </div>
   </section>
 
   <section id="risk">
-    <div class="sh"><h2>H+6 風險雷達</h2><span class="sub">${S?'未來六個月要提防什麼（欣銓／測試廠視角）':'未來六個月 · 欣銓／測試廠視角'}</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
+    <div class="sh"><span class="ix">§03</span><h2>H+6 風險雷達</h2><span class="q">未來六個月要提防什麼？</span><span class="sub">${S?'欣銓／測試廠視角｜含領先訊號與規避動作':'未來六個月 · 欣銓／測試廠視角'}</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
     <div class="card" style="overflow-x:auto">
       <table><thead><tr><th style="width:30%">風險</th><th style="width:28%">領先訊號</th><th style="width:7%">KDF</th><th>規避動作</th></tr></thead><tbody>
       ${(w.riskRadar||[]).map((r,j)=>{
@@ -672,7 +907,7 @@ function render(i){
   </section>
 
   <section id="trend">
-    <div class="sh"><h2>情境軌跡與權重</h2><span class="sub">${S?`W1–W${w.week}｜局勢怎麼走（資料只增不改）`:`W1–W${w.week} 累積 · 只追加不覆寫`}</span></div>
+    <div class="sh"><span class="ix">§04</span><h2>情境軌跡與權重</h2><span class="q">局勢往哪個方向走？</span><span class="sub">${S?`W1–W${w.week} 累積｜資料只追加不覆寫`:`W1–W${w.week} 累積 · 只追加不覆寫`}</span></div>
     ${p?`<div class="trendsum">累積觀察（W${w0.week}→W${w.week}）：X 軸由 <b class="num">${fmt(w0.xy.x)}</b> 移至 <b class="num">${fmt(w.xy.x)}</b>（${w.xy.x<w0.xy.x?'碎裂加深':'聚合改善'} ${Math.abs(w.xy.x-w0.xy.x).toFixed(2)}）；Y 軸由 <b class="num">${fmt(w0.xy.y)}</b> 至 <b class="num">${fmt(w.xy.y)}</b>。期間情境${scenSpan.length===1?`維持 ${scenSpan[0]}`:`歷經 ${scenSpan.join(' → ')}`}；五維中累積變動最大＝${dimTop.n}（<b class="num">${dimTop.a.toFixed(1)}→${dimTop.b.toFixed(1)}</b>）。</div>`:''}
     <div class="g2">
       <div class="card"><button class="zoombtn" data-zoom="xy" aria-label="放大雙軸軌跡圖">⤢ 放大</button>
@@ -694,7 +929,7 @@ function render(i){
   </section>
 
   <section id="events">
-    <div class="sh"><h2>本週事件</h2><span class="sub">${S?'判斷依據的新聞，均可點回原文':'真實可追溯'} · ${(w.events||[]).length} 則 · ${[...new Set((w.events||[]).map(e=>e.source).filter(Boolean))].length} 個來源</span></div>
+    <div class="sh"><span class="ix">§05</span><h2>本週事件</h2><span class="q">這些判斷根據哪些事實？</span><span class="sub">${S?'每則均可點回原文查證':'真實可追溯'} · ${(w.events||[]).length} 則 · ${[...new Set((w.events||[]).map(e=>e.source).filter(Boolean))].length} 個來源</span></div>
     <div class="evgrid">
       ${(w.events||[]).map(e=>`<div class="evc">
         <div class="t">${e.title}</div>
@@ -703,13 +938,13 @@ function render(i){
           <span class="imp ${e.xImpact==='↓'?'d':e.xImpact==='↑'?'u':''}">X ${e.xImpact||'→'}</span>
           <span class="imp ${e.yImpact==='↓'?'d':e.yImpact==='↑'?'u':''}">Y ${e.yImpact||'→'}</span>
           <span>${e.source} · ${e.date}</span>
-          <a href="${e.url}" target="_blank" rel="noopener">原文 ↗</a>
+          <a href="${e.url}" target="_blank" rel="noopener">原文 <span class="arw">↗</span></a>
         </div></div>`).join('')}
     </div>
   </section>
 
   <section id="trace">
-    <div class="sh"><h2>Decision Trace${S?' 決策軌跡':''}</h2><span class="sub">${S?'每個判斷怎麼來：事件 → 關鍵字 → 位移 → 權重調整（逐筆可查證）':'可稽核決策軌跡 · 事件 → 關鍵字 → 軸位移 → KDF 調整'}</span></div>
+    <div class="sh"><span class="ix">§06</span><h2>Decision Trace${S?' 決策軌跡':''}</h2><span class="q">每一步判斷怎麼來的？</span><span class="sub">${S?'事件 → 關鍵字 → 軸位移 → 權重調整，逐筆可查證':'可稽核決策軌跡 · 事件 → 關鍵字 → 軸位移 → KDF 調整'}</span></div>
     ${(w.decisionTrace||[]).map(t=>{
       const ev=(w.events||[]).find(e=>e.title===t.event)||{};
       return `<details><summary><span>${t.event}</span>
@@ -717,13 +952,13 @@ function render(i){
         <div class="tr-b">
           <div class="kws">${t.keywords.map(k=>`<span class="kw">${k}</span>`).join('')}</div>
           ${t.kdfChanges.map(k=>`<div class="kdfc">#${k.id} ${k.name}　<b>${k.from}→${k.to}</b>　<span style="color:var(--muted)">${k.reason}</span></div>`).join('')}
-          ${ev.url?`<div class="src">${ev.source||''} · ${ev.date||''} · <a href="${ev.url}" target="_blank" rel="noopener">原文 ↗</a></div>`:''}
+          ${ev.url?`<div class="src">${ev.source||''} · ${ev.date||''} · <a href="${ev.url}" target="_blank" rel="noopener">原文 <span class="arw">↗</span></a></div>`:''}
         </div></details>`}).join('')}
     <div class="audit">管線稽核：<a href="https://github.com/sakaban-Code/SCAI-test" target="_blank" rel="noopener">原始碼與資料 repo ↗</a> · <a href="https://github.com/sakaban-Code/SCAI-test/actions/workflows/weekly.yml" target="_blank" rel="noopener">每週自動執行紀錄 ↗</a>${w.tokenUsage?`　·　本週模型用量 <b class="num">${(w.tokenUsage.total||0).toLocaleString()}</b> tokens${w.tokenUsage.byStep?`<table><thead><tr><th>步驟</th><th>模型</th><th>in</th><th>out</th></tr></thead><tbody>${Object.entries(w.tokenUsage.byStep).map(([k,v])=>`<tr><td>${k}</td><td>${v.model||''}</td><td class="num">${(v.input_tokens||0).toLocaleString()}</td><td class="num">${(v.output_tokens||0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:''}`:'　·　自 W7 起由雲端管線自動產出，並於本區附逐模型 token 用量'}</div>
   </section>
 
   <section id="profile">
-    <div class="sh"><h2>企業畫像</h2><span class="sub">${S?'欣銓科技 3264.TWO｜公司現況（皆為公開資料）':'欣銓科技 3264.TWO · 公開資料'}</span></div>
+    <div class="sh"><span class="ix">§07</span><h2>企業畫像</h2><span class="q">這些建議是對誰而言？</span><span class="sub">${S?'欣銓科技 3264.TWO｜公司現況（皆為公開資料）':'欣銓科技 3264.TWO · 公開資料'}</span></div>
     <div class="pf">
       <div class="it"><div class="k">2026Q2 營收</div><div class="v">45.3 億</div><div class="n">季增 13.8%／年增 32.4%　法說會</div></div>
       <div class="it"><div class="k">毛利率</div><div class="v">40.2%</div><div class="n">季增 1.8pp／年增 3.9pp</div></div>
@@ -739,7 +974,7 @@ function render(i){
   </section>
 
   <section id="method">
-    <div class="sh"><h2>方法論</h2><span class="sub">${S?'這套判定怎麼運作：雙軸情境 × 25 項關鍵決策因素（KDF）':'雙軸情境分析 × 25 KDF 動態校準（SCAI-Agent）'}</span></div>
+    <div class="sh"><span class="ix">§08</span><h2>方法論</h2><span class="q">這套判定怎麼運作？</span><span class="sub">${S?'雙軸情境 × 25 項關鍵決策因素（KDF）':'雙軸情境分析 × 25 KDF 動態校準（SCAI-Agent）'}</span></div>
     <div class="axbox">
       <div class="axc"><div class="t">X 軸｜地緣與供應鏈聚合程度（−1 碎裂 ↔ +1 聚合）</div>
         <div class="d">碎裂訊號：保護主義、出口管制、關稅、技術封鎖、斷鏈、供應鏈區域化。聚合訊號：自由貿易、國際合作、供應鏈穩定、跨國協作。</div></div>
@@ -759,6 +994,7 @@ function render(i){
     drawXY(i);drawTrend(i);drawKDF(w,p);buildChips(w);buildCmp();
   }
   $$('.zoombtn').forEach(b=>b.onclick=()=>openLB(b.dataset.zoom));
+  heroFx();
   bindSpy();
 }
 
@@ -778,9 +1014,9 @@ function drawXY(idx,cv){
       animation:matchMedia('(prefers-reduced-motion: reduce)').matches?false
         :{duration:480,delay:c=>c.type==='data'&&c.mode==='default'?c.dataIndex*160:0},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw.l}（${c.raw.x}, ${c.raw.y}）`}}},
-      scales:{x:{min:-1,max:1,grid:{color:'#ece8e1'},ticks:{color:'#8b867d',font:{size:10}},
+      scales:{x:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#8b867d',font:{size:10}},
           title:{display:true,text:'碎裂 ← X 地緣與供應鏈 → 聚合',color:'#8b867d',font:{size:11}}},
-        y:{min:-1,max:1,grid:{color:'#ece8e1'},ticks:{color:'#8b867d',font:{size:10}},
+        y:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#8b867d',font:{size:10}},
           title:{display:true,text:'匱乏 ← Y 資源與政策 → 充沛',color:'#8b867d',font:{size:11}}}}},
     plugins:[{id:'q',beforeDatasetsDraw(ch){const{ctx,chartArea:a,scales}=ch;
       const x0=scales.x.getPixelForValue(0),y0=scales.y.getPixelForValue(0);ctx.save();
@@ -817,7 +1053,7 @@ function drawTrend(idx,cv){
       plugins:{legend:{position:'bottom',labels:{boxWidth:8,boxHeight:8,usePointStyle:true,
         pointStyle:'circle',font:{size:10.5},color:'#4a4741',padding:12}},
         tooltip:{callbacks:{title:its=>{const wk=ws[its[0].dataIndex];return `W${wk.week}｜${wk.scenarioEn||wk.scenario||''}`}}}},
-      scales:{y:{min:40,max:85,grid:{color:'#ece8e1'},ticks:{color:'#8b867d',font:{size:10}}},
+      scales:{y:{min:40,max:85,grid:{color:'#f0ece6'},ticks:{color:'#8b867d',font:{size:10}}},
         x:{grid:{display:false},ticks:{color:'#8b867d',font:{size:10.5}}}}}});
   if(!cv)charts.push(inst);
   return inst;
@@ -842,7 +1078,7 @@ function drawKDF(w,p){
             const out=[];if(p)out.push(`上週 ${p.w[c.dataIndex]} → 本週 ${c.raw}`);
             const def=DATA.kdfDefs[String(id)];if(def)out.push(...wrapText('定義：'+def,22));return out}
         }}},
-      scales:{x:{min:0,max:100,grid:{color:'#ece8e1'},ticks:{color:'#8b867d',font:{size:10}}},
+      scales:{x:{min:0,max:100,grid:{color:'#f0ece6'},ticks:{color:'#8b867d',font:{size:10}}},
         y:{grid:{display:false},ticks:{color:'#4a4741',font:{size:10.5}}}}},
     plugins:[{id:'b',afterDatasetsDraw(ch){const x=ch.scales.x.getPixelForValue(50);
       ch.ctx.save();ch.ctx.strokeStyle='#a5a099';ch.ctx.setLineDash([4,3]);ch.ctx.beginPath();
@@ -867,6 +1103,28 @@ function buildChips(w){
   box.appendChild(mk('全部',-1,null));
   DATA.dims.forEach((d,j)=>box.appendChild(mk(d.name,j,DC[j])));
   $$('#dimchips .fchip').forEach((c,ci)=>c.classList.toggle('on',(ci===0?kdfFilter===-1:kdfFilter===ci-1)));
+}
+
+/* ── hero 指標聚光：CSS 變數驅動的極淡網格／底紋位移（無光球、無殘影） ── */
+function heroFx(){
+  const el=$('.brief');if(!el)return;
+  if(!matchMedia('(pointer:fine)').matches)return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const main=el.querySelector('.brief-main');if(!main)return;
+  let tick=false;
+  main.addEventListener('pointermove',e=>{
+    el.classList.add('fx');
+    if(tick)return;tick=true;
+    requestAnimationFrame(()=>{tick=false;
+      const r=main.getBoundingClientRect();
+      const x=e.clientX-r.left,y=e.clientY-r.top;
+      el.style.setProperty('--mx',x.toFixed(1)+'px');
+      el.style.setProperty('--my',y.toFixed(1)+'px');
+      el.style.setProperty('--px',(((x/r.width)-.5)*-12).toFixed(1)+'px');
+      el.style.setProperty('--py',(((y/r.height)-.5)*-8).toFixed(1)+'px');});
+  },{passive:true});
+  main.addEventListener('pointerleave',()=>{el.classList.remove('fx');
+    el.style.setProperty('--px','0px');el.style.setProperty('--py','0px')});
 }
 
 /* ── scrollspy + back-to-top ── */
