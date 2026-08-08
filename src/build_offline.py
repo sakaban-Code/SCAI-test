@@ -143,18 +143,34 @@ def main():
     html = html.replace("/*__DATA__*/", "const DATA=" + data_js + ";")
 
     # ── 7. 零外部請求驗收 ──
-    leaks = re.findall(r'(?:src|href)="https?://[^"]+"', html)
-    leaks = [u for u in leaks if "og:image" not in u]
-    external = [u for u in leaks if not u.startswith(('href="#', 'href="data:'))]
-    # 事件來源連結（<a href="https://…" target="_blank">）是內容不是資源，需保留
-    res_leak = [u for u in external if u.startswith('src="')]
+    # 舊版只擋 src=，漏掉 <link href>、CSS url()、@import、srcset 等同樣會發出
+    # 請求的形式——模板日後改動就會無聲溜過。此處列舉所有「載入資源」的引用方式；
+    # <a href="https://…"> 是內容連結不是資源請求，刻意不納入。
+    RESOURCE_PATTERNS = [
+        ("src",      r'\bsrc\s*=\s*["\']https?://[^"\']+'),
+        ("srcset",   r'\bsrcset\s*=\s*["\'][^"\']*https?://[^"\']*'),
+        ("link",     r'<link\b[^>]*\bhref\s*=\s*["\']https?://[^"\']+'),
+        ("css-url",  r'url\(\s*["\']?https?://[^)]+'),
+        ("@import",  r'@import\s+(?:url\()?\s*["\']?https?://[^;]+'),
+        ("poster",   r'\bposter\s*=\s*["\']https?://[^"\']+'),
+        ("data-src", r'\bdata-src\s*=\s*["\']https?://[^"\']+'),
+    ]
+    res_leak = []
+    for tag, pat in RESOURCE_PATTERNS:
+        for m in re.findall(pat, html, re.I):
+            res_leak.append(f"[{tag}] {m[:100]}")
     if res_leak:
-        sys.exit(f"[錯誤] 仍有外部資源請求：{res_leak[:3]}")
+        sys.exit("[錯誤] 仍有外部資源請求（共 %d 處）：\n       %s"
+                 % (len(res_leak), "\n       ".join(res_leak[:5])))
+
+    content_links = re.findall(r'<a\b[^>]*\bhref\s*=\s*["\']https?://[^"\']+', html, re.I)
 
     out = ROOT / "docs" / "index_offline.html"
     out.write_text(html, encoding="utf-8")
     print(f"[完成] {out}（{len(weeks)} 週，{len(html) // 1024} KB）")
-    print(f"[驗收] 外部資源請求 0 個；保留 {len(external)} 條事件來源連結（內容，離線時不可點但需存在）")
+    print(f"[驗收] 外部資源請求 0 個（已檢查 {len(RESOURCE_PATTERNS)} 種引用形式："
+          f"{'、'.join(t for t, _ in RESOURCE_PATTERNS)}）；"
+          f"保留 {len(content_links)} 條內容連結（離線時不可點但需存在）")
 
 
 if __name__ == "__main__":
