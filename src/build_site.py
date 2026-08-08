@@ -10,38 +10,21 @@ SCAI-Agent｜公開網站產生器 — 雲端管線版
 
 用法： python src/build_site.py
 """
-import json, copy, pathlib
+import pathlib, sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import sitedata
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-def load(p):
-    return json.loads(pathlib.Path(p).read_text(encoding="utf-8"))
-
 def main():
-    weeks = copy.deepcopy(load(ROOT / "data" / "weeks.json"))
-    for w in weeks:
-        w["week"] = int(str(w["week"]).lstrip("Ww"))
-    weeks.sort(key=lambda w: w["week"])
-
-    cfg = load(ROOT / "data" / "kdf_config.json")
-    prof = load(ROOT / "data" / "company_profile.json")
-    pb = load(ROOT / "data" / "playbook.json")
-    extras_path = ROOT / "data" / "kdf_definitions.json"
-    extras = load(extras_path) if extras_path.exists() else {"kdfDefs": {}, "scenarioMeta": []}
-
-    payload = {
-        "weeks": weeks,
-        "kdf": cfg["kdf"],
-        "dims": cfg["dimensions"],
-        "horizons": pb["horizons"],
-        "levers": {l["id"]: l for l in prof["decision_levers"]},
-        "profile": prof,
-        "kdfDefs": extras.get("kdfDefs", {}),
-        "scenarioMeta": extras.get("scenarioMeta", []),
-    }
-    data_js = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    payload = sitedata.build_payload(ROOT)
+    weeks = payload["weeks"]
+    data_js = sitedata.payload_js(ROOT)
 
     tpl = (ROOT / "src" / "site_template.html").read_text(encoding="utf-8")
+    if tpl.count("/*__DATA__*/") != 1:
+        sys.exit(f"[錯誤] 模板中的 /*__DATA__*/ 標記出現 {tpl.count('/*__DATA__*/')} 次（需 1 次）")
     html = tpl.replace("/*__DATA__*/", "const DATA=" + data_js + ";")
     out_dir = ROOT / "docs"
     out_dir.mkdir(exist_ok=True)

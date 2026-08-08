@@ -13,7 +13,10 @@ Chart.js、拉丁字體（Space Grotesk／IBM Plex Mono 的 latin 子集）、�
 
 字體授權：Space Grotesk 與 IBM Plex Mono 均為 SIL Open Font License 1.1，允許內嵌。
 """
-import base64, json, copy, pathlib, re, sys, urllib.request
+import base64, json, pathlib, re, sys, urllib.request
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import sitedata
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CACHE = ROOT / "src" / "_fontcache"
@@ -77,23 +80,9 @@ def build_font_css() -> str:
 
 
 def main():
-    # ── 資料（與 build_site.py 完全相同的 payload）──
-    weeks = copy.deepcopy(load(ROOT / "data" / "weeks.json"))
-    for w in weeks:
-        w["week"] = int(str(w["week"]).lstrip("Ww"))
-    weeks.sort(key=lambda w: w["week"])
-    cfg = load(ROOT / "data" / "kdf_config.json")
-    prof = load(ROOT / "data" / "company_profile.json")
-    pb = load(ROOT / "data" / "playbook.json")
-    ex_path = ROOT / "data" / "kdf_definitions.json"
-    extras = load(ex_path) if ex_path.exists() else {"kdfDefs": {}, "scenarioMeta": []}
-    payload = {
-        "weeks": weeks, "kdf": cfg["kdf"], "dims": cfg["dimensions"],
-        "horizons": pb["horizons"], "levers": {l["id"]: l for l in prof["decision_levers"]},
-        "profile": prof, "kdfDefs": extras.get("kdfDefs", {}),
-        "scenarioMeta": extras.get("scenarioMeta", []),
-    }
-    data_js = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    # ── 資料（與 build_site.py 共用 sitedata.build_payload，不再各自複製）──
+    weeks = sitedata.build_payload(ROOT)["weeks"]
+    data_js = sitedata.payload_js(ROOT)
 
     html = (ROOT / "src" / "site_template.html").read_text(encoding="utf-8")
     assets = ROOT / "docs" / "assets"

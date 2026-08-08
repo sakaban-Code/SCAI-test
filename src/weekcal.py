@@ -31,6 +31,21 @@ def parse_range_end(rng: str) -> datetime.date:
     return datetime.date(year, m, d)
 
 
+def parse_range(rng: str) -> tuple[datetime.date, datetime.date]:
+    """解析區間字串為 (起日, 迄日)。起日一律完整年月日，迄日容忍省略年份。"""
+    parts = rng.replace("—", "–").replace("-", "–").split("–")
+    if len(parts) != 2:
+        raise ValueError(f"無法解析區間字串：{rng!r}")
+    start = datetime.datetime.strptime(parts[0].strip(), "%Y/%m/%d").date()
+    return start, parse_range_end(rng)
+
+
+def span_days(rng: str) -> int:
+    """區間涵蓋天數（含頭尾）。W1–W6 為 7，W7 雙週窗口為 14。"""
+    start, end = parse_range(rng)
+    return (end - start).days + 1
+
+
 def last_week_entry(weeks: list) -> dict | None:
     """取週次編號最大的一筆（weeks.json 未必依序）"""
     return max(weeks, key=lambda w: wnum(w.get("week"))) if weeks else None

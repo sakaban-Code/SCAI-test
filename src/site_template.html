@@ -605,6 +605,15 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
   .sh::after{display:none}
   .sh{gap:5px 9px}
 }
+/* §09 期間涵蓋揭露：內容由建置時推導的 DATA.coverage 產生，資料變動即自動同步 */
+.covbox{margin-top:16px;border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:8px;padding:14px 16px;background:#f8f6f2}
+.covbox .t{font-size:12px;font-weight:600;color:var(--ink);letter-spacing:.02em;margin-bottom:6px}
+.covbox .d{font-size:11.5px;color:var(--ink2);line-height:1.7}
+.covbox ul{margin:8px 0 0;padding-left:17px}
+.covbox li{font-size:11.5px;color:var(--ink2);line-height:1.75;margin-bottom:4px}
+.covbox li b{color:var(--ink);font-weight:600}
+.covbox .d2{font-size:10.5px;color:#6f6a62;margin-top:9px;padding-top:8px;border-top:1px solid var(--line)}
 </style>
 </head>
 <body>
@@ -711,10 +720,24 @@ const rangeSet=r=>{const s=Math.min(r.s,r.e),e=Math.max(r.s,r.e),out=new Set();
   for(let i=s;i<=e;i++)out.add(i);return out};
 const rangeLabel=r=>{const s=Math.min(r.s,r.e),e=Math.max(r.s,r.e);
   return s===e?`W${DATA.weeks[s].week}`:`W${DATA.weeks[s].week}–W${DATA.weeks[e].week}`};
+/* 選取區間實際涵蓋的日曆天數：取聯集，重疊只算一次、缺口不算。
+   期數不等於天數——W7 單獨一期即 14 天，W6+W7 兩期是 21 天。任一期缺推導欄位即回 null。 */
+const rangeDays=r=>{const s=Math.min(r.s,r.e),e=Math.max(r.s,r.e),iv=[];
+  for(let i=s;i<=e;i++){const w=DATA.weeks[i];
+    if(!w||!w.start||!w.end)return null;iv.push([Date.parse(w.start),Date.parse(w.end)])}
+  if(!iv.length)return null;
+  iv.sort((a,b)=>a[0]-b[0]);
+  const D=864e5;let tot=0,cs=iv[0][0],ce=iv[0][1];
+  for(let k=1;k<iv.length;k++){
+    if(iv[k][0]<=ce+D){if(iv[k][1]>ce)ce=iv[k][1]}
+    else{tot+=(ce-cs)/D+1;cs=iv[k][0];ce=iv[k][1]}}
+  return tot+(ce-cs)/D+1};
 
 /* ── week selector ── */
 const sel=$('#wsel');
-DATA.weeks.forEach((w,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`W${w.week}　${w.range}`;sel.appendChild(o)});
+/* days 為建置時由 range 推導的衍生欄位；非 7 天的期別明示天數，避免讀者誤以為每期等長 */
+DATA.weeks.forEach((w,i)=>{const o=document.createElement('option');o.value=i;
+  o.textContent=`W${w.week}　${w.range}${w.days&&w.days!==7?`（${w.days} 天）`:''}`;sel.appendChild(o)});
 const hashW=(location.hash.match(/^#?w(\d+)$/i)||[])[1];
 let cur=hashW?Math.max(0,DATA.weeks.findIndex(x=>x.week==+hashW)):DATA.weeks.length-1;
 if(cur<0)cur=DATA.weeks.length-1;
@@ -817,7 +840,7 @@ function buildCmp(){
     return `<button type="button" class="wpick${cmpOpen===side?' on':''}" data-side="${side}"
       aria-expanded="${cmpOpen===side}" aria-controls="cmppanel">
       <span class="wpick-v num">${rangeLabel(r)}</span>
-      <span class="wpick-n">${n===1?'單週':`共 ${n} 週`}</span>
+      <span class="wpick-n">${(d=>d?`${n} 期・${d} 天`:(n===1?'單週':`共 ${n} 週`))(rangeDays(r))}</span>
       <span class="wpick-c" aria-hidden="true">${cmpOpen===side?'−':'＋'}</span></button>`};
   /* 選擇面板：先點起始、再點結束，中間週次自動納入；附搜尋以免週次過多難找 */
   let panel='';
@@ -987,6 +1010,7 @@ function render(i){
         <span class="ix">§01</span>
         <span class="mt">本週戰略簡報</span>
         <span class="mn">W${String(w.week).padStart(2,'0')}　${w.range}</span>
+        ${w.days&&w.days!==7?`<span class="chip" title="本期涵蓋 ${w.days} 個日曆天，非標準 7 天週期；成因見 §09 方法論">${w.days} 天窗口</span>`:''}
         <span class="sp"></span>
         <span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>
         ${w.crossCheck?`<span class="chip cc${w.confidence==='低'?' lo':''}">雙模型${w.crossCheck.agreement?'一致 ✓':'不一致 ✕'}｜信心 ${w.confidence||'—'}</span>`:''}
@@ -1150,6 +1174,18 @@ function render(i){
       ${DATA.dims.map((d,j)=>`<span class="dimtag"><span class="sw" style="background:${DC[j]}"></span>${d.name}（${d.members.length} 項）</span>`).join('')}
     </div>
     <div class="cap" style="margin-top:12px">每週流程：外部事件擷取（附來源）→ 雙軸衝擊評估 → 情境判定 → 25 KDF 權重校準（附 Decision Trace）→ H+6 風險雷達 → 企業劇本比對 → 報告與通知。全程自動，人工只需審閱。</div>
+    ${(()=>{const c=DATA.coverage;if(!c)return '';const li=[];
+      if(c.irregular.length)li.push(`<li><b>非 7 天期別</b>：${c.irregular.map(x=>`W${x.week}（${x.days} 天）`).join('、')}。排程中斷後，以單一報告涵蓋整段期間，未事後補拆成多期。</li>`);
+      c.overlaps.forEach(o=>li.push(`<li><b>期間重疊</b>：W${o.a} 與 W${o.b} 重複涵蓋 ${o.from}–${o.to} 共 ${o.days} 天。成因為早期的窗口起日接續「上一期產出日」而非「上一期窗口迄日」。</li>`));
+      c.gaps.forEach(g=>li.push(`<li><b>期間缺口</b>：${g.from}${g.days>1?`–${g.to}`:''} 共 ${g.days} 天未被任何一期涵蓋（介於 W${g.after} 與 W${g.before}），同一成因。</li>`));
+      if(c.maxLag!=null&&c.maxLag>7)li.push(`<li><b>產出落差</b>：多數期別於窗口關閉前後 3 天內產出，最大落差為 W${c.maxLagWeek} 的 ${c.maxLag} 天。落差期間發生的事件可能被寫入該期報告，其日期會晚於該期宣告窗口。</li>`);
+      if(!li.length)return '';
+      return `<div class="covbox">
+      <div class="t">期間涵蓋與已知落差</div>
+      <div class="d">全期 ${c.spanFrom}–${c.spanTo} 共 ${c.spanDays} 天，實際涵蓋 ${c.coveredDays} 天${c.doubleCounted?`，其中 ${c.doubleCounted} 天被計入兩期`:''}。下列落差已知且未回頭修改——紀錄採 append-only，既有週次不因後見之明重寫。</div>
+      <ul>${li.join('')}</ul>
+      <div class="d2">多期對比取各期算術平均（每期等權），不依天數加權；期數與天數不等價，選擇器同時標示兩者。</div>
+    </div>`})()}
   </section>`;
 
   if(typeof Chart==='undefined'){
