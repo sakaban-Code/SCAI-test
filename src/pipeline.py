@@ -8,9 +8,8 @@ Step E  更新儀表板 WEEKS（append-only）＋ 產出 report.md
 全程記錄各模型 token 用量 → token_usage.json（對應評審 20% Token 說明）
 """
 import json, os, re, datetime, pathlib
-import anthropic
-from google import genai
 import plan_engine  # 公司規畫層（提案書 Step 5）：情境 × 企業畫像 → 觸發式劇本
+# anthropic／google-genai 延遲匯入：讓 --week 等參數驗證先行，錯誤參數不必等 SDK 就緒才報
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
@@ -37,6 +36,28 @@ token_log = {}   # {step: {model, input_tokens, output_tokens}}
 def latest_week_dir() -> pathlib.Path:
     dirs = sorted((ROOT / "weekly").glob("W*"), key=lambda p: int(p.name[1:]))
     return dirs[-1]
+
+def wnum(w) -> int:
+    """'W7' / 7 / 'w7' → 7"""
+    return int(str(w).lstrip("Ww"))
+
+def resolve_week_dir() -> pathlib.Path:
+    """--week N 指定 weekly/W{N}；省略＝編號最大的目錄（一般週跑）"""
+    import argparse
+    ap = argparse.ArgumentParser(description="SCAI-Agent 分析管線")
+    ap.add_argument("--week", type=int, help="指定要處理的 weekly/W{n} 目錄（回補用）；省略＝最新")
+    a = ap.parse_args()
+    if a.week is None:
+        return latest_week_dir()
+    wd = ROOT / "weekly" / f"W{a.week}"
+    if not (wd / "raw_items.json").exists():
+        raise SystemExit(f"[錯誤] 找不到 {wd/'raw_items.json'}——請先跑 fetch.py --week {a.week} --start … --end …")
+    return wd
+
+def pick_prev_week(weeks: list, cur: int) -> dict | None:
+    """取編號小於本週且最接近的一筆作為對比基準（回補時不可盲取 [-1]）"""
+    earlier = [w for w in weeks if wnum(w.get("week")) < cur]
+    return max(earlier, key=lambda w: wnum(w.get("week"))) if earlier else None
 
 def parse_json_block(text: str) -> dict:
     """容錯解析：剝除 ```json 圍欄後取第一個 JSON 物件"""
@@ -104,6 +125,7 @@ KDF 固定順序清單（id 1–25）：
 
 # ---------------------------------------------------------------- Step C
 def cross_check_gemini(events: dict) -> dict:
+    from google import genai
     g = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
     prompt = f"""你是獨立的半導體情境判定審查員。僅依下列事件，獨立判定本週落在哪一象限。
 {AXES_DEF}。
@@ -220,15 +242,19 @@ def write_report(wd: pathlib.Path, events, opus, verdict, rng, week_obj=None):
 
 # ---------------------------------------------------------------- main
 if __name__ == "__main__":
-    wd = latest_week_dir()
+    wd = resolve_week_dir()
     raw = json.loads((wd / "raw_items.json").read_text(encoding="utf-8"))
+    is_backfill = bool(raw.get("backfill"))
+    print(f"[start] {raw['week']}（{raw['range']}｜{'回補' if is_backfill else '週跑'}）")
+    import anthropic
     ac = anthropic.Anthropic()   # 讀 ANTHROPIC_API_KEY 環境變數
 
     events = extract_events(ac, raw)
     (wd / "events.json").write_text(json.dumps(events, ensure_ascii=False, indent=2), encoding="utf-8")
 
     weeks_file = ROOT / "data" / "weeks.json"
-    prev = json.loads(weeks_file.read_text(encoding="utf-8"))[-1] if weeks_file.exists() else None
+    all_weeks = json.loads(weeks_file.read_text(encoding="utf-8")) if weeks_file.exists() else []
+    prev = pick_prev_week(all_weeks, wnum(raw["week"]))
 
     opus = reason_scenario(ac, events, prev)
     (wd / "scenario.json").write_text(json.dumps(opus, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -239,7 +265,8 @@ if __name__ == "__main__":
         json.dumps({"gemini": gem, "verdict": verdict}, ensure_ascii=False, indent=2), encoding="utf-8")
 
     week_obj = {
-        "week": opus["week"], "range": raw["range"],
+        # 週次與區間一律以抓取層為準（模型回傳值僅供比對，不可作為排序依據）
+        "week": raw["week"], "range": raw["range"],
         "gen": datetime.date.today().isoformat(),
         "scenario": opus["scenario"], "scenarioEn": opus.get("scenarioEn", ""),
         "scenarioDesc": opus["scenarioDesc"],
@@ -257,6 +284,12 @@ if __name__ == "__main__":
         "tokenUsage": {"byStep": token_log,              # Token 治理（決賽 20% 評分項），公開站稽核區渲染
                        "total": sum(v["input_tokens"] + v["output_tokens"] for v in token_log.values())},
     }
+    if is_backfill:
+        # 誠實留痕：事後回補的週次與當週即時產出不同（無 RSS、分析日期晚於區間）
+        week_obj["backfill"] = {"generatedOn": datetime.date.today().isoformat(),
+                                "note": raw.get("sources_note", "")}
+    if str(opus.get("week", "")).lstrip("Ww") != str(raw["week"]).lstrip("Ww"):
+        print(f"[warn] 模型回傳週次 {opus.get('week')} 與抓取層 {raw['week']} 不符，已以抓取層為準")
 
     # 公司規畫層（提案書 Step 5）：比對 X/Y、KDF、關鍵字 → 觸發式劇本 companyPlan
     prof = json.loads((ROOT / "data" / "company_profile.json").read_text(encoding="utf-8"))

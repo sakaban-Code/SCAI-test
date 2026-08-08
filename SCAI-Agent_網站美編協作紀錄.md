@@ -553,3 +553,40 @@ git add -A; git commit -m "說明"; git push
 - `47152b7` feat(ui): 標籤中文化、--muted 對比達 AA、警示列 emoji 改 SVG（5 檔、+113/−77）
 - 已 push（`d4d2404..47152b7`）。**Pages 線上實測**：主站 118.8 KB——中文標籤 ✓、新色 `#736e66` ✓、舊色 `#8b867d` 已無殘留 ✓；離線備援 https://sakaban-code.github.io/SCAI-test/index_offline.html 827.3 KB——Chart.js 內嵌 ✓、外部字體請求 0 ✓。目視確認 masthead「§01 本週戰略簡報」、讀數面板「決策摘要」、行動帶「本週行動建議 問：欣銓現在該做什麼？」排版正確。
 - 提醒：Pages 更新後首次開啟仍會吃到瀏覽器快取，驗證需加查詢字串或強制重新整理。
+---
+
+## 2026-08-08｜管線：缺漏週次回補模式（W7/W8/W9 用）
+
+> 本輪屬管線層（非美編），但與公開網站的資料正確性直接相關，故一併記錄於本檔。
+
+- 人類需求：「API 遇到困難…到時候記得按照缺失的禮拜補上（可能有 W789）」→ 經回報現況缺陷後回覆「只能先這樣了…確認」。
+- 執行者：Claude Code（Fable 5）
+- **修改前狀態的重大缺陷（本輪調查發現）**：現行管線**無法**靠「連跑幾次」補回歷史週。`fetch.py` 的 `current_week_label()` 只有週次編號會遞增（`len(weeks.json)+1`），但：
+  - 日期範圍**寫死** `today−7 … today`
+  - Tavily 固定 `days=7`
+  - RSS `cutoff=now−7d`，且 feed 本身不保留歷史
+  連跑三次的結果＝W7/W8/W9 三週**掛同一段最近日期、抓到同一批新聞**，趨勢圖三點持平，Decision Trace 會拿近期新聞當 W7 的證據——**直接摧毀「每一步可查證」這個競賽主打點**。
+- 修改檔案：`src/fetch.py`、`src/pipeline.py`、**新增 `src/backfill.py`**、**新增 `src/weekcal.py`**。
+- 實作內容：
+  1. **`src/weekcal.py`（新）**：週次曆法共用工具（`wnum`／`fmt_range`／`parse_range_end`／`last_week_entry`），無副作用，三支腳本共用。區間字串沿用 W1–W6 既有樣式（同年 `2026/07/21–07/27`，跨年才寫完整年份），解析時容忍 `–`／`—`／`-` 三種分隔符與迄日省略年份。
+  2. **`fetch.py` 回補模式**：新增 `--week N --start YYYY-MM-DD --end YYYY-MM-DD`。給定區間時 Tavily 改用 `start_date`／`end_date` 搜該歷史區間（官方 API 支援，格式 YYYY-MM-DD）；**RSS 自動跳過**並於 `raw_items.json` 寫入 `backfill: true` 與 `sources_note`，誠實記載「事件來源僅 Tavily 區間搜尋，RSS 因 feed 不保留歷史而未納入，候選事件數可能少於一般週跑」。四道參數把關：`--start`/`--end` 必須成對、週次已存在則拒絕（append-only 鐵則）、迄日不得早於起日、**迄日尚未到來則拒絕**（該週資料不完整）。
+  3. **缺漏防呆（本輪最關鍵的一項）**：一般週跑時若距上一週迄日 **超過 8 天**，直接中止並指引先跑 `backfill.py`。若無此防呆，key 設定後只要每週 cron 先觸發，就會把 W7 這個編號配給「最近 7 天」，**週次與日期永久錯位且無法回頭**（append-only）。提供 `--force` 逃生門供刻意略過缺漏。
+  4. **`pipeline.py`**：新增 `--week N` 指定 `weekly/W{n}` 目錄（省略＝編號最大者）；**上週基準改為 `pick_prev_week()`**——取編號小於本週且最接近的一筆，取代原本盲取 `[-1]`（回補時 `[-1]` 未必是前一週）；**週次與區間一律以抓取層為準**（原本 `week_obj["week"]=opus["week"]` 信任模型回傳值，模型偏離即會破壞排序），模型回傳不符時印出警告；回補週次寫入 `backfill: {generatedOn, note}` 誠實留痕。
+  5. **`src/backfill.py`（新）**：從 `weeks.json` 最後一週迄日往後每 7 天推算缺漏週次，**只補已完整結束的週**；預設僅列印計畫，須加 `--execute` 才實際執行（會消耗 token），另有 `--max N`。逐週依序執行 `fetch.py --week/--start/--end` → `pipeline.py --week`，任一步失敗即中止（已完成週次保留，不回滾）。
+  6. **延遲匯入**：`fetch.py` 的 tavily／feedparser、`pipeline.py` 的 anthropic／google-genai 改為函式內匯入，讓參數驗證先行——錯誤參數不必等 SDK 與網路就緒才報，也讓本機無套件環境仍可測 CLI 邏輯。
+- 遇到的錯誤與原因：
+  1. 本機無 `tavily`／`anthropic`／`google-genai` 套件，原本模組層匯入導致腳本完全無法載入、CLI 邏輯無從測試。**修正**：改延遲匯入（見上）。
+  2. `fetch.py` 原本寫出的區間格式為 `2026/08/01–2026/08/08`（全年份），與 W1–W6 的 `2026/06/11–06/17`（縮寫）不一致。**修正**：統一走 `weekcal.fmt_range()`。
+- 驗證（無 API key，以參數與曆法邏輯為主）：
+  - **回補計畫推算**：基準 W6（迄 2026-07-20）→ 計畫 W7（07/21–07/27）、W8（07/28–08/03）；W9（08/04–08/10）因今天為 08/08 尚未結束而**正確拒絕**。
+  - **四道參數把關**逐一觸發確認：只給 `--start`、週次已存在（W6）、迄日未到（W9）、迄日早於起日——四則錯誤訊息皆正確。
+  - **缺漏防呆**：無參數週跑正確中止，訊息含實際天數（19 天）、將被誤標的區間（2026/08/01–08/08）與確切補救指令；`--force` 正確放行（續行至 Tavily 匯入才因本機無套件停止）。
+  - **`pipeline.py`**：`--week 99` 明確報錯並附上正確的前置指令；`--help` 顯示新參數；`pick_prev_week` 單元測試——補 W8 取 W7、補 W7 取 W6、補 W1 取 None（不受 `weeks.json` 排序影響）。
+  - `py_compile` 全部通過（fetch／pipeline／backfill／weekcal／build_site／build_offline）。
+  - **未能驗證**：Tavily `start_date`/`end_date` 的實際回傳、Anthropic／Gemini 呼叫——皆需 API key。
+- **待人類處理／首跑前務必確認**：
+  1. **模型 ID 有效性**：`pipeline.py` 目前寫 `SONNET="claude-sonnet-5"`、`OPUS="claude-opus-4-8"`、`GEMINI="gemini-2.5-pro"`。key 到位後**第一件事是確認三個 ID 都能解析**，避免在首跑時才因 ID 失效而中斷（Opus 現有 5 代，是否改用需人類決定，涉及成本與競賽三系列限制的判斷）。
+  2. **執行順序**：key 設定後**先跑 `backfill.py --execute` 再讓每週 cron 跑**；防呆會擋住順序顛倒，但先補仍最省事。
+  3. 回補完成後需接著執行 `make_charts.py`、`build_site.py`、`build_offline.py --no-net` 才會反映到網站與斷網備援。
+  4. 回補週次的 `backfill` 欄位目前只寫入資料、**網站尚未顯示**；是否在該週加上「回補」標示（誠實揭露該週無 RSS 來源、分析日期晚於區間）待人類決定。
+- Git commit：（見本節末補記）
