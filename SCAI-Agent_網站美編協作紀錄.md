@@ -648,3 +648,46 @@ git add -A; git commit -m "說明"; git push
 - 修改檔案：`data/playbook.json`、`src/site_template.html`、重建 `docs/index.html`（133 KB）與 `docs/index_offline.html`（841 KB）。
 - Git commit：（見本節末補記）
 - 未完成與後續工作：`selfAudit` 目前僅 W3/W5/W6/W7 有；W1／W2／W4 為早期產出未含此欄位，屬歷史事實，**不回頭補寫**。
+
+---
+
+## 2026-08-08｜游標粒子層（圓點分裂泡泡）整合上線
+
+- 人類需求：交付 `SCAI-Agent_pointer-bubble-effects.zip` 並指示「加上」；經執行者提出規範衝突異議後，人類裁定「**1.＋z-index修掉＋把泡泡出現頻率調到80%**」（＝完整整合＋兩項調整）。
+- 執行者：Claude Code（Fable 5）；素材來源：GPT（圖像／特效軌），交付 `scai-pointer-bubble-fx.js`、demo、整合說明與製作紀錄。
+
+### 執行者異議與人類覆核（依規保留紀錄）
+
+整合前，執行者指出本模組與**人類自己核定過三次的規範**直接衝突：
+- DESIGN.md §6（v1.0，人類回「通過」）：「**禁**：跟隨滑鼠的光暈/**粒子**……與『可信情報室』定位相斥」
+- 人類第 9 輪指示原文：「不要跟隨游標出現光球或**尾巴**」
+- DESIGN.md §6a（v1.2，人類核可 preview9）：「**禁**：跟隨游標的光球或殘影」
+- DESIGN.md §5：「每個動畫都要有目的；**禁純裝飾動效**」
+
+異議理由：全頁游標軌跡屬純裝飾（不傳達狀態、注意力或空間關係），受眾為競賽評審／教授／企業主管，定位為「像正式決策工具，不像行銷 Landing Page」，粒子軌跡飄在風險雷達表與自我稽核文字上方，最可能被設計素養高的評審讀為 AI slop。執行者曾建議折衷（只保留有目的的點擊脈衝、拿掉持續軌跡）。
+**人類覆核後選擇完整整合。規範為人類所有，執行者依裁定執行並同步修改 DESIGN.md，使規範與實作一致、不留矛盾。**
+
+### 整合前的程式碼審查（未執行即先通讀全文 12 KB）
+
+無外部網路請求、無混淆、純 Canvas 繪製；`pointer-events:none`；尊重 `prefers-reduced-motion`；`pointerType==='touch'` 早退故觸控不生軌跡；粒子上限 96；僅在有粒子時執行 `requestAnimationFrame`，靜止即停；`visibilitychange` 隱藏時清空；DPR 上限 2。**無安全疑慮。**
+
+### 實作
+
+- 依交付文件流程：先建 `docs/preview10.html`（模板副本注入，不動正式模板），人類裁定後才回寫。回寫前備份 `site_template_before_fx.html`。
+- config 三項與交付文件不同，均為本輪調整：
+  1. **`muted` `#8b867d` → `#736e66`**——文件寫的是本站 2026-08-08 加深前的舊值，直接照抄會讓粒子色與全站弱化階不一致。
+  2. **`trailInterval` 22 → 27.5ms**——人類指定軌跡頻率降為 80%（22 ÷ 0.8 = 27.5）。
+  3. **`zIndex` 2147483000 → 90**——原值高於放大檢視（100）與週次彈窗（110），泡泡會飄在燈箱上方穿幫。90 位於內容與 header（50）之上、兩種彈窗之下。
+- 保留既有 `heroFx()`（負責 hero 底紋位移與局部網格），與粒子層職責不同、並存。
+- **DESIGN.md 升 v1.2.2**：§6 解除「禁跟隨滑鼠的粒子」並於原處註明廢止理由與異議紀錄；§6a 補「本層不畫粒子」；**新增 §6b 游標粒子層**，把視覺語言（只允許圓點與泡泡）、兩級點擊脈衝、色票、參數上限（27.5ms／96 顆／DPR 2）、**z-index 必須為 90** 及必要條件（pointer-events:none、reduced-motion 停用、觸控不生軌跡、靜止停 rAF、隱藏清空）全部寫成規範。
+- 修改檔案：`src/site_template.html`、`DESIGN.md`、重建 `docs/index.html`（145 KB）與 `docs/index_offline.html`（856 KB）、`docs/preview10.html`（驗證用，推送前刪）、同步 cowork 兩檔。
+
+### 驗證
+
+- **模組**：載入成功、`window.SCAIPointerFX` v1.1.0、canvas `#scai-pointer-fx` 存在、`position:fixed`、`pointer-events:none`、config 三項調整值皆正確套用。
+- **疊層實測**：`#top`(40) → `header`(50) → **特效 canvas(90)** → 放大檢視(100) → 週次彈窗(110)，順序正確，燈箱不再被泡泡覆蓋。
+- **網站本體零影響**：19 個 DOM 掛勾與 section id 全在、7 週、6 張圖表、§07 自我稽核在、`heroFx` 保留、【推斷】5 處、footer 聲明在、無中國用語、佔位符正確。
+- **離線版**：同步重建 856 KB，外部 `<script src>`／`<link href>`／`fonts.googleapis`／`cdnjs` **仍全為 0**。
+- **未能驗證（誠實記載）**：粒子的實際視覺表現。Chrome 受控分頁為背景分頁（`visibilityState:"hidden"`），`requestAnimationFrame` 遭節流，且模組本身在頁面隱藏時會 `clear()`（此為其正確設計）。因此軌跡分裂、兩級脈衝強度、泡泡密度等**動態外觀需由人類在前景視窗自行確認**；驗收清單中屬視覺判斷的項目均未由執行者勾選。
+- Git commit／Pages：（見本節末補記）
+- 未完成與後續工作：人類目視確認粒子密度與觀感後，若需微調只能在圓點／泡泡語言內調density／速度／大小／透明度（依交付文件約定）；`docs/preview10.html` 為臨時驗證檔，推送前刪除。

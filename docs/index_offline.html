@@ -1222,5 +1222,428 @@ addEventListener('scroll',()=>{$('#top').classList.toggle('show',scrollY>600)},{
 
 render(cur);
 </script>
+<script>
+/* 滑鼠泡泡特效設定（2026-08-08 人類核定）
+   muted：取本站現行 token #736e66（交付文件寫的 #8b867d 為加深前的舊值）
+   trailInterval：22 → 27.5ms，軌跡生成頻率降為原本的 80%
+   zIndex：2147483000 → 90，位於內容與 header(50) 之上、放大檢視(100) 與週次彈窗(110) 之下，
+           避免泡泡飄在燈箱上方穿幫 */
+window.SCAI_POINTER_FX_CONFIG={
+  accent:'#a44a24',
+  ink:'#4a4741',
+  muted:'#736e66',
+  line:'#d6d0c6',
+  trailInterval:27.5,
+  maxParticles:96,
+  respectReducedMotion:true,
+  zIndex:90
+};
+</script>
+<script>
+/*
+ * SCAI-Agent Pointer Bubble FX
+ * 企業級 AI 分析介面：圓點分裂泡泡 + 決策脈衝
+ * 無外部依賴，可直接內嵌於 src/site_template.html。
+ */
+(function () {
+  'use strict';
+
+  if (window.__SCAIPointerFXLoaded) return;
+  window.__SCAIPointerFXLoaded = true;
+
+  const defaults = {
+    accent: '#a44a24',
+    ink: '#4a4741',
+    muted: '#8b867d',
+    line: '#d6d0c6',
+    trailInterval: 22,
+    maxParticles: 96,
+    respectReducedMotion: true,
+    zIndex: 2147483000
+  };
+  const cfg = Object.assign({}, defaults, window.SCAI_POINTER_FX_CONFIG || {});
+  const reduceQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const fineQuery = window.matchMedia('(pointer: fine)');
+  const disabled = () => cfg.respectReducedMotion && reduceQuery.matches;
+
+  let canvas;
+  let ctx;
+  let dpr = 1;
+  let width = 0;
+  let height = 0;
+  let frame = 0;
+  let running = false;
+  let lastTime = performance.now();
+  let lastTrailAt = 0;
+  let lastX = -999;
+  let lastY = -999;
+  const particles = [];
+  const pulses = [];
+  const pending = [];
+
+  function hexToRgb(hex) {
+    const value = String(hex).replace('#', '').trim();
+    const full = value.length === 3
+      ? value.split('').map((x) => x + x).join('')
+      : value.padEnd(6, '0').slice(0, 6);
+    return {
+      r: parseInt(full.slice(0, 2), 16),
+      g: parseInt(full.slice(2, 4), 16),
+      b: parseInt(full.slice(4, 6), 16)
+    };
+  }
+
+  const rgb = {
+    accent: hexToRgb(cfg.accent),
+    ink: hexToRgb(cfg.ink),
+    muted: hexToRgb(cfg.muted),
+    line: hexToRgb(cfg.line)
+  };
+
+  function rgba(color, alpha) {
+    return `rgba(${color.r},${color.g},${color.b},${Math.max(0, alpha)})`;
+  }
+
+  function resize() {
+    if (!canvas) return;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+  }
+
+  function createLayer() {
+    canvas = document.createElement('canvas');
+    canvas.id = 'scai-pointer-fx';
+    canvas.setAttribute('aria-hidden', 'true');
+    Object.assign(canvas.style, {
+      position: 'fixed',
+      inset: '0',
+      width: '100vw',
+      height: '100vh',
+      pointerEvents: 'none',
+      zIndex: String(cfg.zIndex),
+      background: 'transparent',
+      contain: 'strict'
+    });
+    document.body.appendChild(canvas);
+    ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
+    resize();
+  }
+
+  function ensureFrame() {
+    if (running || disabled()) return;
+    running = true;
+    lastTime = performance.now();
+    frame = requestAnimationFrame(draw);
+  }
+
+  function addParticle(particle) {
+    particles.push(particle);
+    if (particles.length > cfg.maxParticles) {
+      particles.splice(0, particles.length - cfg.maxParticles);
+    }
+  }
+
+  function spawnTrail(x, y, dx, dy, now) {
+    const speed = Math.hypot(dx, dy);
+    if (speed < 1.5) return;
+    const nx = dx / speed;
+    const ny = dy / speed;
+    const side = Math.random() > 0.5 ? 1 : -1;
+    addParticle({
+      x: x - nx * 5 - ny * side * 2,
+      y: y - ny * 5 + nx * side * 2,
+      vx: -nx * (0.018 + Math.random() * 0.022) - ny * side * 0.006,
+      vy: -ny * (0.018 + Math.random() * 0.022) + nx * side * 0.006,
+      born: now,
+      life: 760 + Math.random() * 260,
+      size: 3.1 + Math.random() * 1.8,
+      color: Math.random() < 0.7 ? rgb.accent : rgb.muted,
+      alpha: 0.72,
+      kind: 'seed',
+      split: false
+    });
+  }
+
+  function isActionTarget(target) {
+    if (!(target instanceof Element)) return false;
+    return Boolean(target.closest(
+      'a,button,select,summary,[role="button"],.fchip,.zoombtn,.wbtn,.vtoggle,canvas'
+    ));
+  }
+
+  function spawnPulse(x, y, strong = true) {
+    if (disabled()) return;
+    const now = performance.now();
+    pulses.push({
+      x,
+      y,
+      born: now,
+      life: strong ? 650 : 520,
+      strong
+    });
+
+    const count = strong ? 18 : 11;
+    for (let index = 0; index < count; index += 1) {
+      const angle = (Math.PI * 2 * index / count) + (Math.random() - 0.5) * 0.22;
+      const velocity = (strong ? 0.075 : 0.05) + Math.random() * 0.07;
+      const colorRoll = Math.random();
+      addParticle({
+        x,
+        y,
+        vx: Math.cos(angle) * velocity,
+        vy: Math.sin(angle) * velocity,
+        born: now,
+        life: 620 + Math.random() * 340,
+        size: 2.2 + Math.random() * 2.4,
+        color: colorRoll < 0.55 ? rgb.accent : colorRoll < 0.82 ? rgb.ink : rgb.line,
+        alpha: strong ? 0.82 : 0.56,
+        kind: index % 3 === 0 ? 'bubble' : 'dot'
+      });
+    }
+    ensureFrame();
+  }
+
+  function onPointerMove(event) {
+    if (disabled() || !fineQuery.matches || event.pointerType === 'touch') return;
+    const now = performance.now();
+    const dx = event.clientX - lastX;
+    const dy = event.clientY - lastY;
+    const moved = Math.hypot(dx, dy);
+    if (now - lastTrailAt >= cfg.trailInterval && moved >= 3) {
+      spawnTrail(event.clientX, event.clientY, dx, dy, now);
+      lastTrailAt = now;
+      ensureFrame();
+    }
+    lastX = event.clientX;
+    lastY = event.clientY;
+  }
+
+  function onPointerDown(event) {
+    if (event.button !== undefined && event.button !== 0) return;
+    spawnPulse(event.clientX, event.clientY, isActionTarget(event.target));
+  }
+
+  function drawParticle(particle, now, dt) {
+    const age = now - particle.born;
+    const progress = age / particle.life;
+    if (progress >= 1) return false;
+
+    particle.x += particle.vx * dt;
+    particle.y += particle.vy * dt;
+    particle.vx *= 0.986;
+    particle.vy *= 0.986;
+
+    const fade = Math.pow(1 - progress, 1.35);
+
+    if (particle.kind === 'seed') {
+      if (!particle.split && progress > 0.26) {
+        particle.split = true;
+        const childCount = 2 + (Math.random() > 0.55 ? 1 : 0);
+        for (let index = 0; index < childCount; index += 1) {
+          const angle = (Math.PI * 2 * index / childCount) + Math.random() * 0.45;
+          const velocity = 0.014 + Math.random() * 0.025;
+          pending.push({
+            x: particle.x,
+            y: particle.y,
+            vx: Math.cos(angle) * velocity,
+            vy: Math.sin(angle) * velocity,
+            born: now,
+            life: 680 + Math.random() * 320,
+            size: particle.size * (0.72 + Math.random() * 0.35),
+            color: index === 0 ? particle.color : rgb.muted,
+            alpha: 0.54 + Math.random() * 0.18,
+            kind: 'bubble'
+          });
+        }
+      }
+
+      if (progress < 0.38) {
+        ctx.fillStyle = rgba(particle.color, particle.alpha * fade);
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size * (1 - progress * 0.8), 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.strokeStyle = rgba(particle.color, particle.alpha * fade);
+        ctx.lineWidth = 1.25;
+        ctx.beginPath();
+        ctx.arc(
+          particle.x,
+          particle.y,
+          particle.size * (1.1 + (progress - 0.38) * 2.2),
+          0,
+          Math.PI * 2
+        );
+        ctx.stroke();
+      }
+    } else if (particle.kind === 'bubble') {
+      const radius = particle.size * (1.15 + progress * 2.5);
+      ctx.fillStyle = rgba(particle.color, particle.alpha * fade * 0.22);
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = rgba(particle.color, particle.alpha * fade);
+      ctx.lineWidth = 1.15;
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = rgba(particle.color, particle.alpha * fade * 0.75);
+      ctx.beginPath();
+      ctx.arc(
+        particle.x - radius * 0.28,
+        particle.y - radius * 0.28,
+        Math.max(0.7, radius * 0.13),
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+    } else {
+      ctx.fillStyle = rgba(particle.color, particle.alpha * fade);
+      ctx.beginPath();
+      ctx.arc(
+        particle.x,
+        particle.y,
+        particle.size * (0.8 + (1 - progress) * 0.25),
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+    }
+    return true;
+  }
+
+  function drawPulse(pulse, now) {
+    const age = now - pulse.born;
+    const progress = age / pulse.life;
+    if (progress >= 1) return false;
+
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const fade = Math.pow(1 - progress, 1.65);
+    const radius = 8 + ease * (pulse.strong ? 58 : 42);
+    const alpha = (pulse.strong ? 0.72 : 0.48) * fade;
+
+    ctx.save();
+    ctx.translate(pulse.x, pulse.y);
+
+    // 主雷達圓環
+    ctx.strokeStyle = rgba(rgb.accent, alpha);
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // 第二圈僅畫 240 度，避免像遊戲準星
+    ctx.strokeStyle = rgba(rgb.ink, alpha * 0.68);
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * 0.63, -Math.PI * 0.72, Math.PI * 0.62);
+    ctx.stroke();
+
+    // 四象限刻度
+    const tickInner = radius + 3;
+    const tickOuter = radius + (pulse.strong ? 12 : 9);
+    ctx.strokeStyle = rgba(rgb.muted, alpha * 0.82);
+    ctx.beginPath();
+    ctx.moveTo(tickInner, 0); ctx.lineTo(tickOuter, 0);
+    ctx.moveTo(-tickInner, 0); ctx.lineTo(-tickOuter, 0);
+    ctx.moveTo(0, tickInner); ctx.lineTo(0, tickOuter);
+    ctx.moveTo(0, -tickInner); ctx.lineTo(0, -tickOuter);
+    ctx.stroke();
+
+    // 中心資料點
+    ctx.fillStyle = rgba(rgb.accent, Math.min(0.92, (pulse.strong ? 0.95 : 0.7) * fade));
+    ctx.beginPath();
+    ctx.arc(0, 0, 2.3 + (1 - progress) * 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    return true;
+  }
+
+  function draw(now) {
+    const dt = Math.min(34, now - lastTime || 16.7);
+    lastTime = now;
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    for (let index = particles.length - 1; index >= 0; index -= 1) {
+      if (!drawParticle(particles[index], now, dt)) particles.splice(index, 1);
+    }
+    if (pending.length) {
+      particles.push(...pending.splice(0, pending.length));
+      if (particles.length > cfg.maxParticles) {
+        particles.splice(0, particles.length - cfg.maxParticles);
+      }
+    }
+    for (let index = pulses.length - 1; index >= 0; index -= 1) {
+      if (!drawPulse(pulses[index], now)) pulses.splice(index, 1);
+    }
+
+    if (particles.length || pulses.length) {
+      frame = requestAnimationFrame(draw);
+    } else {
+      running = false;
+      frame = 0;
+    }
+  }
+
+  function clear() {
+    particles.length = 0;
+    pulses.length = 0;
+    pending.length = 0;
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    running = false;
+    if (ctx && canvas) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  function destroy() {
+    clear();
+    window.removeEventListener('resize', resize);
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerdown', onPointerDown);
+    document.removeEventListener('visibilitychange', onVisibility);
+    if (canvas) canvas.remove();
+    window.__SCAIPointerFXLoaded = false;
+  }
+
+  function onVisibility() {
+    if (document.hidden) clear();
+  }
+
+  function boot() {
+    if (!document.body || disabled()) return;
+    createLayer();
+    window.addEventListener('resize', resize, { passive: true });
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerdown', onPointerDown, { passive: true });
+    document.addEventListener('visibilitychange', onVisibility);
+    reduceQuery.addEventListener?.('change', (event) => {
+      if (cfg.respectReducedMotion && event.matches) clear();
+    });
+
+    window.SCAIPointerFX = {
+      pulse: (x, y, strong = true) => spawnPulse(x, y, strong),
+      clear,
+      destroy,
+      version: '1.1.0'
+    };
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
+}());
+</script>
 </body>
 </html>
