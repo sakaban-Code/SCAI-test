@@ -720,3 +720,42 @@ git add -A; git commit -m "說明"; git push
   - 全站零迴歸：20 個 DOM 掛勾與 section id 無缺漏、7 週、6 張圖表、維度篩選 chip 6 顆、放大鈕 4 顆、§07 自我稽核 3 項、【推斷】5、【待公司確認】3、footer 聲明、粒子模組與 `heroFx` 皆在；離線版重建後外部請求仍為 0。
 - **功能取捨（需人類知悉）**：新模型為**連續區間**，涵蓋單週與連續多週，但**不再支援非連續多週群組**（例如 W1+W3+W5）。第 6 輪原規格為「單週、連續區間、多週群組皆可」，本輪依人類新指示改為區間制。若日後需要非連續群組，需另設計（例如面板內加「進階：自由勾選」切換）。
 - Git commit：（見本節末補記）
+
+---
+
+## 2026-08-08｜第 12 輪：雙軌審查（Codex 靜態＋實機驗證）與手機版 header 破版修復
+
+### 審查分工
+- 人類需求（原文）：「`/codex:review` 檢查網站有無問題」→ 追加澄清「我說的是 SCAI 網站」（要實站，不只讀碼）。
+- 兩軌並行：**Codex CLI 0.144.4 唯讀靜態審查**（`codex-companion.mjs task`，thread `019fe198`）＋ **Claude Code 於 Browser 面板開線上實站量測**。Codex 主動聲明其 session 無瀏覽器可用、響應式結論屬原始碼推論而非實機觀察——該缺口由實機補足。
+- 環境障礙：harness 的 Bash tool 全面失效（連 `echo ok` 都回 ``line 77: unexpected EOF while looking for matching `'``；bash 本身直接執行正常）。`codex:codex-rescue` 子代理僅有 Bash 權限故無法使用，改以 PowerShell 直呼 companion，結果等價。**根因未查明**：曾誤判為 `.claude/settings.local.json` 內 4 條引號不成對的權限規則，移除後問題依舊；該 4 條本身確為壞規則故保持移除，備份於 `settings.local.json.bak-20260808`。
+
+### 實機推翻的三項假陽性（避免日後重蹈）
+1. **三張主圖 canvas 寬度 0、像素全空** → 假象。手動設寬後呼叫 `draw()` 立即畫出，純 canvas 2D 亦正常。成因為 **Browser 面板 rAF 凍結**，而 Chart.js 的 resize 走 rAF 節流。
+2. **小標籤對比度 4 筆不足** → 自製稽核腳本的假陽性：`rgba(255,255,255,.06)` 被當成不透明白計算。改為逐層 alpha 合成後，336 個文字節點 **0 筆不合格**。
+3. **Chart.js 僅由 cdnjs 載入、斷網全滅** → 不成立。CDN 之後接 `<script src="assets/chart.umd.min.js">` 本地備援。
+
+### 本輪修復：手機版 header 破版
+- 症狀（線上實機 390px 量測）：`.brand` 容器被壓成寬度 **0**，但子元素 `overflow:visible`，logo(34px)＋站名(79px) **溢出疊在 `.vtoggle` 上**；`.wnav` 落在 x=136–**446**，右側 **56px 切出畫面**。
+- 成因：`.hd` 為固定 58px 的 `flex-wrap:nowrap`；`.brand` 是 `min-width:0`（可壓到 0）而 `.hr` 是 `min-width:auto`（min-content 394px，壓不下去）。實測 `.hd` 的 min-content 需求為 **580px**。
+- 修法：新增獨立 `@media(max-width:600px)` 區塊，以 `.hr{display:contents}` 攤平（**沿用 ≥1100px 側欄的同一手法，DOM 零改動**），第一行＝品牌＋檢視切換，第二行＝週次控制整條；`html{scroll-padding-top:150px}` 同步。
+- **斷點取 600 而非 560**：初版寫在既有的 `@media(max-width:560px)` 內，實測 561px 仍破（`.wnav` 右緣 564，該寬度下還多一顆桌面版列印鈕），因需求寬度為 580px。**561–580 這段 20px 帶會被漏掉**，故獨立拉高到 600。
+- 修改檔案：`src/site_template.html`；重建 `docs/index.html`（208.7 KB）與 `docs/index_offline.html`（917.4 KB，外部請求驗收仍為 0）；同步 cowork 兩個鏡像檔（動工前以 SHA256 確認與 HEAD 位元組相同、無他人改動）。**`cowork/index.html`（148,585 bytes）與 `docs/index.html`（213,043 bytes）並非同一產物，未動。**
+- 驗證（本機 8765 服務，逐斷點量測）：**320／390／570／600／601／1280／1440 全部 0 真實溢出、0 元素重疊、0 對比失敗**；390px header 高 148px 對應 `scroll-padding-top:150px`；601px 維持單行、600px 起轉雙行；1440／1280 側欄模式完全未受影響。
+  - 殘留的 `CANVAS scai-pointer-fx r=569` 為面板假象：該層 `position:fixed`＋`pointer-events:none`，尺寸靠 resize 事件經 rAF 重設，面板凍結故停在前一個視窗尺寸；同理圖表 inline width 停在 479，但實際渲染盒受 `.cbox`(325) 正確約束。
+
+### 本輪查出、尚未修復（依確認制逐項待裁決）
+- **【High】儲存型注入**：`build_site.py:42`、`build_offline.py:96` 以 `json.dumps()` 直接嵌入 `<script>`，管線字串若含 `</script>` 即可跳出；事件標題／來源 URL 進 `innerHTML` 無 HTML／屬性／協定跳脫。目前 JSON 無惡意內容，但資料源為 Tavily＋LLM，不完全可控。
+- **【High】兩個 `aria-modal` 對話框非鍵盤模態**：不移入焦點、不困住 Tab、關閉不還原焦點；點放大圖內資料點可能同時顯示兩個對話框。Esc 可用。
+- **【Med】週次時間軸重疊與缺口**（自行以 `weeks.json` 重算確認）：W3(06/25–07/01) 與 W4(06/29–07/05) **重疊 3 天**；W4 迄 07/05 與 W5 起 07/07 之間 **07/06 無人涵蓋**。另逐週比對事件日期與宣告窗口，**W1–W6 皆有窗口外事件，唯 W7 為零**——W7 正是唯一走過三道門檻匯入的一週。W6 的 07/21、07/24 屬窗口關閉後日期（已知為刻意計入以免與 W7 重複，但站上標籤仍寫 07/14–07/20，讀者無從分辨）。
+- **【Med】中文 IME 於對比搜尋被打斷**：每次 `input` 事件重建 `#cmpui` 並換掉輸入框，注音／拼音／倉頡組字中的第一個事件即移除 IME 目標。英數與日期搜尋正常。
+- **【Med】圖表資料點講解僅限滑鼠**：canvas 無 `tabindex` 或鍵盤處理，`showWeekPop()` 只能由 Chart.js `onClick` 進入，但圖說寫著「點資料點可看該週講解」。
+- **【Med】桌機側欄視覺順序與 Tab 順序不一致**：`display:contents`＋`order` 的必然代價。
+- **【Med】區間選擇器關閉後焦點消失**；**回頂鈕在平滑捲動途中變透明但仍保有焦點**。
+- **【Low】`#w8` 等未知週次錨點靜默顯示 W1**（線上實測重現）：`findIndex()` 回 −1 被 `Math.max(0,…)` 轉為 0，其後「退回最新週」的分支永遠到不了。回補 W8／W9 前分享的連結都會指錯。
+- **【Low】離線檔複製連結得到 `null/...`**（`file://` 下 `location.origin` 為 `"null"`）；**圖表載入全失敗時放大鈕仍可點**並在 `new Chart` 拋錯；**`build_offline.py` 零外部資源檢查只擋 `src=`**，漏 `href`／CSS `url()`／`@import`／`srcset`／執行期請求，且資料標記檢查僅驗存在、`build_site.py` 完全沒有標記斷言。
+
+### Codex 判定通過的項目
+區間選擇器逆序／同週／Esc 清除 `cmpPend` 全正確；Esc 優先序＝週次講解→放大檢視→對比面板；Chart.js 銷毀、observer 清理與 `innerHTML` 後 handler 重綁無洩漏；缺 `selfAudit`／`riskRadar` 安全降級且無死錨點；週次正規化、數值排序、索引與 1-based 維度歸屬皆正確；離線產物目前確實零外部請求；兩個產物與建置腳本的記憶體重建完全一致；粒子層 z-index 90／`pointer-events:none`／reduced-motion 關閉／觸控無拖尾全部符合。
+
+- Git commit：（見本節末補記）

@@ -580,6 +580,19 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
   td{padding:10px 8px 10px 0}
   .pf{grid-template-columns:1fr 1fr}
 }
+/* header 改雙行。原本 .hd 是固定 58px 的 nowrap 單行，min-content 需求 580px：
+   窄於此時 .brand（min-width:0）被壓成 0 寬，其 logo 與站名以 overflow:visible 溢出疊在
+   .vtoggle 上，且 .wnav 右緣衝出畫面。以 .hr{display:contents} 攤平（同 ≥1100px 側欄手法），
+   第一行品牌＋檢視切換、第二行週次控制整條。斷點取 600 而非 560，否則 561–580 仍會破。 */
+@media(max-width:600px){
+  .hd{height:auto;flex-wrap:wrap;row-gap:9px;padding:10px 0 11px}
+  .hr{display:contents}
+  .brand{flex:1 1 auto;min-width:0}
+  .vtoggle{flex:0 0 auto}
+  .wnav{flex:1 0 100%;justify-content:space-between}
+  .wnav select{flex:1 1 auto;min-width:0}
+  html{scroll-padding-top:150px}
+}
 @media print{
   header,nav.secnav,#top,.wnav{display:none}
   body{background:#fff;font-size:12px;padding-left:0}
