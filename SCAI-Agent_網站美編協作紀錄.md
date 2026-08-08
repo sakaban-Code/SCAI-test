@@ -810,3 +810,38 @@ git add -A; git commit -m "說明"; git push
 - 同步 cowork 兩個鏡像檔前，先以 SHA256 確認其與 HEAD 位元組相同、無他人改動。
 
 - Git commit：（見本節末補記）
+
+---
+
+## 2026-08-08｜第 14 輪：儲存型注入修補（Codex High①）
+
+- 人類需求：接續審查清單，處理最高風險項——`json.dumps()` 直接嵌入 `<script>`、事件標題與來源 URL 進 `innerHTML` 無跳脫。
+- 執行者：Claude Code（Opus 5）
+- 威脅模型：`data/weeks.json` 由 Tavily 檢索結果與模型輸出寫入，**不完全可控**；`kdf_config`／`company_profile`／`playbook`／`kdf_definitions` 是版本控管下的自家設定檔，能改動它們的人同樣能改模板本身，**不在此防線範圍**（刻意界定，避免防護範圍無限擴張）。
+
+### 動工前的規模盤點（決定不採逐點跳脫）
+- 模板有 **306 處樣板插值、8 個 `innerHTML` 賦值、2 處 `href` 插值**。逐點加 `esc()` 需人工判斷每一處是文字還是刻意的 HTML 片段，306 選 1 判斷錯就破版——風險高於收益。
+- 改採**單一咽喉點**：建置時對 `weeks` 子樹整批跳脫。
+- 事前確認可行性的兩項關鍵事實：
+  1. `weeks.json` 現有的 `<`（28 筆）、`>`（45 筆）、`&`（2 筆）**全是正當內容**（`KDF#4=66 >= 70`、`X=-0.35 <= -0.4`、`R&D`、`>40%`），HTML 跳脫後瀏覽器渲染結果**完全相同**——換言之這些 `<` 本來就該跳脫，現在只是碰巧沒被解析成標籤。
+  2. `weeks.json` 的 35 條 URL **全部是 https**，目前無 `javascript:`。
+- 亦逐一追查 canvas 文字輸出路徑（跳脫值不能進 canvas，`fillText` 不解析實體）：只有 `scenario`／`scenarioEn` 一條路徑來自 `weeks.json`；`raw.l` 只帶週次數字與寫死字串，`kdf`／`dims`／`kdfDefs` 皆為可信設定。
+
+### 修補內容
+1. **`sitedata.payload_js()`**：序列化後將 `<` `>` `&` 改寫為 `<` `>` `&`，另跳脫 U+2028／U+2029（合法 JSON 字元、卻是 JS 行終止符）。這三個字元只可能出現在 JSON 的字串值裡（結構字元僅 `{}[],:"`），故**解析結果不變**——並以 `json.loads(safe) != payload` 硬性斷言保證，不等價即中止建置。
+2. **`sitedata.escape_html_deep()`**：遞迴 HTML 跳脫 `weeks` 子樹所有字串葉節點（`&` 必須先換否則二次跳脫）。`coverage` 於跳脫**之前**推導，以免日期解析吃到實體。
+3. **`safeUrl()`（模板）**：`href` 協定白名單，僅放行 `http(s)://`，其餘回空字串。HTML 跳脫擋不住 `javascript:`，這是必要的第二道。事件卡的來源列改為 `safeUrl()` 為真才渲染，避免產生空連結。
+4. **`deEnt()`（模板）**：canvas tooltip 寫入前把實體解回原字（`&` 必須最後換）。
+
+**`data/weeks.json` 未被修改**——跳脫是呈現層職責，資料層保持原文以維持可稽核性；`pipeline.py` 之後寫入新週次也不受影響。
+
+### 驗證
+- **合成注入測試**（不碰 `data/`）：以 `</script><img src=x onerror=alert(1)>`、`<svg onload=…>`、`a"onmouseover="…`、`javascript:alert(document.cookie)` 餵入 `escape_html_deep`——輸出中殘留 `</script>` ／ `<img` ／ `<svg` ／裸引號屬性**皆為 0**。
+- **實際產物**：`docs/index.html` 與 `docs/index_offline.html` 的 DATA 區段中，`</script>` 出現 0 次、**裸 `<` 出現 0 次**。
+- **二次跳脫回歸（最關鍵）**：以 TreeWalker 排除 `<script>`／`<style>` 後掃描實際渲染文字（`document.body.textContent` 會把 JS 原始碼算進去，初次量測因此得到假數據，已更正）——**七週全部 0 個實體洩漏**，比較運算子正常顯示：`✓ X=-0.42 <= -0.4；✓ KDF#7=68 >= 62`。無殘留注入標籤、無 `javascript:` href、無空 href。
+- **全站回歸**：371 個文字節點 0 對比失敗、0 真實溢出、0 死錨點、10 section、7 canvas（5 個 Chart 實例）、來源連結 10 條、揭露區與兩顆區間按鈕、footer 皆在。
+
+### 尚未處理
+- Codex High②（兩個 `aria-modal` 對話框非鍵盤模態）與其餘 Medium／Low 項目。
+
+- Git commit：（見本節末補記）

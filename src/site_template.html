@@ -718,6 +718,14 @@ let cmpPend=null;    /* 已點的起始索引，等待第二個時間點 */
 let cmpQuery='';     /* 面板內的搜尋字串 */
 const rangeSet=r=>{const s=Math.min(r.s,r.e),e=Math.max(r.s,r.e),out=new Set();
   for(let i=s;i<=e;i++)out.add(i);return out};
+/* DATA.weeks 的字串已於建置時 HTML 跳脫（來源為 Tavily 與模型輸出，不可信）。
+   兩個配套：
+   - safeUrl()：跳脫擋不住 `javascript:`，故 href 另做協定白名單。
+   - deEnt()：canvas 以 fillText 畫字、不解析實體，寫入圖表前須解回原字。 */
+const safeUrl=u=>{const s=String(u==null?'':u).trim();
+  return /^https?:\/\//i.test(s)?s:''};
+const deEnt=s=>String(s==null?'':s).replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+  .replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
 const rangeLabel=r=>{const s=Math.min(r.s,r.e),e=Math.max(r.s,r.e);
   return s===e?`W${DATA.weeks[s].week}`:`W${DATA.weeks[s].week}–W${DATA.weeks[e].week}`};
 /* 選取區間實際涵蓋的日曆天數：取聯集，重疊只算一次、缺口不算。
@@ -1124,7 +1132,7 @@ function render(i){
           <span class="imp ${e.xImpact==='↓'?'d':e.xImpact==='↑'?'u':''}">X ${e.xImpact||'→'}</span>
           <span class="imp ${e.yImpact==='↓'?'d':e.yImpact==='↑'?'u':''}">Y ${e.yImpact||'→'}</span>
           <span>${e.source} · ${e.date}</span>
-          <a href="${e.url}" target="_blank" rel="noopener">原文 <span class="arw">↗</span></a>
+          <a href="${safeUrl(e.url)}" target="_blank" rel="noopener">原文 <span class="arw">↗</span></a>
         </div></div>`).join('')}
     </div>
   </section>
@@ -1138,7 +1146,7 @@ function render(i){
         <div class="tr-b">
           <div class="kws">${t.keywords.map(k=>`<span class="kw">${k}</span>`).join('')}</div>
           ${t.kdfChanges.map(k=>`<div class="kdfc">#${k.id} ${k.name}　<b>${k.from}→${k.to}</b>　<span style="color:var(--muted)">${k.reason}</span></div>`).join('')}
-          ${ev.url?`<div class="src">${ev.source||''} · ${ev.date||''} · <a href="${ev.url}" target="_blank" rel="noopener">原文 <span class="arw">↗</span></a></div>`:''}
+          ${safeUrl(ev.url)?`<div class="src">${ev.source||''} · ${ev.date||''} · <a href="${safeUrl(ev.url)}" target="_blank" rel="noopener">原文 <span class="arw">↗</span></a></div>`:''}
         </div></details>`}).join('')}
     <div class="audit">管線稽核：<a href="https://github.com/sakaban-Code/SCAI-test" target="_blank" rel="noopener">原始碼與資料 repo ↗</a> · <a href="https://github.com/sakaban-Code/SCAI-test/actions/workflows/weekly.yml" target="_blank" rel="noopener">每週自動執行紀錄 ↗</a>${w.tokenUsage?`　·　本週模型用量 <b class="num">${(w.tokenUsage.total||0).toLocaleString()}</b> tokens${w.tokenUsage.byStep?`<table><thead><tr><th>步驟</th><th>模型</th><th>in</th><th>out</th></tr></thead><tbody>${Object.entries(w.tokenUsage.byStep).map(([k,v])=>`<tr><td>${k}</td><td>${v.model||''}</td><td class="num">${(v.input_tokens||0).toLocaleString()}</td><td class="num">${(v.output_tokens||0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:''}`:'　·　自 W7 起由雲端管線自動產出，並於本區附逐模型 token 用量'}</div>
   </section>
@@ -1252,7 +1260,7 @@ function drawTrend(idx,cv){
         if(hit)showWeekPop(hit.index);},
       plugins:{legend:{position:'bottom',labels:{boxWidth:8,boxHeight:8,usePointStyle:true,
         pointStyle:'circle',font:{size:10.5},color:'#4a4741',padding:12}},
-        tooltip:{callbacks:{title:its=>{const wk=ws[its[0].dataIndex];return `W${wk.week}｜${wk.scenarioEn||wk.scenario||''}`}}}},
+        tooltip:{callbacks:{title:its=>{const wk=ws[its[0].dataIndex];return `W${wk.week}｜${deEnt(wk.scenarioEn||wk.scenario||'')}`}}}},
       scales:{y:{min:40,max:85,grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}}},
         x:{grid:{display:false},ticks:{color:'#736e66',font:{size:10.5}}}}}});
   if(!cv)charts.push(inst);

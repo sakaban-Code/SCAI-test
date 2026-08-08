@@ -67,6 +67,31 @@ def build_coverage(weeks: list):
     }
 
 
+_HTML_MAP = {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}
+
+
+def escape_html_deep(obj):
+    """遞迴 HTML 跳脫所有字串葉節點（`&` 必須先換，否則會二次跳脫）。
+
+    只施用於 `weeks`——該子樹由 Tavily 檢索結果與模型輸出寫入，不完全可控，
+    而模板以樣板字面值組出 HTML 後經 innerHTML 寫入，未跳脫的 `<img onerror=…>`
+    會在該週渲染時執行。`kdf_config`／`company_profile`／`playbook` 是版本控管
+    下的自家設定檔，能改動它們的人同樣能改模板本身，故不在此防線範圍。
+
+    現有資料中的 `<` `>` 皆為正當內容（`KDF#4=66 >= 70`、`R&D`、`>40%`），
+    跳脫後瀏覽器渲染結果與跳脫前完全相同。
+    """
+    if isinstance(obj, str):
+        for ch, rep in _HTML_MAP.items():
+            obj = obj.replace(ch, rep)
+        return obj
+    if isinstance(obj, list):
+        return [escape_html_deep(v) for v in obj]
+    if isinstance(obj, dict):
+        return {k: escape_html_deep(v) for k, v in obj.items()}
+    return obj
+
+
 def build_payload(root: pathlib.Path) -> dict:
     weeks = copy.deepcopy(load(root / "data" / "weeks.json"))
     for w in weeks:
@@ -89,8 +114,9 @@ def build_payload(root: pathlib.Path) -> dict:
     ex_path = root / "data" / "kdf_definitions.json"
     extras = load(ex_path) if ex_path.exists() else {"kdfDefs": {}, "scenarioMeta": []}
 
+    coverage = build_coverage(weeks)      # 以未跳脫的原值推導日期，須早於跳脫
     return {
-        "weeks": weeks,
+        "weeks": escape_html_deep(weeks),
         "kdf": cfg["kdf"],
         "dims": cfg["dimensions"],
         "horizons": pb["horizons"],
@@ -98,9 +124,24 @@ def build_payload(root: pathlib.Path) -> dict:
         "profile": prof,
         "kdfDefs": extras.get("kdfDefs", {}),
         "scenarioMeta": extras.get("scenarioMeta", []),
-        "coverage": build_coverage(weeks),
+        "coverage": coverage,
     }
 
 
 def payload_js(root: pathlib.Path) -> str:
-    return json.dumps(build_payload(root), ensure_ascii=False, separators=(",", ":"))
+    """序列化為可安全嵌入 <script> 的 JSON。
+
+    `json.dumps` 不會跳脫 `<`，故資料中若出現 `</script>` 就能提前關閉標籤、
+    其後的內容會被當成 HTML 解析並執行（管線資料來自 Tavily 與模型輸出，
+    不完全可控）。將 `<` `>` `&` 改寫為 `\\u00XX`：這三個字元只可能出現在
+    JSON 的字串值裡（結構字元僅 {}[],:"），改寫後**解析結果完全相同**。
+    另跳脫 U+2028／U+2029——它們是合法的 JSON 字元卻是 JS 的行終止符。
+    """
+    payload = build_payload(root)
+    raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    safe = (raw.replace("<", "\\u003c").replace(">", "\\u003e")
+               .replace("&", "\\u0026")
+               .replace("\u2028", "\\u2028").replace("\u2029", "\\u2029"))
+    if json.loads(safe) != payload:          # 等價性硬性保證，不等價即中止
+        raise AssertionError("payload 跳脫後與原資料不等價")
+    return safe
