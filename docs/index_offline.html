@@ -435,6 +435,26 @@ details[open] summary::after{content:"−"}
 .src a{text-decoration:none}
 .src a:hover{text-decoration:underline}
 
+/* ── §07 自我稽核 ── */
+.sa-list{display:grid;gap:12px}
+.sa{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+.sa-h{display:flex;gap:10px;align-items:baseline;margin-bottom:12px}
+.sa-n{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:11px;color:#6f6a62;
+  border:1px solid var(--line2);border-radius:4px;padding:1px 6px;flex-shrink:0}
+.sa-h b{font-size:13.5px;font-weight:650;line-height:1.6}
+.sa-r{display:grid;grid-template-columns:82px 1fr;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
+.sa .k{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:10px;letter-spacing:.06em;
+  color:#6f6a62;line-height:1.9}
+.sa .v{font-size:12.5px;color:var(--ink2);line-height:1.75}
+.sa-d{display:grid;grid-template-columns:82px 1fr;gap:12px;margin-top:12px;padding:10px 12px;
+  background:#fdf6ec;border:1px solid #f0dcc0;border-radius:6px}
+.sa-d .k{color:#8a6420}
+.sa-d .v{color:#6b4f18}
+@media(max-width:640px){
+  .sa-r,.sa-d{grid-template-columns:1fr;gap:2px}
+  .sa .k{line-height:1.6}
+}
+
 /* ── profile ── */
 .pf{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
 .pf .it{border:1px solid var(--line-soft);border-radius:8px;padding:13px 15px;background:var(--surface);box-shadow:var(--shadow)}
@@ -601,8 +621,9 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
       <a href="#trend"><span class="ni">04</span>趨勢圖表</a>
       <a href="#events"><span class="ni">05</span>本週事件</a>
       <a href="#trace"><span class="ni">06</span>決策軌跡</a>
-      <a href="#profile"><span class="ni">07</span>企業畫像</a>
-      <a href="#method"><span class="ni">08</span>方法論</a>
+      <a href="#selfaudit" id="navselfaudit"><span class="ni">07</span>自我稽核</a>
+      <a href="#profile"><span class="ni">08</span>企業畫像</a>
+      <a href="#method"><span class="ni">09</span>方法論</a>
     </div>
   </nav>
 </header>
@@ -849,6 +870,24 @@ function render(i){
     </section>`;
   }
 
+  /* §07 自我稽核：僅在該週有資料時才出現，導覽項同步顯隱（W1–W5 無此欄位） */
+  const sa=w.selfAudit||[];
+  const nav_sa=$('#navselfaudit');
+  if(nav_sa)nav_sa.style.display=sa.length?'':'none';
+  const saHTML=sa.length?`
+  <section id="selfaudit">
+    <div class="sh"><span class="ix">§07</span><h2>自我稽核</h2><span class="q">這些判斷如果錯了會怎樣？</span><span class="sub">${S?`本週 ${sa.length} 項關鍵判斷｜含代價與最早翻盤訊號`:`關鍵判斷之依據、行動與反面情境（憲法自我稽核要求）`}</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
+    <div class="sa-list">${sa.map((a,j)=>`
+      <div class="sa">
+        <div class="sa-h"><span class="sa-n num">${String(j+1).padStart(2,'0')}</span><b>${clean(a.judgment||'')}</b></div>
+        ${a.meaning?`<div class="sa-r"><div class="k">影響什麼</div><div class="v">${clean(a.meaning)}</div></div>`:''}
+        ${!S&&a.basis?`<div class="sa-r"><div class="k">判斷依據</div><div class="v">${clean(a.basis)}</div></div>`:''}
+        ${a.action?`<div class="sa-r"><div class="k">因此採取</div><div class="v">${clean(a.action)}</div></div>`:''}
+        ${a.downside?`<div class="sa-d"><div class="k">若這個判斷錯了</div><div class="v">${clean(a.downside)}</div></div>`:''}
+      </div>`).join('')}</div>
+    <div class="cap">本區為系統對自身判斷的反面檢視：每項列出「若判斷錯誤的代價」與「最早可觀察到的翻盤訊號」，供讀者自行監看、不必全盤採信本站結論。</div>
+  </section>`:'';
+
   /* scenario meta cards */
   const scMeta=(DATA.scenarioMeta||[]).map(s=>{
     const isCur=s.name.includes(w.scenarioEn);
@@ -995,8 +1034,10 @@ function render(i){
     <div class="audit">管線稽核：<a href="https://github.com/sakaban-Code/SCAI-test" target="_blank" rel="noopener">原始碼與資料 repo ↗</a> · <a href="https://github.com/sakaban-Code/SCAI-test/actions/workflows/weekly.yml" target="_blank" rel="noopener">每週自動執行紀錄 ↗</a>${w.tokenUsage?`　·　本週模型用量 <b class="num">${(w.tokenUsage.total||0).toLocaleString()}</b> tokens${w.tokenUsage.byStep?`<table><thead><tr><th>步驟</th><th>模型</th><th>in</th><th>out</th></tr></thead><tbody>${Object.entries(w.tokenUsage.byStep).map(([k,v])=>`<tr><td>${k}</td><td>${v.model||''}</td><td class="num">${(v.input_tokens||0).toLocaleString()}</td><td class="num">${(v.output_tokens||0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:''}`:'　·　自 W7 起由雲端管線自動產出，並於本區附逐模型 token 用量'}</div>
   </section>
 
+  ${saHTML}
+
   <section id="profile">
-    <div class="sh"><span class="ix">§07</span><h2>企業畫像</h2><span class="q">這些建議是對誰而言？</span><span class="sub">${S?'欣銓科技 3264.TWO｜公司現況（皆為公開資料）':'欣銓科技 3264.TWO · 公開資料'}</span></div>
+    <div class="sh"><span class="ix">§08</span><h2>企業畫像</h2><span class="q">這些建議是對誰而言？</span><span class="sub">${S?'欣銓科技 3264.TWO｜公司現況（皆為公開資料）':'欣銓科技 3264.TWO · 公開資料'}</span></div>
     <div class="pf">
       <div class="it"><div class="k">2026Q2 營收</div><div class="v">45.3 億</div><div class="n">季增 13.8%／年增 32.4%　法說會</div></div>
       <div class="it"><div class="k">毛利率</div><div class="v">40.2%</div><div class="n">季增 1.8pp／年增 3.9pp</div></div>
@@ -1012,7 +1053,7 @@ function render(i){
   </section>
 
   <section id="method">
-    <div class="sh"><span class="ix">§08</span><h2>方法論</h2><span class="q">這套判定怎麼運作？</span><span class="sub">${S?'雙軸情境 × 25 項關鍵決策因素（KDF）':'雙軸情境分析 × 25 KDF 動態校準（SCAI-Agent）'}</span></div>
+    <div class="sh"><span class="ix">§09</span><h2>方法論</h2><span class="q">這套判定怎麼運作？</span><span class="sub">${S?'雙軸情境 × 25 項關鍵決策因素（KDF）':'雙軸情境分析 × 25 KDF 動態校準（SCAI-Agent）'}</span></div>
     <div class="axbox">
       <div class="axc"><div class="t">X 軸｜地緣與供應鏈聚合程度（−1 碎裂 ↔ +1 聚合）</div>
         <div class="d">碎裂訊號：保護主義、出口管制、關稅、技術封鎖、斷鏈、供應鏈區域化。聚合訊號：自由貿易、國際合作、供應鏈穩定、跨國協作。</div></div>
