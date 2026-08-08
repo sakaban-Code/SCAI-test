@@ -471,9 +471,14 @@ git add -A; git commit -m "說明"; git push
 
 **遇到的錯誤**：預先寫好的 `apply_r9_writeback.ps1` 執行失敗——PowerShell 5.1 以系統 ANSI 讀取 UTF-8 腳本檔，中文全部亂碼並在解析階段報 `ExpectedValueExpression`。**因錯誤發生在解析階段，腳本未執行任何動作**，已確認模板未被部分修改。**修正**：改用行內指令（本次工作階段一路可行的方式）逐步執行。**教訓**：此環境下含中文的 `.ps1` 腳本檔不可靠，需以 `-Encoding utf8` 寫入並確認 PowerShell 讀取編碼，或直接用行內指令。
 
-**Git commit**：（見下方補記）
+**Git commit／Pages**：見本節末補記。
 **Pages 線上確認**：（見下方補記）
 
 **本輪未做（人類尚未裁示）**：三個英文標籤（`Weekly Strategic Brief`／`Executive Snapshot`／`Action Required`）是否中文化；`--muted` 於淺底 3.4:1 之既有系統性用法是否全面加深（本輪僅將新增微標籤排除在外）。
 
 **後續工作**：`index_offline.html` 斷網備援重建（美編已定案，可進行）；🖨 emoji 改 SVG；`ANTHROPIC_API_KEY` 設定後 Actions 首跑產出 W7。
+
+**Git commit**：`fb7d17a` feat(site): Executive AI Intelligence Workspace（第 8＋9 輪美編）——5 檔變更、+1145/−191；新增 `DESIGN.md`（v1.2）與 `DESIGN-AUDIT.md`（v1.0）。已 push 至 `origin/main`（`79df58d..fb7d17a`）。
+
+**Pages 線上確認**：https://sakaban-code.github.io/SCAI-test/ 已部署（118.3 KB）。線上實測：第 9 輪結構全在（`.brief`／`.snap`／`.actband`／§ 索引 7 個／問題標籤 8 條／側欄編號 8 個／指標聚光層）；**19 個 DOM 掛勾與 9 個 section id 零缺漏**；紅線全在（footer 聲明、【推斷】chip 4、【待公司確認】3、`rel="noopener"` 來源連結 8、✓/✗ 標記 9、無佔位符外洩）；6 張圖表正常；Space Grotesk 與 IBM Plex Mono 均載入；`scai-logo-dark-bg.png` 正常顯示；無橫向捲動。
+**注意**：首次開啟線上版時 Chrome 會回舊版快取——需強制重新整理或加查詢字串（本次以 `?v=r9` 驗證）。
