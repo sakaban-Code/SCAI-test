@@ -546,3 +546,10 @@ git add -A; git commit -m "說明"; git push
 - Git commit：（見本節末補記）
 - Pages 線上確認：（見本節末補記）
 - 未完成與後續工作：`ANTHROPIC_API_KEY` 設定後 Actions 首跑產出 W7（屆時 `crossCheck` 與警示列會首次帶真實資料，建議人工確認一次外觀）。
+
+**第 10／11 輪 Git commit 與 Pages 補記**
+
+- `cf2e9a1` feat(offline): 重製決賽斷網備援；列印鈕 emoji 改 SVG（11 檔、+1562/−3）
+- `47152b7` feat(ui): 標籤中文化、--muted 對比達 AA、警示列 emoji 改 SVG（5 檔、+113/−77）
+- 已 push（`d4d2404..47152b7`）。**Pages 線上實測**：主站 118.8 KB——中文標籤 ✓、新色 `#736e66` ✓、舊色 `#8b867d` 已無殘留 ✓；離線備援 https://sakaban-code.github.io/SCAI-test/index_offline.html 827.3 KB——Chart.js 內嵌 ✓、外部字體請求 0 ✓。目視確認 masthead「§01 本週戰略簡報」、讀數面板「決策摘要」、行動帶「本週行動建議 問：欣銓現在該做什麼？」排版正確。
+- 提醒：Pages 更新後首次開啟仍會吃到瀏覽器快取，驗證需加查詢字串或強制重新整理。
