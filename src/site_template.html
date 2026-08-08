@@ -503,11 +503,14 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
   header{position:fixed;top:0;left:0;bottom:0;width:238px;display:flex;flex-direction:column;
     border-bottom:none;border-right:1px solid var(--ink-line);overflow:hidden auto}
   .hd,.hr{display:contents}
+  /* order 的排法對齊 DOM 的可聚焦順序（檢視切換 → 週次 → 區段導覽），
+     否則 Tab 會從視覺上最下方的檢視切換開始、再跳回上方的週次控制。
+     改視覺而非改 DOM：DOM 一動會連帶影響 600–1100px 與 ≤600px 兩個版型。 */
   .brand{order:1;padding:18px 16px 14px}
-  .wnav{order:2;margin:2px 14px 6px;padding:9px 10px;background:rgba(255,255,255,.05);
+  .wnav{order:3;margin:2px 14px 6px;padding:9px 10px;background:rgba(255,255,255,.05);
     border:1px solid var(--ink-line);border-radius:8px}
   #wsel{flex:1;min-width:0;max-width:none}
-  nav.secnav{order:3;flex:1;border-top:1px solid var(--ink-line);margin-top:8px}
+  nav.secnav{order:4;flex:1;border-top:1px solid var(--ink-line);margin-top:8px}
   .secnav .wrap{flex-direction:column;padding:10px 10px 12px;gap:1px;overflow:visible}
   .secnav a{padding:7px 12px;border-bottom:none;border-left:2px solid transparent;border-radius:0 6px 6px 0}
   .secnav a::after{display:none}
@@ -515,7 +518,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
   .secnav a.on{background:rgba(255,255,255,.05);border-left-color:var(--accent-br)}
   .ngroup{padding:14px 12px 5px;letter-spacing:1px}
   .ndiv{display:none}
-  .vtoggle{order:4;margin:10px 16px;display:flex}
+  .vtoggle{order:2;margin:0 16px 10px;display:flex}
   .vtoggle button{flex:1;padding:7px 11px}
   .stat{order:5;margin:auto 16px 0;padding:12px 2px 16px;border-top:1px solid var(--ink-line)}
 }
@@ -850,7 +853,7 @@ addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
   if(!$('#weekpop').hidden){closeWeekPop()}
   else if(!$('#lightbox').hidden){closeLB()}
-  else if(cmpOpen){cmpOpen=null;cmpPend=null;cmpQuery='';buildCmp()}
+  else if(cmpOpen){const side=cmpOpen;cmpOpen=null;cmpPend=null;cmpQuery='';buildCmp();focusPick(side)}
 });
 
 /* ── 週次對比（功能三）：A/B 自由勾選，多週取算術平均 ── */
@@ -886,6 +889,13 @@ function drawCmpK(A,B,cv,full){
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Δ ${c.raw>0?'+':''}${c.raw}`}}},
       scales:{x:{grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}}},
         y:{grid:{display:false},ticks:{color:'#4a4741',font:{size:10}}}}}});
+}
+/* 面板關閉後 #cmpui 會整個重建，原本被聚焦的元素隨之消失、焦點掉回文件開頭。
+   關閉的四條路徑（Esc／✕／再點同一顆／選定結束週）一律把焦點交還該側按鈕。 */
+function focusPick(side){
+  if(!side)return;
+  const b=document.querySelector(`#cmpui .wpick[data-side="${side}"]`);
+  if(b)b.focus({preventScroll:true});
 }
 /* 面板列表單獨抽出，供搜尋時做局部更新。
    輸入時若重建整個 #cmpui，使用者正在輸入的 <input> 會被一併換掉——中文 IME
@@ -975,17 +985,19 @@ function buildCmp(){
     cmpPend=null;cmpQuery='';
     buildCmp();
     if(cmpOpen)$('#cmpq')&&$('#cmpq').focus();
+    else focusPick(side);
   });
-  const closePanel=()=>{cmpOpen=null;cmpPend=null;cmpQuery='';buildCmp()};
+  const closePanel=()=>{const side=cmpOpen;cmpOpen=null;cmpPend=null;cmpQuery='';buildCmp();focusPick(side)};
   $('#cmpclose')&&($('#cmpclose').onclick=closePanel);
   /* 週次列：第一次點＝起始，第二次點＝結束（順序顛倒也成立，取小到大）。
      局部更新後需重綁，故抽成函式。 */
   const bindRows=()=>$$('#cmpui .wrow').forEach(b=>b.onclick=()=>{
     const k=+b.dataset.k;
     if(cmpPend===null){cmpPend=k;buildCmp();$('#cmpq')&&$('#cmpq').focus();return}
+    const side=cmpOpen;
     cmpSel[cmpOpen]={s:Math.min(cmpPend,k),e:Math.max(cmpPend,k)};
     cmpOpen=null;cmpPend=null;cmpQuery='';
-    buildCmp();
+    buildCmp();focusPick(side);
   });
   bindRows();
   /* 搜尋：只替換列表，輸入框不重建——保住中文 IME 的組字目標，也不需要再
@@ -1171,11 +1183,15 @@ function render(i){
     ${p?`<div class="trendsum">累積觀察（W${w0.week}→W${w.week}）：X 軸由 <b class="num">${fmt(w0.xy.x)}</b> 移至 <b class="num">${fmt(w.xy.x)}</b>（${w.xy.x<w0.xy.x?'碎裂加深':'聚合改善'} ${Math.abs(w.xy.x-w0.xy.x).toFixed(2)}）；Y 軸由 <b class="num">${fmt(w0.xy.y)}</b> 至 <b class="num">${fmt(w.xy.y)}</b>。期間情境${scenSpan.length===1?`維持 ${scenSpan[0]}`:`歷經 ${scenSpan.join(' → ')}`}；五維中累積變動最大＝${dimTop.n}（<b class="num">${dimTop.a.toFixed(1)}→${dimTop.b.toFixed(1)}</b>）。</div>`:''}
     <div class="g2">
       <div class="card"><button class="zoombtn" data-zoom="xy" aria-label="放大雙軸軌跡圖">⤢ 放大</button>
-        <div class="cbox" style="height:330px"><canvas id="cx" role="img" aria-label="雙軸情境軌跡圖"></canvas></div>
-        <div class="cap" id="capx"></div></div>
+        <div class="cbox" style="height:330px"><canvas id="cx" role="img" tabindex="0"
+          aria-label="雙軸情境軌跡圖。左右鍵選擇週次，Enter 或空白鍵開啟該週講解"></canvas></div>
+        <div class="cap" id="capx"></div>
+        <div class="sr" id="cxlive" aria-live="polite"></div></div>
       <div class="card"><button class="zoombtn" data-zoom="trend" aria-label="放大五維趨勢圖">⤢ 放大</button>
-        <div class="cbox" style="height:330px"><canvas id="ct" role="img" aria-label="五大維度趨勢圖"></canvas></div>
-        <div class="cap">五大維度平均權重趨勢（中性基準 50）。點資料點可看該週講解。</div></div>
+        <div class="cbox" style="height:330px"><canvas id="ct" role="img" tabindex="0"
+          aria-label="五大維度趨勢圖。左右鍵選擇週次，Enter 或空白鍵開啟該週講解"></canvas></div>
+        <div class="cap">五大維度平均權重趨勢（中性基準 50）。點資料點可看該週講解；鍵盤可聚焦圖表後以左右鍵選擇、Enter 開啟。</div>
+        <div class="sr" id="ctlive" aria-live="polite"></div></div>
     </div>
     <div class="card" style="margin-top:16px">
       <div class="chips" id="dimchips" role="group" aria-label="依維度篩選"></div>
@@ -1266,17 +1282,42 @@ function render(i){
     $$('.cbox').forEach(b=>b.innerHTML='<div class="nochart">圖表庫載入失敗（需網路連線）</div>');
   }else{
     drawXY(i);drawTrend(i);drawKDF(w,p);buildChips(w);buildCmp();
+    bindChartKeys('cx','cxlive');bindChartKeys('ct','ctlive');
   }
   $$('.zoombtn').forEach(b=>b.onclick=()=>openLB(b.dataset.zoom));
   heroFx();
   bindSpy();
 }
 
+/* 圖表資料點講解的鍵盤路徑。原本 showWeekPop() 只能經 Chart.js 的 onClick 進入，
+   canvas 無 tabindex 也無鍵盤處理，圖說卻寫著「點資料點可看該週講解」——鍵盤
+   使用者做不到該動作。以左右鍵在已繪出的週次間移動、Enter／空白鍵開啟講解，
+   並以視覺隱藏的 aria-live 區播報目前落點（canvas 內容本身無法被輔助科技讀取）。 */
+const chartKbIdx={};
+function bindChartKeys(id,liveId){
+  const cv=$('#'+id),live=$('#'+liveId);
+  if(!cv)return;
+  chartKbIdx[id]=cur;                       /* 每次重繪都回到本週，行為可預期 */
+  const say=()=>{const w=DATA.weeks[chartKbIdx[id]];
+    if(live&&w)live.textContent=`W${w.week}　${w.range}　按 Enter 開啟該週講解`};
+  cv.onfocus=say;
+  cv.onkeydown=e=>{
+    const max=cur;let k=chartKbIdx[id];
+    if(e.key==='Enter'||e.key===' '||e.key==='Spacebar'){e.preventDefault();showWeekPop(k);return}
+    if(e.key==='ArrowRight'||e.key==='ArrowDown')k=Math.min(max,k+1);
+    else if(e.key==='ArrowLeft'||e.key==='ArrowUp')k=Math.max(0,k-1);
+    else if(e.key==='Home')k=0;
+    else if(e.key==='End')k=max;
+    else return;
+    e.preventDefault();chartKbIdx[id]=k;say();
+  };
+}
+
 /* ── charts ── */
 function drawXY(idx,cv){
   const pts=DATA.weeks.slice(0,idx+1).map(w=>({x:w.xy.x,y:w.xy.y,l:'W'+w.week}));
   const first=pts[0],last=pts[pts.length-1];
-  $('#capx').innerHTML=`雙軸軌跡：X 由 ${fmt(first.x)} 移至 <b class="num">${fmt(last.x)}</b>，Y 由 ${fmt(first.y)} 移至 <b class="num">${fmt(last.y)}</b>。點上緣標示週次；點資料點可看該週講解。`;
+  $('#capx').innerHTML=`雙軸軌跡：X 由 ${fmt(first.x)} 移至 <b class="num">${fmt(last.x)}</b>，Y 由 ${fmt(first.y)} 移至 <b class="num">${fmt(last.y)}</b>。點上緣標示週次；點資料點可看該週講解，鍵盤則以左右鍵選擇、Enter 開啟。`;
   const inst=new Chart(cv||$('#cx'),{type:'scatter',
     data:{datasets:[{data:pts,showLine:true,borderColor:'#cdc8bf',borderWidth:1.5,
       pointRadius:pts.map((_,i)=>i===pts.length-1?7:4),
