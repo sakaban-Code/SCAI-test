@@ -128,6 +128,50 @@ header{position:sticky;top:0;z-index:50;background:var(--ink-bg);
 .cmp-note{font-size:11px;color:var(--muted);margin-left:4px}
 .cmp-line{font-size:12.5px;color:var(--ink2);margin-bottom:12px;line-height:1.7}
 .cmp-g{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+/* ── 週次對比：區間選擇按鈕與面板 ── */
+.wpick{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line2);
+  background:var(--surface);border-radius:7px;padding:6px 11px;cursor:pointer;
+  font-family:inherit;font-size:12.5px;color:var(--ink);
+  transition:border-color .18s,background .18s}
+.wpick:hover{border-color:var(--ink2)}
+.wpick.on{border-color:var(--accent);background:#fdf6f2}
+.wpick-v{font-weight:600;font-variant-numeric:tabular-nums}
+.wpick-n{font-size:11px;color:#6f6a62}
+.wpick-c{font-size:12px;color:var(--muted);margin-left:2px}
+.cmppanel{margin:10px 0 14px;border:1px solid var(--line2);border-radius:8px;
+  background:var(--surface);box-shadow:var(--sh2);overflow:hidden}
+.cmppanel-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;
+  border-bottom:1px solid var(--line);background:#f7f5f1}
+.cmppanel-h b{font-size:12.5px}
+.cmppanel-hint{font-size:11.5px;color:#6f6a62}
+.cmppanel-h .sp{flex:1 1 8px}
+.cmppanel-x{border:1px solid var(--line2);background:var(--surface);border-radius:6px;
+  width:26px;height:26px;cursor:pointer;color:var(--ink2);font-family:inherit;font-size:12px;
+  transition:border-color .18s,color .18s}
+.cmppanel-x:hover{border-color:var(--ink2);color:var(--ink)}
+.cmppanel-q{width:100%;border:none;border-bottom:1px solid var(--line);padding:10px 14px;
+  font-family:inherit;font-size:12.5px;color:var(--ink);background:var(--surface)}
+.cmppanel-q:focus{outline:none;border-bottom-color:var(--accent);background:#fffdfb}
+.cmppanel-l{max-height:250px;overflow-y:auto}
+.cmppanel-e{padding:16px 14px;font-size:12.5px;color:var(--muted)}
+.wrow{display:grid;grid-template-columns:52px 148px 1fr auto;gap:10px;align-items:center;
+  width:100%;border:none;border-bottom:1px solid var(--line);background:var(--surface);
+  padding:9px 14px;cursor:pointer;font-family:inherit;text-align:left;
+  transition:background .16s}
+.wrow:last-child{border-bottom:none}
+.wrow:hover{background:var(--dim)}
+.wrow.in{background:#fdf6f2}
+.wrow.lo{background:#f7ede6;box-shadow:inset 2px 0 0 var(--accent)}
+.wrow-w{font-weight:600;font-size:12.5px;color:var(--ink)}
+.wrow-r{font-size:11.5px;color:var(--ink2)}
+.wrow-s{font-size:11.5px;color:#6f6a62;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wrow-t{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:10px;letter-spacing:.06em;
+  color:var(--accent);border:1px solid #e6cdbf;border-radius:4px;padding:1px 6px;white-space:nowrap}
+.wrow-t.on{color:#6f6a62;border-color:var(--line2)}
+@media(max-width:640px){
+  .wrow{grid-template-columns:46px 1fr auto;gap:8px}
+  .wrow-s{display:none}
+}
 .cmp-more{border:1px solid var(--line2);background:var(--surface);border-radius:6px;font-size:11px;
   padding:3px 10px;cursor:pointer;color:var(--ink2);font-family:inherit;margin-top:8px}
 .cmp-cell{position:relative;padding-top:26px}
@@ -645,6 +689,15 @@ let charts=[], kdfChart=null, kdfFilter=-1;
 let view='simple';  /* 簡略｜詳細 分流（D3 預設簡略；憲法禁 localStorage，僅存於當次瀏覽） */
 let lbChart=null,popIdx=0,cmpCharts=[],cmpFull=false;
 let cmpA=new Set([0]),cmpB=new Set([DATA.weeks.length-1]);  /* 週次對比預設：W1 vs 最新週 */
+/* 區間選取狀態：每側記起訖索引，選 W1→W3 即代表 W1、W2、W3 連續區間 */
+let cmpSel={a:{s:0,e:0},b:{s:DATA.weeks.length-1,e:DATA.weeks.length-1}};
+let cmpOpen=null;    /* 目前展開的選擇面板：'a' | 'b' | null */
+let cmpPend=null;    /* 已點的起始索引，等待第二個時間點 */
+let cmpQuery='';     /* 面板內的搜尋字串 */
+const rangeSet=r=>{const s=Math.min(r.s,r.e),e=Math.max(r.s,r.e),out=new Set();
+  for(let i=s;i<=e;i++)out.add(i);return out};
+const rangeLabel=r=>{const s=Math.min(r.s,r.e),e=Math.max(r.s,r.e);
+  return s===e?`W${DATA.weeks[s].week}`:`W${DATA.weeks[s].week}–W${DATA.weeks[e].week}`};
 
 /* ── week selector ── */
 const sel=$('#wsel');
@@ -704,7 +757,9 @@ $('#weekpop').addEventListener('click',e=>{if(e.target.id==='weekpop')$('#weekpo
 $('#wpgo').onclick=()=>{$('#weekpop').hidden=true;closeLB();go(popIdx)};
 addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
-  if(!$('#weekpop').hidden){$('#weekpop').hidden=true}else{closeLB()}
+  if(!$('#weekpop').hidden){$('#weekpop').hidden=true}
+  else if(!$('#lightbox').hidden){closeLB()}
+  else if(cmpOpen){cmpOpen=null;cmpPend=null;cmpQuery='';buildCmp()}
 });
 
 /* ── 週次對比（功能三）：A/B 自由勾選，多週取算術平均 ── */
@@ -744,12 +799,45 @@ function drawCmpK(A,B,cv,full){
 function buildCmp(){
   cmpCharts.forEach(c=>c.destroy());cmpCharts=[];
   const box=$('#cmpui');if(!box)return;
-  const chipRow=(set,cls)=>DATA.weeks.map((w,k)=>
-    `<button type="button" class="fchip${set.has(k)?' on':''}" data-side="${cls}" data-k="${k}">W${w.week}</button>`).join('');
+  cmpA=rangeSet(cmpSel.a);cmpB=rangeSet(cmpSel.b);
+  const pickBtn=side=>{const r=cmpSel[side],n=rangeSet(r).size;
+    return `<button type="button" class="wpick${cmpOpen===side?' on':''}" data-side="${side}"
+      aria-expanded="${cmpOpen===side}" aria-controls="cmppanel">
+      <span class="wpick-v num">${rangeLabel(r)}</span>
+      <span class="wpick-n">${n===1?'單週':`共 ${n} 週`}</span>
+      <span class="wpick-c" aria-hidden="true">${cmpOpen===side?'−':'＋'}</span></button>`};
+  /* 選擇面板：先點起始、再點結束，中間週次自動納入；附搜尋以免週次過多難找 */
+  let panel='';
+  if(cmpOpen){
+    const q=cmpQuery.trim().toLowerCase();
+    const rows=DATA.weeks.map((w,k)=>({w,k}))
+      .filter(({w})=>!q||[`w${w.week}`,String(w.week),w.range,w.scenario||'',w.scenarioEn||'']
+        .join(' ').toLowerCase().includes(q));
+    const cur=rangeSet(cmpSel[cmpOpen]);
+    const lo=cmpPend!==null?cmpPend:null;
+    panel=`<div class="cmppanel" id="cmppanel">
+      <div class="cmppanel-h">
+        <b>${cmpOpen==='a'?'基準 A':'對比 B'}：選擇區間</b>
+        <span class="cmppanel-hint">${cmpPend===null?'點第一次＝起始週':`已選起始 W${DATA.weeks[cmpPend].week}，再點一次＝結束週`}</span>
+        <span class="sp"></span>
+        <button type="button" class="cmppanel-x" id="cmpclose" aria-label="關閉選擇面板">✕</button>
+      </div>
+      <input type="search" class="cmppanel-q" id="cmpq" value="${cmpQuery.replace(/"/g,'&quot;')}"
+        placeholder="搜尋週次、日期或情境（例：W5、07/14、Crossroads）" aria-label="搜尋週次">
+      <div class="cmppanel-l" role="listbox">${rows.length?rows.map(({w,k})=>{
+        const inCur=cur.has(k),isLo=lo===k;
+        return `<button type="button" class="wrow${inCur?' in':''}${isLo?' lo':''}" data-k="${k}" role="option" aria-selected="${inCur}">
+          <span class="wrow-w num">W${w.week}</span>
+          <span class="wrow-r num">${w.range}</span>
+          <span class="wrow-s">${w.scenarioEn||w.scenario||''}</span>
+          ${isLo?'<span class="wrow-t">起始</span>':inCur?'<span class="wrow-t on">已選</span>':''}
+        </button>`}).join(''):'<div class="cmppanel-e">找不到符合的週次，請換個關鍵字。</div>'}</div>
+    </div>`;
+  }
   let html=`<div class="cmp-rows">
-    <div class="cmp-row"><span class="cmp-lab a">基準 A</span>${chipRow(cmpA,'a')}</div>
-    <div class="cmp-row"><span class="cmp-lab b">對比 B</span>${chipRow(cmpB,'b')}</div>
-  </div>`;
+    <div class="cmp-row"><span class="cmp-lab a">基準 A</span>${pickBtn('a')}</div>
+    <div class="cmp-row"><span class="cmp-lab b">對比 B</span>${pickBtn('b')}</div>
+  </div>${panel}`;
   if(!cmpA.size||!cmpB.size){
     box.innerHTML=html+`<div class="cmp-line" style="color:var(--muted)">A、B 兩側各至少勾選一週即可比較。</div>`;
   }else{
@@ -781,9 +869,28 @@ function buildCmp(){
     $('#cmpmore').onclick=()=>{cmpFull=!cmpFull;buildCmp()};
     $$('#cmpui .zoombtn').forEach(b=>b.onclick=()=>openLB(b.dataset.zoom));
   }
-  $$('#cmpui .fchip').forEach(b=>b.onclick=()=>{
-    const set=b.dataset.side==='a'?cmpA:cmpB,k=+b.dataset.k;
-    set.has(k)?set.delete(k):set.add(k);
+  /* 兩顆側別按鈕：展開／收合選擇面板 */
+  $$('#cmpui .wpick').forEach(b=>b.onclick=()=>{
+    const side=b.dataset.side;
+    cmpOpen=cmpOpen===side?null:side;
+    cmpPend=null;cmpQuery='';
+    buildCmp();
+    if(cmpOpen)$('#cmpq')&&$('#cmpq').focus();
+  });
+  const closePanel=()=>{cmpOpen=null;cmpPend=null;cmpQuery='';buildCmp()};
+  $('#cmpclose')&&($('#cmpclose').onclick=closePanel);
+  /* 搜尋：即時篩選，重繪後把游標與插入點復原 */
+  const qi=$('#cmpq');
+  if(qi)qi.oninput=()=>{
+    const pos=qi.selectionStart;cmpQuery=qi.value;buildCmp();
+    const n=$('#cmpq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}
+  };
+  /* 週次列：第一次點＝起始，第二次點＝結束（順序顛倒也成立，取小到大） */
+  $$('#cmpui .wrow').forEach(b=>b.onclick=()=>{
+    const k=+b.dataset.k;
+    if(cmpPend===null){cmpPend=k;buildCmp();$('#cmpq')&&$('#cmpq').focus();return}
+    cmpSel[cmpOpen]={s:Math.min(cmpPend,k),e:Math.max(cmpPend,k)};
+    cmpOpen=null;cmpPend=null;cmpQuery='';
     buildCmp();
   });
 }
@@ -965,7 +1072,7 @@ function render(i){
       <div class="cap">25 項 KDF 本週權重，依五大維度著色；虛線＝中性基準 50；灰短線＝上週權重位置。<b>滑鼠停留可看各 KDF 定義與週變化</b>（出自提案書）；點上方圓鈕可聚焦單一維度。</div>
     </div>
     <div class="card" style="margin-top:16px" id="cmpcard">
-      <div class="sh" style="margin-bottom:12px"><h2 style="font-size:15px">週次對比</h2><span class="sub">A、B 兩側自由勾選：單週、連續區間、多週群組皆可；多週取平均</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
+      <div class="sh" style="margin-bottom:12px"><h2 style="font-size:15px">週次對比</h2><span class="sub">A、B 各選一段區間（點起始週再點結束週，中間自動納入）；多週取算術平均</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
       <div id="cmpui"></div>
     </div>
   </section>
