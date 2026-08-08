@@ -56,6 +56,8 @@ jobs:
           python src/pipeline.py
           python src/make_charts.py
           python src/build_site.py
+          # 決賽斷網備援：--no-net 用已提交的 src/_fontcache/，不依賴 Google Fonts
+          python src/build_offline.py --no-net
 
       - name: Commit results (Observability 留痕)
         if: steps.keys.outputs.ok == 'true'

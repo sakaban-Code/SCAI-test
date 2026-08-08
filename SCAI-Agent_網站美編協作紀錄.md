@@ -482,3 +482,38 @@ git add -A; git commit -m "說明"; git push
 
 **Pages 線上確認**：https://sakaban-code.github.io/SCAI-test/ 已部署（118.3 KB）。線上實測：第 9 輪結構全在（`.brief`／`.snap`／`.actband`／§ 索引 7 個／問題標籤 8 條／側欄編號 8 個／指標聚光層）；**19 個 DOM 掛勾與 9 個 section id 零缺漏**；紅線全在（footer 聲明、【推斷】chip 4、【待公司確認】3、`rel="noopener"` 來源連結 8、✓/✗ 標記 9、無佔位符外洩）；6 張圖表正常；Space Grotesk 與 IBM Plex Mono 均載入；`scai-logo-dark-bg.png` 正常顯示；無橫向捲動。
 **注意**：首次開啟線上版時 Chrome 會回舊版快取——需強制重新整理或加查詢字串（本次以 `?v=r9` 驗證）。
+---
+
+## 2026-08-08｜第 10 輪：斷網備援重製＋列印圖示去 emoji
+
+- 人類需求：「index_offline.html 斷網備援現在可以重製了（美編已定案）；🖨 emoji 改 SVG——完成這部分」
+- 執行者：Claude Code（Fable 5）
+- 修改前狀態：第 9 輪已上線（`d4d2404`）。離線備援仍為第 3 輪前的舊版設計，**且實測根本不具離線能力**：仍有 2 處 `fonts.googleapis.com` 外部請求、**Chart.js 完全沒有內嵌**（斷網時三張圖表全滅）。列印鈕使用 🖨 emoji，違反 DESIGN.md §8 黑名單第 5 條。
+- 修改檔案：`src/site_template.html`（列印鈕與 `.ic` 樣式）、**新增 `src/build_offline.py`**、**新增 `src/_fontcache/`**（4 個 latin woff2＋gf.css，63.7 KB）、`.github/workflows/weekly.yml`（每週同步重建離線版）、重建 `docs/index.html` 與**新增 `docs/index_offline.html`**、同步 cowork 兩檔。
+- 實作內容：
+  1. **🖨 → SVG**：改為三段 `path` 的線性印表機圖示（`viewBox 0 0 16 16`），新增 `.ic` 樣式（14px、`fill:none`、`stroke:currentColor`、1.3 筆畫、圓端圓角）——與相鄰的複製鈕 `⧉` 筆畫重量一致，且隨按鈕文字色變化（hover 時同步變亮）。`aria-label` 與 `title` 原樣保留。
+  2. **斷網備援改為可重複建置**：新增 `src/build_offline.py`，與 `build_site.py` 共用同一份模板與同一份 payload，差別只在把外部資源全部內嵌：
+     - **Chart.js 4.4.1** 由 `docs/assets/chart.umd.min.js` 內嵌（196 KB），連同 CDN 失敗備援的 `document.write` 一併移除
+     - **拉丁字體**：Space Grotesk 700＋IBM Plex Mono 400/500/600 的 **latin 子集** woff2 轉 data URI（4 組，63.7 KB）。**中文字體不內嵌**（Noto Sans TC 全字集數 MB），改用系統 CJK 堆疊（`Microsoft JhengHei UI`／`PingFang TC`／`Heiti TC`…）
+     - **圖片**：`scai-logo-light-bg`（favicon＋apple-touch-icon）、`scai-logo-dark-bg`（側欄）、`scai-header-pattern`（簡報封面底紋）共 4 處轉 data URI
+     - **標題加註「（離線版）」**，避免 Demo 現場與線上版混淆
+     - 腳本內建**零外部資源驗收**，任一 `src="http…"` 殘留即中止；模板錨點命中次數不符也中止（模板變動時會明確報錯而非默默產出壞檔）
+  3. **字體授權**：Space Grotesk（© 2020 Florian Karsten）與 IBM Plex Mono（© 2017 IBM Corp.）皆為 SIL OFL 1.1，允許嵌入；已於離線檔 `<style>` 開頭寫入完整授權聲明與 OFL 連結。
+  4. **CI 同步**：`weekly.yml` 於 `build_site.py` 後加一行 `python src/build_offline.py --no-net`，用已提交的字體快取重建，**不依賴 Google Fonts 可用性**；避免離線版隨每週新資料而過期。
+- 遇到的錯誤與原因：
+  1. **舊離線檔名不副實**——實測 `fonts.googleapis.com` 2 處、Chart.js 0 處內嵌。若決賽現場真的斷網，圖表區會全部顯示「圖表庫載入失敗」。**修正**：重寫為真正零外部請求，並以瀏覽器網路面板實測驗收。
+  2. **PowerShell 多行驗收指令解析失敗**（`IncompleteDollarSubexpressionReference`）——字串內含 `$(...)` 巢狀與中文混排。**修正**：驗收邏輯改寫成 Python 腳本執行。
+  3. Python f-string 內不可含反斜線（驗收腳本 `SyntaxError`）——**修正**：正規表示式先存入變數再代入。
+- 驗證：
+  - **零外部請求（瀏覽器實測）**：以 Chrome 開啟並記錄網路請求，總計 10 筆＝頁面本身（localhost）＋擴充功能腳本＋data URI；**`fonts.googleapis.com`／`fonts.gstatic.com`／`cdnjs` 各 0 筆**。靜態掃描亦為 0（`<script src=`／`<link href=`／`<img src=`／CSS `url()`／`@import` 外部一律 0）。
+  - **內嵌資源**：4 組 woff2 data URI、4 處 png data URI、Chart.js 4.4.1 內嵌；`document.fonts.check` 確認 Space Grotesk 700 與 IBM Plex Mono 400/600 **均已載入**；`.scen-en` 實際套用 Space Grotesk、`.num` 實際套用 IBM Plex Mono。
+  - **圖表**：6 張 canvas 全部實際繪出（逐張取中心點像素確認非空白），Chart.js 版本 4.4.1。
+  - **紅線（線上版／離線版雙檔比對）**：佔位符已取代、footer 不確定性聲明、【推斷】chip、【待公司確認】、`rel="noopener"` 來源連結、Executive Snapshot 結構、SVG 列印圖示、印表機 emoji 已移除——**八項全部兩檔皆通過**。
+  - **可重現性**：`--no-net`（CI 路徑）與有網路路徑產出**位元組完全相同**。
+  - 檔案大小：離線版 828 KB（單檔，含字體與圖片）；線上版維持 118 KB。
+- Git commit：（待補）
+- Pages 線上確認：（待補；離線檔一併發佈於 `https://sakaban-code.github.io/SCAI-test/index_offline.html`，供團隊賽前下載）
+- 未完成與後續工作：
+  - **人類尚未裁示**：三個英文標籤是否中文化；`--muted` 淺底 3.4:1 既有用法是否全面加深；**本輪是否推送**（依人類指示第 10 條，未經確認不推送）。
+  - 觀察（未擅自更動）：`heroflag` 的 ⚠️ 仍是 emoji（`crossCheck.flag` 警示列），與 §8 黑名單第 5 條同類，但屬內容語意標記而非裝飾，是否比照改 SVG 待人類決定。
+  - `ANTHROPIC_API_KEY` 設定後 Actions 首跑產出 W7。

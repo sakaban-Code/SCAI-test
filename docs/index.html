@@ -78,6 +78,8 @@ header{position:sticky;top:0;z-index:50;background:var(--ink-bg);
   cursor:pointer;font-size:13px;color:#d8d3c9;display:flex;align-items:center;justify-content:center;
   transition:border-color .15s,background .15s,color .15s}
 .wbtn:disabled{opacity:.35;cursor:default}
+.ic{width:14px;height:14px;display:block;fill:none;stroke:currentColor;stroke-width:1.3;
+  stroke-linecap:round;stroke-linejoin:round}
 .wbtn:not(:disabled):hover{border-color:#5a554b;background:rgba(255,255,255,.11);color:#fff}
 .vtoggle{display:flex;border:1px solid var(--ink-line2);border-radius:7px;overflow:hidden;flex-shrink:0}
 .vtoggle button{border:none;background:transparent;color:var(--mut-d);font-family:inherit;
@@ -548,7 +550,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
         <select id="wsel" aria-label="選擇週次"></select>
         <button class="wbtn" id="wnext" aria-label="下一週">›</button>
         <button class="wbtn" id="wcopy" aria-label="複製本週連結" title="複製本週連結">⧉</button>
-        <button class="wbtn onlydesk" id="wprint" aria-label="列印或存成 PDF" title="列印／存 PDF">🖨</button>
+        <button class="wbtn onlydesk" id="wprint" aria-label="列印或存成 PDF" title="列印／存 PDF"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4.6 6.1V2.6h6.8v3.5"/><path d="M4.6 11.9H3.1a1 1 0 0 1-1-1V7.1a1 1 0 0 1 1-1h9.8a1 1 0 0 1 1 1v3.8a1 1 0 0 1-1 1h-1.5"/><path d="M4.6 9.6h6.8v3.8H4.6z"/></svg></button>
       </div>
     </div>
   </div>
