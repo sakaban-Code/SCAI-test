@@ -712,14 +712,14 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 
 <button id="top" aria-label="回到頂部" onclick="scrollTo({top:0,behavior:'smooth'})">↑</button>
 
-<div id="lightbox" class="lb" role="dialog" aria-modal="true" aria-label="圖表放大檢視" hidden>
+<div id="lightbox" class="lb" role="dialog" aria-modal="true" aria-label="圖表放大檢視" tabindex="-1" hidden>
   <div class="lb-box">
     <button id="lbclose" class="lb-x" aria-label="關閉">✕</button>
     <div class="lb-canvas"><canvas id="lbcv"></canvas></div>
   </div>
 </div>
 
-<div id="weekpop" class="wp" role="dialog" aria-modal="true" aria-label="週次講解" hidden>
+<div id="weekpop" class="wp" role="dialog" aria-modal="true" aria-label="週次講解" tabindex="-1" hidden>
   <div class="wp-box">
     <button id="wpclose" class="lb-x" aria-label="關閉">✕</button>
     <div id="wpbody"></div>
@@ -799,10 +799,56 @@ function setView(v){if(view===v)return;view=v;
 $('#vsimple').onclick=()=>setView('simple');
 $('#vfull').onclick=()=>setView('full');
 
+/* ── 對話框焦點管理 ──
+   兩個 role="dialog" aria-modal="true" 先前只切換 hidden：不移入焦點、
+   不困住 Tab、背景未 inert、關閉也不還原焦點，鍵盤使用者會被留在被遮蔽的
+   觸發鈕上，Tab 還會走到覆蓋層背後的控制項。以堆疊管理（放大檢視中點資料點
+   會再開週次講解，兩層並存），inert 為主、Tab 陷阱為備援不依賴 inert 支援度。 */
+const modalStack=[];
+const BG_SEL='header,nav.secnav,#main,footer,#top';
+const FOCUSABLE='a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+/* position:fixed 元素的 offsetParent 為 null，故以 getClientRects 判可見 */
+const focusablesIn=el=>[...el.querySelectorAll(FOCUSABLE)].filter(n=>n.getClientRects().length>0);
+const setInert=(el,on)=>{if(el)on?el.setAttribute('inert',''):el.removeAttribute('inert')};
+function focusInto(el){const f=focusablesIn(el);(f[0]||el).focus({preventScroll:true})}
+function openModal(id){
+  const el=$('#'+id);if(!el||modalStack.some(m=>m.id===id))return;
+  modalStack.push({id,opener:document.activeElement});
+  el.hidden=false;el.removeAttribute('inert');
+  document.body.style.overflow='hidden';
+  $$(BG_SEL).forEach(n=>setInert(n,true));
+  modalStack.slice(0,-1).forEach(m=>setInert($('#'+m.id),true));  /* 只有最上層可互動 */
+  focusInto(el);
+}
+function closeModal(id){
+  const i=modalStack.findIndex(m=>m.id===id);if(i<0)return;
+  const [rec]=modalStack.splice(i,1);
+  const el=$('#'+id);el.hidden=true;el.removeAttribute('inert');
+  if(modalStack.length){
+    const top=$('#'+modalStack[modalStack.length-1].id);
+    setInert(top,false);focusInto(top);
+  }else{
+    $$(BG_SEL).forEach(n=>setInert(n,false));
+    document.body.style.overflow='';
+    if(rec.opener&&rec.opener.isConnected)rec.opener.focus({preventScroll:true});
+  }
+}
+/* Tab 陷阱：inert 已能擋住背景，此處另保最上層對話框內的循環，兩者互為備援 */
+addEventListener('keydown',e=>{
+  if(e.key!=='Tab'||!modalStack.length)return;
+  const el=$('#'+modalStack[modalStack.length-1].id);
+  const f=focusablesIn(el);
+  if(!f.length){e.preventDefault();el.focus({preventScroll:true});return}
+  const first=f[0],last=f[f.length-1];
+  if(!el.contains(document.activeElement)){e.preventDefault();first.focus({preventScroll:true})}
+  else if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus({preventScroll:true})}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus({preventScroll:true})}
+},true);
+
 /* ── 放大檢視（功能一） ── */
 function openLB(kind){
   if((kind==='cmpxy'||kind==='cmpk')&&(!cmpA.size||!cmpB.size))return;
-  $('#lightbox').hidden=false;document.body.style.overflow='hidden';
+  openModal('lightbox');
   lbChart&&lbChart.destroy();
   if(kind==='xy')lbChart=drawXY(cur,$('#lbcv'));
   else if(kind==='trend')lbChart=drawTrend(cur,$('#lbcv'));
@@ -812,7 +858,7 @@ function openLB(kind){
 }
 function closeLB(){
   if($('#lightbox').hidden)return;
-  $('#lightbox').hidden=true;document.body.style.overflow='';
+  closeModal('lightbox');
   lbChart&&lbChart.destroy();lbChart=null;
 }
 $('#lbclose').onclick=closeLB;
@@ -829,14 +875,15 @@ function showWeekPop(k){
     <p class="wp-p">${first}</p>
     <div class="wp-m">觸發劇本 ${firedN} 條${wk.confidence?`｜信心 ${wk.confidence}`:''}｜完整內容含事件、決策軌跡與規畫</div>`;
   $('#wpgo').textContent=`跳轉到 W${wk.week}`;
-  $('#weekpop').hidden=false;
+  openModal('weekpop');
 }
-$('#wpclose').onclick=()=>$('#weekpop').hidden=true;
-$('#weekpop').addEventListener('click',e=>{if(e.target.id==='weekpop')$('#weekpop').hidden=true});
-$('#wpgo').onclick=()=>{$('#weekpop').hidden=true;closeLB();go(popIdx)};
+const closeWeekPop=()=>closeModal('weekpop');
+$('#wpclose').onclick=closeWeekPop;
+$('#weekpop').addEventListener('click',e=>{if(e.target.id==='weekpop')closeWeekPop()});
+$('#wpgo').onclick=()=>{closeWeekPop();closeLB();go(popIdx)};
 addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
-  if(!$('#weekpop').hidden){$('#weekpop').hidden=true}
+  if(!$('#weekpop').hidden){closeWeekPop()}
   else if(!$('#lightbox').hidden){closeLB()}
   else if(cmpOpen){cmpOpen=null;cmpPend=null;cmpQuery='';buildCmp()}
 });

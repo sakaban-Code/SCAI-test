@@ -901,3 +901,40 @@ git add -A; git commit -m "說明"; git push
 - 教訓與既有的「背景分頁事件派發失效」同類：**此環境測互動與切換，不可信任非同步包裝函式，須直接呼叫同步的渲染／處理函式**。
 
 - Git commit：（見本節末補記）
+
+---
+
+## 2026-08-08｜第 17 輪：兩個對話框補上鍵盤模態（Codex High②）
+
+- 人類需求：「2 做完再推」——先修完 Codex High②，再一併推 Pages。
+- 執行者：Claude Code（Opus 5）
+- 缺陷：`#lightbox`（放大檢視）與 `#weekpop`（週次講解）雖標了 `role="dialog" aria-modal="true"`，但實作只切換 `hidden`——**不移入焦點、不困住 Tab、背景未 inert、關閉不還原焦點**。鍵盤使用者按下放大鈕後焦點仍停在被遮蔽的觸發鈕上，Tab 會一路走到覆蓋層背後的控制項；且在放大圖中點資料點會讓兩個 `aria-modal` 同時可見。
+
+### 實作
+- 新增**對話框堆疊管理器**（`modalStack`／`openModal`／`closeModal`）。放大檢視中再開週次講解是既有的合理行為，故不禁止並存，改以堆疊處理：**開新層時把下層一併 `inert`，關閉時焦點退回下層，堆疊清空才還原背景與原觸發元素**。
+- 背景 `inert` 範圍：`header, nav.secnav, #main, footer, #top`。兩個對話框加 `tabindex="-1"` 以便在無可聚焦子元素時仍能承接焦點。
+- **Tab 陷阱為備援**（capture 階段 keydown）：`inert` 已足以擋住背景，但額外保證最上層對話框內的循環，兩者互為備援，不依賴 `inert` 的瀏覽器支援度。
+- 可聚焦元素判定用 `getClientRects().length>0` 而非 `offsetParent!==null`——後者對 `position:fixed` 恆為 null，會誤判整個對話框沒有可聚焦元素。
+- Esc 優先序維持既有的「週次講解 → 放大檢視 → 對比面板」，只是改呼叫 `closeModal`。
+
+### 驗證（此面板事件派發可用，已先以 probe 確認，故 Tab／Esc 以真事件測試）
+逐步狀態表：
+
+| 步驟 | 堆疊 | 焦點 | 背景 inert | 放大層 inert |
+|---|---|---|---|---|
+| 初始 | (空) | 放大鈕 | 全 false | false |
+| 開放大檢視 | lightbox | **lbclose** | **全 true** | false |
+| 再開週次講解 | lightbox>weekpop | **wpclose** | 全 true | **true** |
+| 關週次講解 | lightbox | **回 lbclose** | 全 true | **false** |
+| 關放大檢視 | (空) | **還原到放大鈕** | **全 false** | false |
+
+- Tab 陷阱：最後一顆 + Tab → 回捲第一顆；第一顆 + Shift+Tab → 繞到最後一顆；**強制把焦點 `.focus()` 到對話框外的 `#wsel` 竟移不出去**（焦點留在對話框內）——證明 `inert` 真的生效；再 Tab 拉回第一顆。
+- Esc：兩層皆開時第一次只關週次講解且焦點回 `lbclose`，第二次關放大檢視且焦點還原到原觸發鈕；收尾背景 `inert` 全清、`body.overflow` 復原。
+- 全站回歸（1265 寬）：353 節點 0 對比失敗、0 真實溢出、**八週實體洩漏 0、可見死錨點 0**、10 section、5 個 Chart 實例、`residualInert` 0（多輪開關後無殘留）。
+- 390×844：0 真實溢出、雙行 header 與揭露區完好、對話框在手機開啟時焦點正確移入。
+
+### 已知小瑕疵（未修）
+- `≤560px` 的 `.lb-box{width:100vw}` 會把捲軸溝寬算進去，模擬環境下比可視區寬 3px。真實手機無此溝寬，且開啟時 `body` 已 `overflow:hidden` 不會產生捲動，故未動。
+- Codex 其餘 Medium／Low 尚未處理：中文 IME 於對比搜尋被打斷、圖表資料點講解僅限滑鼠、桌機側欄視覺與 Tab 順序不一致、區間選擇器關閉後焦點消失、回頂鈕變透明但仍保有焦點、離線檔複製連結得到 `null/…`、圖表載入全失敗時放大鈕仍可點、`build_offline.py` 零外部資源檢查只擋 `src=`。
+
+- Git commit：（見本節末補記）
