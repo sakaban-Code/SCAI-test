@@ -612,6 +612,26 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
   .sh::after{display:none}
   .sh{gap:5px 9px}
 }
+/* 週次對比：快捷比較、模式切換、非 7 天期別提示 */
+.cmp-presets{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:9px}
+.cmp-presets-l{font-size:10px;letter-spacing:.08em;color:var(--muted);
+  font-family:"IBM Plex Mono","Noto Sans TC",monospace;text-transform:uppercase}
+.cmp-preset{font-family:inherit;font-size:11px;color:var(--ink2);background:var(--surface);
+  border:1px solid var(--line);border-radius:20px;padding:4px 11px;cursor:pointer;
+  transition:border-color .16s,color .16s}
+.cmp-preset:hover{border-color:var(--ink2);color:var(--ink)}
+.cmp-preset:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cmpmode{display:inline-flex;border:1px solid var(--line2);border-radius:6px;overflow:hidden;flex-shrink:0}
+.cmpmode-b{font-family:inherit;font-size:10.5px;padding:3px 9px;border:none;cursor:pointer;
+  background:transparent;color:var(--muted);transition:background .16s,color .16s}
+.cmpmode-b.on{background:var(--accent);color:#fff;font-weight:600}
+.cmpmode-b:not(.on):hover{color:var(--ink)}
+.cmpmode-b:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.wrow-cb{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;
+  border:1px solid var(--line2);border-radius:3px;font-size:10px;color:#fff;flex-shrink:0}
+.wrow.in .wrow-cb{background:var(--accent);border-color:var(--accent)}
+.cmpnote{margin-top:9px;font-size:11px;line-height:1.65;color:var(--ink2);
+  background:#f8f6f2;border-left:2px solid var(--accent);border-radius:0 6px 6px 0;padding:8px 11px}
 /* §09 期間涵蓋揭露：內容由建置時推導的 DATA.coverage 產生，資料變動即自動同步 */
 .covbox{margin-top:16px;border:1px solid var(--line);border-left:3px solid var(--accent);
   border-radius:8px;padding:14px 16px;background:#f8f6f2}
@@ -718,12 +738,17 @@ let charts=[], kdfChart=null, kdfFilter=-1;
 let view='simple';  /* 簡略｜詳細 分流（D3 預設簡略；憲法禁 localStorage，僅存於當次瀏覽） */
 let lbChart=null,popIdx=0,cmpCharts=[],cmpFull=false;
 let cmpA=new Set([0]),cmpB=new Set([DATA.weeks.length-1]);  /* 週次對比預設：W1 vs 最新週 */
-/* 區間選取狀態：每側記起訖索引，選 W1→W3 即代表 W1、W2、W3 連續區間 */
-let cmpSel={a:{s:0,e:0},b:{s:DATA.weeks.length-1,e:DATA.weeks.length-1}};
+/* 選取狀態：兩種模式共存，每側各自獨立
+   - range：{mode:'range', s, e}   連續區間，點起始再點結束，中間自動納入
+   - pick ：{mode:'pick', ks:[…]}  自由勾選，可非連續（如 W1+W3+W5） */
+let cmpSel={a:{mode:'range',s:0,e:0},b:{mode:'range',s:DATA.weeks.length-1,e:DATA.weeks.length-1}};
 let cmpOpen=null;    /* 目前展開的選擇面板：'a' | 'b' | null */
-let cmpPend=null;    /* 已點的起始索引，等待第二個時間點 */
+let cmpPend=null;    /* 區間模式下已點的起始索引，等待第二個時間點 */
 let cmpQuery='';     /* 面板內的搜尋字串 */
-const rangeSet=r=>{const s=Math.min(r.s,r.e),e=Math.max(r.s,r.e),out=new Set();
+const selSet=r=>{
+  if(!r)return new Set();
+  if(r.mode==='pick')return new Set(r.ks||[]);
+  const s=Math.min(r.s,r.e),e=Math.max(r.s,r.e),out=new Set();
   for(let i=s;i<=e;i++)out.add(i);return out};
 /* DATA.weeks 的字串已於建置時 HTML 跳脫（來源為 Tavily 與模型輸出，不可信）。
    兩個配套：
@@ -733,12 +758,22 @@ const safeUrl=u=>{const s=String(u==null?'':u).trim();
   return /^https?:\/\//i.test(s)?s:''};
 const deEnt=s=>String(s==null?'':s).replace(/&lt;/g,'<').replace(/&gt;/g,'>')
   .replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
-const rangeLabel=r=>{const s=Math.min(r.s,r.e),e=Math.max(r.s,r.e);
-  return s===e?`W${DATA.weeks[s].week}`:`W${DATA.weeks[s].week}–W${DATA.weeks[e].week}`};
-/* 選取區間實際涵蓋的日曆天數：取聯集，重疊只算一次、缺口不算。
-   期數不等於天數——W7 單獨一期即 14 天，W6+W7 兩期是 21 天。任一期缺推導欄位即回 null。 */
-const rangeDays=r=>{const s=Math.min(r.s,r.e),e=Math.max(r.s,r.e),iv=[];
-  for(let i=s;i<=e;i++){const w=DATA.weeks[i];
+/* 標籤：連續者一律以區間呈現（含自由勾選勾成連續的情形），非連續才列舉；
+   超過三段就只給首末與段數，免得按鈕被撐爆。 */
+const selLabel=r=>{
+  const ks=[...selSet(r)].sort((a,b)=>a-b);
+  if(!ks.length)return '未選';
+  const W=k=>`W${DATA.weeks[k].week}`;
+  const contiguous=ks[ks.length-1]-ks[0]===ks.length-1;
+  if(!contiguous)return ks.length<=3?ks.map(W).join('+')
+    :`${W(ks[0])}…${W(ks[ks.length-1])}（${ks.length} 選）`;
+  return ks.length===1?W(ks[0]):`${W(ks[0])}–${W(ks[ks.length-1])}`};
+/* 實際涵蓋的日曆天數：取聯集，重疊只算一次、缺口不計入。
+   期數不等於天數——非連續勾選尤其明顯（W1+W3+W5 是 3 期但只涵蓋 21 天中的 21 天，
+   中間空檔不算）。任一期缺推導欄位即回 null，呼叫端退回舊文案。 */
+const selDays=r=>{
+  const ks=[...selSet(r)].sort((a,b)=>a-b),iv=[];
+  for(const i of ks){const w=DATA.weeks[i];
     if(!w||!w.start||!w.end)return null;iv.push([Date.parse(w.start),Date.parse(w.end)])}
   if(!iv.length)return null;
   iv.sort((a,b)=>a[0]-b[0]);
@@ -747,6 +782,12 @@ const rangeDays=r=>{const s=Math.min(r.s,r.e),e=Math.max(r.s,r.e),iv=[];
     if(iv[k][0]<=ce+D){if(iv[k][1]>ce)ce=iv[k][1]}
     else{tot+=(ce-cs)/D+1;cs=iv[k][0];ce=iv[k][1]}}
   return tot+(ce-cs)/D+1};
+/* 快捷比較：只提供實際可用的組合（週數不足時該顆不渲染） */
+const CMP_PRESETS=[
+  {k:'first-last',label:'首週 vs 本週',fn:n=>({a:{mode:'range',s:0,e:0},b:{mode:'range',s:n-1,e:n-1}})},
+  {k:'prev-last', label:'上週 vs 本週',fn:n=>n<2?null:{a:{mode:'range',s:n-2,e:n-2},b:{mode:'range',s:n-1,e:n-1}}},
+  {k:'halves',    label:'前半 vs 後半',fn:n=>n<4?null:{a:{mode:'range',s:0,e:Math.floor(n/2)-1},b:{mode:'range',s:Math.floor(n/2),e:n-1}}},
+];
 
 /* ── week selector ── */
 const sel=$('#wsel');
@@ -918,46 +959,67 @@ function cmpRowsHTML(){
   const rows=DATA.weeks.map((w,k)=>({w,k}))
     .filter(({w})=>!q||[`w${w.week}`,String(w.week),w.range,w.scenario||'',w.scenarioEn||'']
       .join(' ').toLowerCase().includes(q));
-  const cur=rangeSet(cmpSel[cmpOpen]);
-  const lo=cmpPend!==null?cmpPend:null;
+  const sel=cmpSel[cmpOpen],pick=sel.mode==='pick';
+  const cur=selSet(sel);
+  const lo=pick?null:(cmpPend!==null?cmpPend:null);
   return rows.length?rows.map(({w,k})=>{
     const inCur=cur.has(k),isLo=lo===k;
-    return `<button type="button" class="wrow${inCur?' in':''}${isLo?' lo':''}" data-k="${k}" role="option" aria-selected="${inCur}">
+    return `<button type="button" class="wrow${inCur?' in':''}${isLo?' lo':''}" data-k="${k}"
+      role="option" aria-selected="${inCur}">
+      ${pick?`<span class="wrow-cb" aria-hidden="true">${inCur?'✓':''}</span>`:''}
       <span class="wrow-w num">W${w.week}</span>
       <span class="wrow-r num">${w.range}</span>
       <span class="wrow-s">${w.scenarioEn||w.scenario||''}</span>
-      ${isLo?'<span class="wrow-t">起始</span>':inCur?'<span class="wrow-t on">已選</span>':''}
+      ${isLo?'<span class="wrow-t">起始</span>':(inCur&&!pick)?'<span class="wrow-t on">已選</span>':''}
     </button>`}).join(''):'<div class="cmppanel-e">找不到符合的週次，請換個關鍵字。</div>';
 }
 function buildCmp(){
   cmpCharts.forEach(c=>c.destroy());cmpCharts=[];
   const box=$('#cmpui');if(!box)return;
-  cmpA=rangeSet(cmpSel.a);cmpB=rangeSet(cmpSel.b);
-  const pickBtn=side=>{const r=cmpSel[side],n=rangeSet(r).size;
+  cmpA=selSet(cmpSel.a);cmpB=selSet(cmpSel.b);
+  const pickBtn=side=>{const r=cmpSel[side],n=selSet(r).size;
     return `<button type="button" class="wpick${cmpOpen===side?' on':''}" data-side="${side}"
       aria-expanded="${cmpOpen===side}" aria-controls="cmppanel">
-      <span class="wpick-v num">${rangeLabel(r)}</span>
-      <span class="wpick-n">${(d=>d?`${n} 期・${d} 天`:(n===1?'單週':`共 ${n} 週`))(rangeDays(r))}</span>
+      <span class="wpick-v num">${selLabel(r)}</span>
+      <span class="wpick-n">${(d=>d?`${n} 期・${d} 天`:(n===1?'單週':`共 ${n} 週`))(selDays(r))}</span>
       <span class="wpick-c" aria-hidden="true">${cmpOpen===side?'−':'＋'}</span></button>`};
-  /* 選擇面板：先點起始、再點結束，中間週次自動納入；附搜尋以免週次過多難找 */
+  /* 選擇面板：區間模式＝點起始再點結束、中間自動納入；自由勾選模式＝逐週切換。
+     附搜尋以免週次過多難找。 */
   let panel='';
   if(cmpOpen){
+    const pick=cmpSel[cmpOpen].mode==='pick';
+    const hint=pick?`逐週點選切換，可非連續（已選 ${selSet(cmpSel[cmpOpen]).size} 週）`
+      :(cmpPend===null?'點第一次＝起始週':`已選起始 W${DATA.weeks[cmpPend].week}，再點一次＝結束週`);
     panel=`<div class="cmppanel" id="cmppanel">
       <div class="cmppanel-h">
-        <b>${cmpOpen==='a'?'基準 A':'對比 B'}：選擇區間</b>
-        <span class="cmppanel-hint">${cmpPend===null?'點第一次＝起始週':`已選起始 W${DATA.weeks[cmpPend].week}，再點一次＝結束週`}</span>
+        <b>${cmpOpen==='a'?'基準 A':'對比 B'}</b>
+        <div class="cmpmode" role="group" aria-label="選擇方式">
+          <button type="button" class="cmpmode-b${pick?'':' on'}" data-mode="range" aria-pressed="${!pick}">區間</button>
+          <button type="button" class="cmpmode-b${pick?' on':''}" data-mode="pick" aria-pressed="${pick}">自由勾選</button>
+        </div>
+        <span class="cmppanel-hint">${hint}</span>
         <span class="sp"></span>
         <button type="button" class="cmppanel-x" id="cmpclose" aria-label="關閉選擇面板">✕</button>
       </div>
       <input type="search" class="cmppanel-q" id="cmpq" value="${cmpQuery.replace(/"/g,'&quot;')}"
         placeholder="搜尋週次、日期或情境（例：W5、07/14、Crossroads）" aria-label="搜尋週次">
-      <div class="cmppanel-l" role="listbox">${cmpRowsHTML()}</div>
+      <div class="cmppanel-l" role="listbox" aria-multiselectable="${pick}">${cmpRowsHTML()}</div>
     </div>`;
   }
-  let html=`<div class="cmp-rows">
+  const n=DATA.weeks.length;
+  const presets=CMP_PRESETS.filter(p=>p.fn(n)).map(p=>
+    `<button type="button" class="cmp-preset" data-p="${p.k}">${p.label}</button>`).join('');
+  let html=`${presets?`<div class="cmp-presets"><span class="cmp-presets-l">快捷</span>${presets}</div>`:''}
+  <div class="cmp-rows">
     <div class="cmp-row"><span class="cmp-lab a">基準 A</span>${pickBtn('a')}</div>
     <div class="cmp-row"><span class="cmp-lab b">對比 B</span>${pickBtn('b')}</div>
   </div>${panel}`;
+  /* 期數不等於天數：僅在選取範圍含非 7 天期別時提示，八週等長時完全不出現。
+     避免把「N 期平均」誤讀為按時間加權。 */
+  const odd=[...new Set([...cmpA,...cmpB])].map(k=>DATA.weeks[k])
+    .filter(w=>w&&w.days&&w.days!==7);
+  if(odd.length)html+=`<div class="cmpnote">本次比較含非 7 天期別（${odd.map(w=>`W${w.week} ${w.days} 天`).join('、')}）；
+    多期平均為<b>每期等權</b>，不依天數加權。</div>`;
   if(!cmpA.size||!cmpB.size){
     box.innerHTML=html+`<div class="cmp-line" style="color:var(--muted)">A、B 兩側各至少勾選一週即可比較。</div>`;
   }else{
@@ -1003,14 +1065,39 @@ function buildCmp(){
   /* 週次列：第一次點＝起始，第二次點＝結束（順序顛倒也成立，取小到大）。
      局部更新後需重綁，故抽成函式。 */
   const bindRows=()=>$$('#cmpui .wrow').forEach(b=>b.onclick=()=>{
-    const k=+b.dataset.k;
+    const k=+b.dataset.k,s=cmpSel[cmpOpen];
+    if(s.mode==='pick'){
+      /* 自由勾選：逐週切換、面板保持開啟；至少保留一週，避免選成空集合而無法比較 */
+      const ks=new Set(s.ks||[]);
+      if(ks.has(k)){if(ks.size>1)ks.delete(k)}else ks.add(k);
+      cmpSel[cmpOpen]={mode:'pick',ks:[...ks].sort((x,y)=>x-y)};
+      buildCmp();$('#cmpq')&&$('#cmpq').focus();
+      return;
+    }
     if(cmpPend===null){cmpPend=k;buildCmp();$('#cmpq')&&$('#cmpq').focus();return}
     const side=cmpOpen;
-    cmpSel[cmpOpen]={s:Math.min(cmpPend,k),e:Math.max(cmpPend,k)};
+    cmpSel[cmpOpen]={mode:'range',s:Math.min(cmpPend,k),e:Math.max(cmpPend,k)};
     cmpOpen=null;cmpPend=null;cmpQuery='';
     buildCmp();focusPick(side);
   });
   bindRows();
+  /* 模式切換：兩邊互轉都以目前選取為基礎，不清空使用者已選的週次。
+     轉自由勾選＝以目前區間為初始勾選；轉區間＝取目前選取的首末為新區間。 */
+  $$('#cmpui .cmpmode-b').forEach(b=>b.onclick=()=>{
+    const m=b.dataset.mode,ks=[...selSet(cmpSel[cmpOpen])].sort((x,y)=>x-y);
+    const first=ks.length?ks[0]:0,last=ks.length?ks[ks.length-1]:0;
+    cmpSel[cmpOpen]=m==='pick'?{mode:'pick',ks:ks.length?ks:[0]}:{mode:'range',s:first,e:last};
+    cmpPend=null;buildCmp();
+    const nb=document.querySelector(`#cmpui .cmpmode-b[data-mode="${m}"]`);if(nb)nb.focus();
+  });
+  /* 快捷比較：一鍵設定 A/B 兩側並收合面板 */
+  $$('#cmpui .cmp-preset').forEach(b=>b.onclick=()=>{
+    const p=CMP_PRESETS.find(x=>x.k===b.dataset.p);if(!p)return;
+    const v=p.fn(DATA.weeks.length);if(!v)return;
+    cmpSel={a:v.a,b:v.b};cmpOpen=null;cmpPend=null;cmpQuery='';
+    buildCmp();
+    const nb=document.querySelector(`#cmpui .cmp-preset[data-p="${p.k}"]`);if(nb)nb.focus();
+  });
   /* 搜尋：只替換列表，輸入框不重建——保住中文 IME 的組字目標，也不需要再
      復原游標與插入點。組字期間（compositionstart→end）不篩選，避免以未上字的
      注音符號去比對而顯示空結果，改於組字完成時一次套用。 */
@@ -1210,7 +1297,7 @@ function render(i){
       <div class="cap">25 項 KDF 本週權重，依五大維度著色；虛線＝中性基準 50；灰短線＝上週權重位置。<b>滑鼠停留可看各 KDF 定義與週變化</b>（出自提案書）；點上方圓鈕可聚焦單一維度。</div>
     </div>
     <div class="card" style="margin-top:16px" id="cmpcard">
-      <div class="sh" style="margin-bottom:12px"><h2 style="font-size:15px">週次對比</h2><span class="sub">A、B 各選一段區間（點起始週再點結束週，中間自動納入）；多週取算術平均</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
+      <div class="sh" style="margin-bottom:12px"><h2 style="font-size:15px">週次對比</h2><span class="sub">A、B 各選一段區間（點起始再點結束，中間自動納入），或切換自由勾選挑非連續週次；多期取算術平均、每期等權</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
       <div id="cmpui"></div>
     </div>
   </section>
