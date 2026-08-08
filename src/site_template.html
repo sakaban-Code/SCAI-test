@@ -887,6 +887,27 @@ function drawCmpK(A,B,cv,full){
       scales:{x:{grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}}},
         y:{grid:{display:false},ticks:{color:'#4a4741',font:{size:10}}}}}});
 }
+/* 面板列表單獨抽出，供搜尋時做局部更新。
+   輸入時若重建整個 #cmpui，使用者正在輸入的 <input> 會被一併換掉——中文 IME
+   （注音／拼音／倉頡）組字中的第一個 input 事件就會讓組字目標消失，造成組字
+   取消或提前上字。改為只替換列表，輸入框自始至終是同一個節點。 */
+function cmpRowsHTML(){
+  if(!cmpOpen)return '';
+  const q=cmpQuery.trim().toLowerCase();
+  const rows=DATA.weeks.map((w,k)=>({w,k}))
+    .filter(({w})=>!q||[`w${w.week}`,String(w.week),w.range,w.scenario||'',w.scenarioEn||'']
+      .join(' ').toLowerCase().includes(q));
+  const cur=rangeSet(cmpSel[cmpOpen]);
+  const lo=cmpPend!==null?cmpPend:null;
+  return rows.length?rows.map(({w,k})=>{
+    const inCur=cur.has(k),isLo=lo===k;
+    return `<button type="button" class="wrow${inCur?' in':''}${isLo?' lo':''}" data-k="${k}" role="option" aria-selected="${inCur}">
+      <span class="wrow-w num">W${w.week}</span>
+      <span class="wrow-r num">${w.range}</span>
+      <span class="wrow-s">${w.scenarioEn||w.scenario||''}</span>
+      ${isLo?'<span class="wrow-t">起始</span>':inCur?'<span class="wrow-t on">已選</span>':''}
+    </button>`}).join(''):'<div class="cmppanel-e">找不到符合的週次，請換個關鍵字。</div>';
+}
 function buildCmp(){
   cmpCharts.forEach(c=>c.destroy());cmpCharts=[];
   const box=$('#cmpui');if(!box)return;
@@ -900,12 +921,6 @@ function buildCmp(){
   /* 選擇面板：先點起始、再點結束，中間週次自動納入；附搜尋以免週次過多難找 */
   let panel='';
   if(cmpOpen){
-    const q=cmpQuery.trim().toLowerCase();
-    const rows=DATA.weeks.map((w,k)=>({w,k}))
-      .filter(({w})=>!q||[`w${w.week}`,String(w.week),w.range,w.scenario||'',w.scenarioEn||'']
-        .join(' ').toLowerCase().includes(q));
-    const cur=rangeSet(cmpSel[cmpOpen]);
-    const lo=cmpPend!==null?cmpPend:null;
     panel=`<div class="cmppanel" id="cmppanel">
       <div class="cmppanel-h">
         <b>${cmpOpen==='a'?'基準 A':'對比 B'}：選擇區間</b>
@@ -915,14 +930,7 @@ function buildCmp(){
       </div>
       <input type="search" class="cmppanel-q" id="cmpq" value="${cmpQuery.replace(/"/g,'&quot;')}"
         placeholder="搜尋週次、日期或情境（例：W5、07/14、Crossroads）" aria-label="搜尋週次">
-      <div class="cmppanel-l" role="listbox">${rows.length?rows.map(({w,k})=>{
-        const inCur=cur.has(k),isLo=lo===k;
-        return `<button type="button" class="wrow${inCur?' in':''}${isLo?' lo':''}" data-k="${k}" role="option" aria-selected="${inCur}">
-          <span class="wrow-w num">W${w.week}</span>
-          <span class="wrow-r num">${w.range}</span>
-          <span class="wrow-s">${w.scenarioEn||w.scenario||''}</span>
-          ${isLo?'<span class="wrow-t">起始</span>':inCur?'<span class="wrow-t on">已選</span>':''}
-        </button>`}).join(''):'<div class="cmppanel-e">找不到符合的週次，請換個關鍵字。</div>'}</div>
+      <div class="cmppanel-l" role="listbox">${cmpRowsHTML()}</div>
     </div>`;
   }
   let html=`<div class="cmp-rows">
@@ -970,20 +978,31 @@ function buildCmp(){
   });
   const closePanel=()=>{cmpOpen=null;cmpPend=null;cmpQuery='';buildCmp()};
   $('#cmpclose')&&($('#cmpclose').onclick=closePanel);
-  /* 搜尋：即時篩選，重繪後把游標與插入點復原 */
-  const qi=$('#cmpq');
-  if(qi)qi.oninput=()=>{
-    const pos=qi.selectionStart;cmpQuery=qi.value;buildCmp();
-    const n=$('#cmpq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}
-  };
-  /* 週次列：第一次點＝起始，第二次點＝結束（順序顛倒也成立，取小到大） */
-  $$('#cmpui .wrow').forEach(b=>b.onclick=()=>{
+  /* 週次列：第一次點＝起始，第二次點＝結束（順序顛倒也成立，取小到大）。
+     局部更新後需重綁，故抽成函式。 */
+  const bindRows=()=>$$('#cmpui .wrow').forEach(b=>b.onclick=()=>{
     const k=+b.dataset.k;
     if(cmpPend===null){cmpPend=k;buildCmp();$('#cmpq')&&$('#cmpq').focus();return}
     cmpSel[cmpOpen]={s:Math.min(cmpPend,k),e:Math.max(cmpPend,k)};
     cmpOpen=null;cmpPend=null;cmpQuery='';
     buildCmp();
   });
+  bindRows();
+  /* 搜尋：只替換列表，輸入框不重建——保住中文 IME 的組字目標，也不需要再
+     復原游標與插入點。組字期間（compositionstart→end）不篩選，避免以未上字的
+     注音符號去比對而顯示空結果，改於組字完成時一次套用。 */
+  const qi=$('#cmpq');
+  if(qi){
+    let composing=false;
+    const applyFilter=()=>{
+      cmpQuery=qi.value;
+      const list=$('#cmppanel .cmppanel-l');
+      if(list){list.innerHTML=cmpRowsHTML();bindRows()}
+    };
+    qi.addEventListener('compositionstart',()=>{composing=true});
+    qi.addEventListener('compositionend',()=>{composing=false;applyFilter()});
+    qi.addEventListener('input',()=>{if(!composing)applyFilter()});
+  }
 }
 function go(i){
   if(i<0||i>=DATA.weeks.length)return;
