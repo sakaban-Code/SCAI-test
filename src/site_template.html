@@ -657,6 +657,24 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 .gov-b{font-size:12px;line-height:1.78;color:var(--ink2)}
 .gov-b code{font-family:"IBM Plex Mono",monospace;font-size:11px;background:#f0ece6;padding:1px 5px;border-radius:3px}
 @media(max-width:820px){.govgrid{grid-template-columns:1fr}.card.gov{grid-column:auto}}
+/* 企業畫像切換（§02/§08）：欣銓官方＋兩家虛構示範企業 */
+.cosel{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.cosel-l{font-size:10px;letter-spacing:.08em;color:var(--muted);
+  font-family:"IBM Plex Mono","Noto Sans TC",monospace;text-transform:uppercase}
+.co-b{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:12px;
+  font-weight:500;color:var(--ink2);background:var(--surface);border:1px solid var(--line);
+  border-radius:20px;padding:6px 14px;cursor:pointer;
+  transition:border-color .16s,color .16s,background .16s}
+.co-b:hover{border-color:var(--ink2);color:var(--ink)}
+.co-b.on{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+.co-b:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.co-tag{font-size:9px;letter-spacing:.06em;padding:1px 6px;border-radius:8px;
+  background:#f3e9d8;color:#6d5120;border:1px solid #e2d2b4}
+.co-b.on .co-tag{background:rgba(255,255,255,.16);color:#f0e6d2;border-color:rgba(255,255,255,.25)}
+.chip.demo{background:#f8f0e0;border-color:#dfcba2;color:#6d5120}
+.demobox{margin-bottom:14px;font-size:11.5px;line-height:1.7;color:var(--ink2);
+  background:#faf5ea;border:1px solid #e8dcc2;border-left:3px solid #b98a2e;
+  border-radius:0 8px 8px 0;padding:10px 13px}
 /* 週次對比：快捷比較、模式切換、非 7 天期別提示 */
 .cmp-presets{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:9px}
 .cmp-presets-l{font-size:10px;letter-spacing:.08em;color:var(--muted);
@@ -772,6 +790,7 @@ const evTag=s=>(s||'').replace(/✓/g,'<span class="tk ok">✓</span>')
   .replace(/✗/g,'<span class="tk no">✗</span>').replace(/✕/g,'<span class="tk no">✕</span>');
 let charts=[], kdfChart=null, kdfFilter=-1;
 let view='simple';  /* 簡略｜詳細 分流（D3 預設簡略；憲法禁 localStorage，僅存於當次瀏覽） */
+let curCompany='anst'; /* 企業畫像切換：anst＝欣銓（官方紀錄）；示範企業於建置時以引擎重算 */
 let lbChart=null,popIdx=0,cmpCharts=[],cmpFull=false;
 let cmpA=new Set([0]),cmpB=new Set([DATA.weeks.length-1]);  /* 週次對比預設：W1 vs 最新週 */
 /* 選取狀態：兩種模式共存，每側各自獨立
@@ -1262,6 +1281,13 @@ function render(i){
   $('#wprev').disabled=(i===0);$('#wnext').disabled=(i===DATA.weeks.length-1);
   const dx=p?w.xy.x-p.xy.x:0, dy=p?w.xy.y-p.xy.y:0;
   const plan=w.companyPlan, fired=plan?plan.firedPlaybooks:[];
+  /* 企業畫像切換：§01 總覽維持欣銓官方週報；§02／§08 依 curCompany 切換。
+     欣銓（real）取 weeks.json 正本；示範企業取建置時以引擎重算的 plans。 */
+  const CO=DATA.companies||[];
+  const co=CO.find(c=>c.id===curCompany)||CO[0]||null;
+  const coPlan=co?(co.real?plan:((co.plans||{})[String(w.week)]||null)):plan;
+  const coFired=coPlan?(coPlan.firedPlaybooks||[]):[];
+  const coLev={};(co?co.decision_levers:(DATA.profile.decision_levers||[])).forEach(l=>coLev[l.id]=l);
   const top3=DATA.kdf.map((k,j)=>({...k,v:w.w[j]})).sort((a,b)=>b.v-a.v).slice(0,3);
   const w0=DATA.weeks[0];
   const scenSpan=[...new Set(DATA.weeks.slice(0,i+1).map(x=>x.scenarioEn||x.scenario))];
@@ -1373,15 +1399,20 @@ function render(i){
   ${moversHTML}
 
   <section id="plan" data-tab="company">
-    <div class="sh"><span class="ix">§02</span><h2>對欣銓的公司規畫</h2><span class="q">欣銓現在該做什麼？</span><span class="sub">${S?`共 ${fired.length} 條觸發｜含成功指標與停損訊號`:'企業畫像 × 情境 → 觸發式劇本'}</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
-    ${plan?`<div style="font-size:12.5px;color:var(--ink2);margin-bottom:14px">情境姿態：${plan.scenarioStance}</div>`:''}
-    <div class="plan">${fired.map(f=>`
+    ${CO.length>1?`<div class="cosel" role="group" aria-label="選擇企業畫像">
+      <span class="cosel-l">企業畫像</span>
+      ${CO.map(c=>`<button type="button" class="co-b${c.id===co.id?' on':''}" data-co="${c.id}" aria-pressed="${c.id===co.id}">${c.short}${c.real?'':'<span class="co-tag">示範</span>'}</button>`).join('')}
+    </div>`:''}
+    <div class="sh"><span class="ix">§02</span><h2>對${co?co.short:'欣銓'}的公司規畫</h2><span class="q">${co?co.short:'欣銓'}現在該做什麼？</span><span class="sub">${S?`共 ${coFired.length} 條觸發｜含成功指標與停損訊號`:'企業畫像 × 情境 → 觸發式劇本'}</span>${co&&!co.real?'<span class="chip demo" title="虛構企業：畫像與劇本為示範資料；觸發依據引用的週次資料為真實紀錄">示範資料</span>':'<span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>'}</div>
+    ${co&&!co.real?`<div class="demobox"><b>${co.name}</b>為虛構示範企業——同一套週次情境判定，換上不同企業畫像與劇本組，觸發結果隨之改變（可與欣銓對照本週差異）。觸發依據引用的座標、KDF 與關鍵字均為真實週次資料；虛構的只有企業本身。非投資建議。</div>`:''}
+    ${coPlan?`<div style="font-size:12.5px;color:var(--ink2);margin-bottom:14px">情境姿態：${coPlan.scenarioStance}</div>`:''}
+    <div class="plan">${coFired.map(f=>`
       <div class="pb">
         <div class="pb-h"><span class="hz">${(DATA.horizons[f.horizon]||f.horizon).split('｜')[0]}</span>
           <span class="pb-t">${f.title}</span><span class="pb-id">${f.id}</span></div>
         <div class="pb-a">${f.action}</div>
         <div class="meta">
-          <div class="mi"><div class="k">負責槓桿</div><div class="v">${(DATA.levers[f.lever]||{}).name||f.lever}／${(DATA.levers[f.lever]||{}).owner||'—'}</div></div>
+          <div class="mi"><div class="k">負責槓桿</div><div class="v">${(coLev[f.lever]||{}).name||f.lever}／${(coLev[f.lever]||{}).owner||'—'}</div></div>
           <div class="mi"><div class="k">成功指標</div><div class="v">${f.success_metric}</div></div>
           <div class="mi"><div class="k">停損訊號</div><div class="v">${f.stop_loss}</div></div>
         </div>
@@ -1464,17 +1495,15 @@ function render(i){
   ${saHTML}
 
   <section id="profile" data-tab="company">
-    <div class="sh"><span class="ix">§08</span><h2>企業畫像</h2><span class="q">這些建議是對誰而言？</span><span class="sub">${S?'欣銓科技 3264.TWO｜公司現況（皆為公開資料）':'欣銓科技 3264.TWO · 公開資料'}</span></div>
+    <div class="sh"><span class="ix">§08</span><h2>企業畫像</h2><span class="q">這些建議是對誰而言？</span><span class="sub">${co?`${co.name}｜${co.tickerLabel}`:'欣銓科技 3264.TWO · 公開資料'}</span>${co&&!co.real?'<span class="chip demo" title="虛構企業：畫像數字為示範資料">示範資料</span>':''}</div>
+    ${co&&co.industry?`<div style="font-size:12px;color:var(--ink2);margin-bottom:12px">${co.industry}${co.positioning?`——${co.positioning}`:''}</div>`:''}
     <div class="pf">
-      <div class="it"><div class="k">2026Q2 營收</div><div class="v">45.3 億</div><div class="n">季增 13.8%／年增 32.4%　法說會</div></div>
-      <div class="it"><div class="k">毛利率</div><div class="v">40.2%</div><div class="n">季增 1.8pp／年增 3.9pp</div></div>
-      <div class="it"><div class="k">上半年 capex</div><div class="v">約 70 億</div><div class="n">主投龍潭廠高階測試設備 <span class="tbc">待確認</span></div></div>
-      <div class="it"><div class="k">稼動率</div><div class="v">&gt;70%</div><div class="n">龍潭廠 2026/07 量產 <span class="tbc">待確認</span></div></div>
+      ${(co?co.stats:[]).map(s2=>`<div class="it"><div class="k">${s2.k}</div><div class="v">${s2.v}</div><div class="n">${s2.n}${s2.tbc?' <span class="tbc">待確認</span>':''}${co.real?'':' <span class="tbc">示範</span>'}</div></div>`).join('')}
     </div>
     <div class="card" style="margin-top:14px;font-size:12.5px;color:var(--ink2)">
-      <b>決策槓桿</b>（公司實際可調動的資源）：${DATA.profile.decision_levers.map(l=>`${l.name}<span style="color:var(--muted)">（${l.owner}・${l.speed}）</span>`).join('、')}。
+      <b>決策槓桿</b>（公司實際可調動的資源）：${(co?co.decision_levers:DATA.profile.decision_levers).map(l=>`${l.name}<span style="color:var(--muted)">（${l.owner}・${l.speed}）</span>`).join('、')}。
       <div style="margin-top:10px;color:var(--muted);font-size:11.5px">
-        營收組合占比、客戶集中度、耗材庫存月數等未公開項目均標示 <span class="tbc">待確認</span>，本系統不以估計值冒充內部數據。
+        ${co?co.profileNote:'營收組合占比、客戶集中度、耗材庫存月數等未公開項目均標示 <span class="tbc">待確認</span>，本系統不以估計值冒充內部數據。'}
       </div>
     </div>
   </section>
@@ -1535,6 +1564,14 @@ function render(i){
     bindChartKeys('cx','cxlive');bindChartKeys('ct','ctlive');
   }
   $$('.zoombtn').forEach(b=>b.onclick=()=>openLB(b.dataset.zoom));
+  /* 企業畫像切換：重繪後把焦點交還同一顆藥丸（render 會銷毀原按鈕） */
+  $$('.co-b').forEach(b=>b.onclick=()=>{
+    if(curCompany===b.dataset.co)return;
+    curCompany=b.dataset.co;
+    render(cur);
+    const nb=document.querySelector(`.co-b[data-co="${curCompany}"]`);
+    if(nb)nb.focus({preventScroll:true});
+  });
   heroFx();
   /* setTab 內含 bindSpy 與圖表 resize；圖表先畫再切分頁，藏起來的那些會在
      使用者切到該頁時由 setTab 的 resize 補正尺寸。keepScroll＝重繪不捲頂。 */

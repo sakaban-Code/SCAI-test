@@ -95,6 +95,56 @@ def escape_html_deep(obj):
     return obj
 
 
+def build_companies(root: pathlib.Path, weeks: list, prof: dict, pb: dict):
+    """企業畫像可切換：欣銓＋兩家虛構示範企業。
+
+    - 欣銓（real=True）：§02 規畫仍取 weeks.json 的 companyPlan（append-only 官方紀錄，
+      不重算）；此處只帶 §08 畫像顯示資料。
+    - 示範企業（real=False）：於建置時以 plan_engine 對**真實週次資料**逐週重算——
+      觸發依據引用的座標／KDF／關鍵字都是真實的，虛構的只有企業本身。
+      展示「同一套情境判定 × 不同企業畫像 → 不同觸發結果」的引擎可移植性。
+    demo_profiles.json 不存在時回傳 None，網站自動退回單一企業模式。
+    """
+    demo_path = root / "data" / "demo_profiles.json"
+    if not demo_path.exists():
+        return None
+    import sys as _sys
+    _here = str(pathlib.Path(__file__).resolve().parent)
+    if _here not in _sys.path:
+        _sys.path.insert(0, _here)
+    import plan_engine
+
+    companies = [{
+        "id": "anst", "real": True,
+        "short": "欣銓科技", "name": "欣銓科技",
+        "tickerLabel": "3264.TWO｜公開資料",
+        "industry": prof["company"]["industry"],
+        "stats": [
+            {"k": "2026Q2 營收", "v": "45.3 億", "n": "季增 13.8%／年增 32.4%　法說會"},
+            {"k": "毛利率", "v": "40.2%", "n": "季增 1.8pp／年增 3.9pp"},
+            {"k": "上半年 capex", "v": "約 70 億", "n": "主投龍潭廠高階測試設備", "tbc": True},
+            {"k": "稼動率", "v": ">70%", "n": "龍潭廠 2026/07 量產", "tbc": True},
+        ],
+        "profileNote": "營收組合占比、客戶集中度、耗材庫存月數等未公開項目均標示【待確認】，本系統不以估計值冒充內部數據。",
+        "decision_levers": prof["decision_levers"],
+    }]
+
+    demo = load(demo_path)
+    for c in demo["companies"]:
+        pbwrap = {"playbooks": c["playbooks"]}
+        profwrap = {"scenario_stance": c["scenario_stance"]}
+        plans = {}
+        for w in weeks:                      # weeks＝正規化後、跳脫前的原值
+            p = plan_engine.build_plan(w, profwrap, pbwrap)
+            p["note"] = "示範資料：虛構企業，用於展示引擎可移植性；觸發依據引用的週次資料為真實紀錄。"
+            plans[str(w["week"])] = p
+        entry = {k: v for k, v in c.items() if k not in ("playbooks", "scenario_stance")}
+        entry["real"] = False
+        entry["plans"] = plans
+        companies.append(entry)
+    return companies
+
+
 def build_payload(root: pathlib.Path) -> dict:
     weeks = copy.deepcopy(load(root / "data" / "weeks.json"))
     for w in weeks:
@@ -118,7 +168,9 @@ def build_payload(root: pathlib.Path) -> dict:
     extras = load(ex_path) if ex_path.exists() else {"kdfDefs": {}, "scenarioMeta": []}
 
     coverage = build_coverage(weeks)      # 以未跳脫的原值推導日期，須早於跳脫
+    companies = build_companies(root, weeks, prof, pb)   # 亦須用未跳脫的原值計算
     return {
+        "companies": escape_html_deep(companies) if companies else None,
         "weeks": escape_html_deep(weeks),
         "kdf": cfg["kdf"],
         "dims": cfg["dimensions"],
