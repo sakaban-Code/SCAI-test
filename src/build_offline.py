@@ -140,7 +140,19 @@ def main():
     # ── 6. 注入資料 ──
     if "/*__DATA__*/" not in html:
         sys.exit("[錯誤] 佔位符遺失")
-    html = html.replace("/*__DATA__*/", "const DATA=" + data_js + ";")
+    # 離線旗標：助理面板據此關閉 AI endpoint。斷網備援的意義就是零外部請求，
+    # 不能因為助理接了後端就在離線檔裡偷偷發 fetch。
+    html = html.replace("/*__DATA__*/",
+                        "window.__SCAI_OFFLINE__=true;const DATA=" + data_js + ";")
+
+    # 連 endpoint 字串本身也一併清掉：執行期旗標已足夠，但離線檔裡不留任何外部端點
+    # 才經得起「打開原始碼檢查」——與零外部資源驗收同一個標準。
+    ep_pat = re.compile(r"(endpoint:\s*)'https?://[^']*'")
+    n_ep = len(ep_pat.findall(html))
+    if n_ep != 1:
+        sys.exit(f"[錯誤] SCAI_AI_CONFIG.endpoint 命中 {n_ep} 次（需 1 次）——模板已變動，請更新本腳本")
+    html = ep_pat.sub(r"\1''", html)
+    print("[離線] AI endpoint 已清空並置入離線旗標（助理僅提供規則式回答）")
 
     # ── 7. 零外部請求驗收 ──
     # 舊版只擋 src=，漏掉 <link href>、CSS url()、@import、srcset 等同樣會發出

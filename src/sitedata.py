@@ -103,11 +103,12 @@ def build_companies(root: pathlib.Path, weeks: list, prof: dict, pb: dict):
     - 示範企業（real=False）：於建置時以 plan_engine 對**真實週次資料**逐週重算——
       觸發依據引用的座標／KDF／關鍵字都是真實的，虛構的只有企業本身。
       展示「同一套情境判定 × 不同企業畫像 → 不同觸發結果」的引擎可移植性。
-    demo_profiles.json 不存在時回傳 None，網站自動退回單一企業模式。
+    demo_profiles.json 不存在時只回傳欣銓一筆，網站自動退回單一企業模式（不顯示切換器）。
     """
+    # 欣銓的畫像資料（§08 四張統計卡）改由此供給，故 demo_profiles.json 不存在時
+    # 不能整個回 None——那會讓 §08 拿到空的 stats 陣列而少掉四張卡。
+    # 改為仍回傳只含欣銓的單筆清單，模板照樣以 CO[0] 渲染、只是不出現切換器。
     demo_path = root / "data" / "demo_profiles.json"
-    if not demo_path.exists():
-        return None
     import sys as _sys
     _here = str(pathlib.Path(__file__).resolve().parent)
     if _here not in _sys.path:
@@ -128,6 +129,9 @@ def build_companies(root: pathlib.Path, weeks: list, prof: dict, pb: dict):
         "profileNote": "營收組合占比、客戶集中度、耗材庫存月數等未公開項目均標示【待確認】，本系統不以估計值冒充內部數據。",
         "decision_levers": prof["decision_levers"],
     }]
+
+    if not demo_path.exists():
+        return companies          # 只有欣銓：§08 照常渲染，模板不顯示切換器
 
     demo = load(demo_path)
     for c in demo["companies"]:

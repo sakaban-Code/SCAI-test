@@ -575,7 +575,9 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
   html{scroll-padding-top:186px}
 }
 @media print{
-  header,nav.secnav,#top,.wnav,#aifab,#aipanel{display:none}
+  /* 加 !important：助理的 #aifab/#aipanel 規則在本區塊之後、同特異性會蓋回 display:flex */
+  header,nav.secnav,#top,.wnav{display:none}
+  #aifab,#aipanel{display:none!important}
   /* 分頁以 hidden 藏起的區段在列印時全部攤開，否則只印得出當前分頁 */
   #main section[hidden]{display:block}
   body{background:#fff;font-size:12px;padding-left:0}
@@ -825,7 +827,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 </button>
 <aside id="aipanel" role="complementary" aria-label="SCAI 助理" hidden>
   <div class="ai-h">
-    <b>SCAI 助理</b><span class="ai-mode" id="aimode">展示模式</span>
+    <b>SCAI 助理</b><span class="ai-mode" id="aimode">—</span>
     <span class="sp"></span>
     <button id="aiclose" class="lb-x" aria-label="關閉助理面板">✕</button>
   </div>
@@ -836,7 +838,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
       placeholder="問本週判定、劇本觸發、三家企業差異…" aria-label="輸入問題">
     <button type="submit" class="ai-send">送出</button>
   </form>
-  <div class="ai-note" id="ainote">展示模式：規則式回答，直接讀取本頁資料（零 token、未連接 AI）。後端連接後此處將顯示真實 AI 回覆與逐次 token 用量。</div>
+  <div class="ai-note" id="ainote"></div>
 </aside>
 
 <script>
@@ -1836,17 +1838,45 @@ if(pendingSec){const el=document.getElementById(pendingSec);if(el)el.scrollIntoV
    免費額度每日 10,000 Neurons；額度用罄或斷線時前端自動降級展示模式。 */
 window.SCAI_AI_CONFIG=window.SCAI_AI_CONFIG||{endpoint:'https://scai-ask.leozero0517.workers.dev'};
 const aiFab=$('#aifab'),aiPanel=$('#aipanel'),aiLog=$('#ailog'),aiQ=$('#aiq');
-let aiTok={i:0,o:0,n:0};
+let aiTok={i:0,o:0,n:0},aiSeq=0;
+/* 離線備援檔（file:// 或建置時標記）一律不外連：斷網保險的意義就在於零外部請求。
+   build_offline.py 會把 __SCAI_OFFLINE__ 置為 true。 */
+const AI_OFFLINE=(window.__SCAI_OFFLINE__===true)||location.protocol==='file:';
+if(AI_OFFLINE)window.SCAI_AI_CONFIG.endpoint='';
+const aiEP=()=>((window.SCAI_AI_CONFIG||{}).endpoint||'');
+/* 模式標示須反映「下一題會怎麼走」，不能寫死：設了 endpoint 就是會外送，
+   別再宣稱「零 token、未連接 AI」；連線失敗降級後也要把標示改回來。 */
+function aiSetMode(m){
+  const badge=$('#aimode'),note=$('#ainote');
+  if(m==='live'){badge.textContent='AI 連線';
+    note.textContent='已連接後端：問題與當週脈絡（週次、情境、座標、觸發清單）會送至 Cloudflare Worker 推論；逐次 token 用量列於各回覆下方，問答內容不落地記錄。';}
+  else if(m==='ready'){badge.textContent='AI 待命';
+    note.textContent='已設定後端：送出問題時會將該題與當週脈絡外送推論。若後端無回應，自動改用展示模式（規則式回答）。';}
+  else{badge.textContent='展示模式';
+    note.textContent=AI_OFFLINE?'離線備援檔：一律不外連，僅提供規則式回答（零 token）。'
+      :'展示模式：規則式回答，直接讀取本頁資料（零 token、未連接 AI）。';}
+}
+aiSetMode(aiEP()?'ready':'demo');
 function aiMsg(role,html,asText){const d=document.createElement('div');d.className='ai-m '+role;
   if(asText)d.textContent=html;else d.innerHTML=html;
   aiLog.appendChild(d);aiLog.scrollTop=aiLog.scrollHeight;return d}
 function aiOpen(){aiPanel.hidden=false;aiFab.setAttribute('aria-expanded','true');
-  if(!aiLog.children.length)aiMsg('a',`您好，我是 SCAI 助理。目前為<b>展示模式</b>——規則式回答，直接讀取本頁真實資料（零 token、未連接 AI）。可以問我：本週判定、任一劇本為何觸發、三家企業差異、資料可信度。`);
+  if(!aiLog.children.length)aiMsg('a',aiEP()
+    ?`您好，我是 SCAI 助理。本站已接上 AI 後端：您的問題與當週脈絡會外送推論，回覆下方會列出<b>真實 token 用量</b>；後端無回應時自動改用規則式回答。可以問我：本週判定、任一劇本為何觸發、三家企業差異、資料可信度。`
+    :`您好，我是 SCAI 助理。目前為<b>展示模式</b>——規則式回答，直接讀取本頁真實資料（零 token、未連接 AI）。可以問我：本週判定、任一劇本為何觸發、三家企業差異、資料可信度。`);
   aiQ.focus({preventScroll:true})}
 function aiClose(){aiPanel.hidden=true;aiFab.setAttribute('aria-expanded','false');aiFab.focus({preventScroll:true})}
 aiFab.onclick=()=>aiPanel.hidden?aiOpen():aiClose();
 $('#aiclose').onclick=aiClose;
 aiPanel.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();aiClose()}});
+/* 焦點不在面板內時（例：開過燈箱後焦點回到背景觸發鈕），上面的區域處理器收不到 Esc。
+   在全域鏈末端補一手：對話框都關閉、面板仍開著才處理。 */
+addEventListener('keydown',e=>{
+  if(e.key!=='Escape'||aiPanel.hidden)return;
+  if(!$('#weekpop').hidden||!$('#lightbox').hidden||cmpOpen)return;
+  if(aiPanel.contains(document.activeElement))return;   // 區域處理器已接手
+  aiClose();
+});
 const AI_SUGS=['本週判定是什麼？','為什麼觸發 PB-07？','三家企業本週差在哪？','這些資料可信嗎？'];
 $('#aisug').innerHTML=AI_SUGS.map(s=>`<button type="button">${s}</button>`).join('');
 $$('#aisug button').forEach(b=>b.onclick=()=>{aiQ.value=b.textContent;aiAsk()});
@@ -1884,7 +1914,8 @@ function aiAnswer(q){
     if(!rs.length)return `W${n} 無風險雷達紀錄（H+6 風險雷達為 2026-07-10 導入之機制，部分早期週次未回填——此為歷史事實，不回頭補寫）。${SRC}`;
     return `W${n} 風險雷達（前 ${Math.min(3,rs.length)} 項）：<br>${rs.slice(0,3).map(r=>`・${r.risk}<br>　領先訊號：${r.signal}`).join('<br>')}${SRC}`;
   }
-  if(/(x|y|軸|座標|象限|方法|kdf)/i.test(t)){
+  /* 用詞邊界比對：原本的 /(x|y|…)/ 會把英文 why 裡的 y 當成軸向查詢 */
+  if(/(\bx\s*軸|\by\s*軸|\bx\b|\by\b|軸|座標|象限|方法論|kdf)/i.test(t)){
     return `方法論：<b>X 軸＝地緣與供應鏈聚合</b>（−1 碎裂 ↔ +1 聚合）、<b>Y 軸＝資源與政策充沛</b>（−1 匱乏 ↔ +1 充沛），定位四情境後校準 25 項 KDF 權重（中性 50），每次調整附 Decision Trace。詳見「治理」分頁 §10。${SRC}`;
   }
   if(/(治理|token|護欄|控管|harness)/i.test(t)){
@@ -1899,30 +1930,43 @@ function aiAnswer(q){
 async function aiAsk(){
   const q=aiQ.value.trim();if(!q)return;
   aiMsg('u',q,true);aiQ.value='';
-  const ep=(window.SCAI_AI_CONFIG||{}).endpoint;
+  const ep=aiEP();
   if(ep){
+    const seq=++aiSeq;                       /* 併發時只認最後一題，避免答案錯位 */
     const hold=aiMsg('a','思考中…');
+    let tm=null;
     try{
-      const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),15000);
+      const ctl=new AbortController();
+      tm=setTimeout(()=>ctl.abort(),15000);
       const w=DATA.weeks[cur];const co=(DATA.companies||[]).find(c=>c.id===curCompany);
       const fired=(co&&!co.real?(((co.plans||{})[String(w.week)]||{}).firedPlaybooks):((w.companyPlan||{}).firedPlaybooks))||[];
       const r=await fetch(ep,{method:'POST',headers:{'content-type':'application/json'},signal:ctl.signal,
         body:JSON.stringify({question:q,week:w.week,range:w.range,
           scenario:w.scenarioEn||w.scenario,x:w.xy.x,y:w.xy.y,
-          company:co?co.short:'欣銓',fired:fired.map(f=>`${f.id} ${f.title}`)})});
-      clearTimeout(tm);
+          company:co?co.short:'欣銓',
+          /* 帶上觸發依據：只給 id 與標題的話，模型答不出「為什麼觸發」——
+             而面板的建議問題正是「為什麼觸發 PB-07」。deEnt 還原成模型看得懂的原字。 */
+          fired:fired.slice(0,12).map(f=>`${f.id} ${deEnt(f.title)}（依據：${deEnt(f.evidence||'').slice(0,90)}）`)})});
       if(!r.ok)throw new Error('HTTP '+r.status);
       const j=await r.json();
+      if(seq!==aiSeq){hold.remove();return}    /* 已有更新的提問，丟棄這則舊回覆 */
       hold.remove();
-      const u=j.usage||{};aiTok.i+=u.input_tokens||0;aiTok.o+=u.output_tokens||0;aiTok.n++;
+      const u=j.usage||{};
+      const iN=Number(u.input_tokens),oN=Number(u.output_tokens);
+      if(Number.isFinite(iN))aiTok.i+=iN;
+      if(Number.isFinite(oN))aiTok.o+=oN;
+      aiTok.n++;
       const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      aiMsg('a',`${esc(j.answer).replace(/\n/g,'<br>')}<div class="ai-src">模型：${esc(j.model||'AI')}｜本次 in ${u.input_tokens??'—'}／out ${u.output_tokens??'—'} tokens｜本階段累計 ${aiTok.i}／${aiTok.o}（${aiTok.n} 次）</div>`);
-      $('#aimode').textContent='AI 連線';
-      $('#ainote').textContent=`已連接後端（${j.model||'AI'}）。逐次 token 用量列於各回覆下方；問答內容不落地記錄。`;
+      aiMsg('a',`${esc(j.answer).replace(/\n/g,'<br>')}<div class="ai-src">模型：${esc(j.model||'AI')}｜本次 in ${Number.isFinite(iN)?iN:'—'}／out ${Number.isFinite(oN)?oN:'—'} tokens｜本階段累計 ${aiTok.i}／${aiTok.o}（${aiTok.n} 次）</div>`);
+      aiSetMode('live');
       return;
     }catch(err){
       hold.remove();
+      if(seq!==aiSeq)return;
+      aiSetMode('ready');                      /* 失敗後標示回到「待命」，不可續掛「AI 連線」 */
       aiMsg('a',`<b>後端無回應</b>（${String(err&&err.message||err).slice(0,40)}），改用展示模式回答：`);
+    }finally{
+      if(tm)clearTimeout(tm);                  /* 逾時器一律回收，含 fetch 立即拒絕的路徑 */
     }
   }
   aiMsg('a',aiAnswer(q));
