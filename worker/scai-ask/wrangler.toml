@@ -1,0 +1,7 @@
+# SCAI 助理後端（CLI 部署用；儀表板部署不需要本檔）
+name = "scai-ask"
+main = "worker.js"
+compatibility_date = "2026-08-01"
+
+[ai]
+binding = "AI"

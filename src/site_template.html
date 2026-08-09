@@ -575,7 +575,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
   html{scroll-padding-top:186px}
 }
 @media print{
-  header,nav.secnav,#top,.wnav{display:none}
+  header,nav.secnav,#top,.wnav,#aifab,#aipanel{display:none}
   /* 分頁以 hidden 藏起的區段在列印時全部攤開，否則只印得出當前分頁 */
   #main section[hidden]{display:block}
   body{background:#fff;font-size:12px;padding-left:0}
@@ -657,6 +657,52 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 .gov-b{font-size:12px;line-height:1.78;color:var(--ink2)}
 .gov-b code{font-family:"IBM Plex Mono",monospace;font-size:11px;background:#f0ece6;padding:1px 5px;border-radius:3px}
 @media(max-width:820px){.govgrid{grid-template-columns:1fr}.card.gov{grid-column:auto}}
+/* SCAI 助理（#1a 展示模式：規則式回答；#1b 設定 endpoint 後轉真 AI） */
+#aifab{position:fixed;right:20px;bottom:70px;width:44px;height:44px;border-radius:50%;
+  background:var(--accent);color:#fff;border:none;cursor:pointer;z-index:60;
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--sh2);
+  transition:transform .16s,box-shadow .16s,background .16s}
+#aifab:hover{transform:translateY(-2px);box-shadow:var(--sh3)}
+#aifab:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+#aifab[aria-expanded="true"]{background:var(--ink)}
+#aipanel{position:fixed;top:0;right:0;bottom:0;width:min(380px,100vw);z-index:95;
+  background:var(--surface);border-left:1px solid var(--line);
+  box-shadow:-8px 0 30px rgba(33,31,28,.12);display:flex;flex-direction:column}
+#aipanel[hidden]{display:none}
+.ai-h{display:flex;align-items:center;gap:9px;padding:12px 16px;border-bottom:1px solid var(--ink-line);background:var(--ink-bg)}
+.ai-h b{font-size:13.5px;color:#f5f2ec;letter-spacing:.04em}
+.ai-mode{font-size:9.5px;letter-spacing:.07em;padding:2px 8px;border-radius:9px;
+  background:#f3e9d8;color:#6d5120;border:1px solid #e2d2b4}
+.ai-h .lb-x{position:static;width:28px;height:28px}
+.ai-log{flex:1;overflow-y:auto;padding:14px 14px 6px;display:flex;flex-direction:column;gap:9px}
+.ai-m{max-width:92%;font-size:12.5px;line-height:1.75;border-radius:10px;padding:9px 12px;overflow-wrap:anywhere}
+.ai-m.u{align-self:flex-end;background:var(--ink);color:#fff;border-bottom-right-radius:3px}
+.ai-m.a{align-self:flex-start;background:#f6f4ef;border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:3px}
+.ai-src{margin-top:7px;padding-top:6px;border-top:1px dashed var(--line);font-size:10px;color:#6f6a62}
+.ai-sug{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px}
+.ai-sug button{font-family:inherit;font-size:11px;color:var(--ink2);background:var(--surface);
+  border:1px solid var(--line);border-radius:14px;padding:4px 11px;cursor:pointer;
+  transition:border-color .15s,color .15s}
+.ai-sug button:hover{border-color:var(--ink2);color:var(--ink)}
+.ai-sug button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+#aiform{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--line)}
+#aiq{flex:1;min-width:0;font-family:inherit;font-size:12.5px;padding:9px 11px;
+  border:1px solid var(--line2);border-radius:8px;background:#fff;color:var(--ink)}
+#aiq:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.ai-send{font-family:inherit;font-size:12px;font-weight:600;color:#fff;background:var(--accent);
+  border:none;border-radius:8px;padding:9px 16px;cursor:pointer;transition:background .15s}
+.ai-send:hover{background:#8f3f1f}
+.ai-send:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.ai-note{padding:8px 14px 12px;font-size:10px;line-height:1.6;color:#6f6a62;border-top:1px dashed var(--line)}
+@media(max-width:600px){
+  /* 手機：底部彈出。用 left:0 讓寬度由左右錨定推得，不寫 width:100%
+     （100% 會解析成含捲軸溝寬的視窗寬而右溢數 px）。 */
+  #aipanel{top:auto;left:0;right:0;height:72vh;width:auto;max-width:none;
+    border-left:none;border-top:1px solid var(--line);
+    border-radius:14px 14px 0 0;box-shadow:0 -8px 30px rgba(33,31,28,.14)}
+}
+@media (prefers-reduced-motion:no-preference){#aipanel{animation:aiin .18s ease-out}}
+@keyframes aiin{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
 /* 企業畫像切換（§02/§08）：欣銓官方＋兩家虛構示範企業 */
 .cosel{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:14px}
 .cosel-l{font-size:10px;letter-spacing:.08em;color:var(--muted);
@@ -772,6 +818,26 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
     <button id="wpgo" class="wp-go">跳轉到這一週</button>
   </div>
 </div>
+
+<button id="aifab" aria-expanded="false" aria-controls="aipanel" title="SCAI 助理">
+  <svg class="ic" viewBox="0 0 16 16" aria-hidden="true" focusable="false" style="width:17px;height:17px"><path d="M2.6 3.4h10.8v7.2H8.2L5 13.4v-2.8H2.6z"/><path d="M5.4 6.2h5.2"/><path d="M5.4 8.2h3.4"/></svg>
+  <span class="sr">開啟 SCAI 助理</span>
+</button>
+<aside id="aipanel" role="complementary" aria-label="SCAI 助理" hidden>
+  <div class="ai-h">
+    <b>SCAI 助理</b><span class="ai-mode" id="aimode">展示模式</span>
+    <span class="sp"></span>
+    <button id="aiclose" class="lb-x" aria-label="關閉助理面板">✕</button>
+  </div>
+  <div class="ai-log" id="ailog" aria-live="polite"></div>
+  <div class="ai-sug" id="aisug"></div>
+  <form id="aiform">
+    <input id="aiq" type="text" maxlength="300" autocomplete="off"
+      placeholder="問本週判定、劇本觸發、三家企業差異…" aria-label="輸入問題">
+    <button type="submit" class="ai-send">送出</button>
+  </form>
+  <div class="ai-note" id="ainote">展示模式：規則式回答，直接讀取本頁資料（零 token、未連接 AI）。後端連接後此處將顯示真實 AI 回覆與逐次 token 用量。</div>
+</aside>
 
 <script>
 /*__DATA__*/
@@ -966,7 +1032,7 @@ $('#vfull').onclick=()=>setView('full');
 const modalStack=[];
 /* .skip 與 .guide 也要納入：它們在 header 之外，漏掉的話 aria-modal 期間
    輔助科技仍能直接聚焦背景連結 */
-const BG_SEL='header,nav.secnav,.guide,#main,footer,#top,.skip';
+const BG_SEL='header,nav.secnav,.guide,#main,footer,#top,.skip,#aifab,#aipanel';
 const FOCUSABLE='a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 /* position:fixed 元素的 offsetParent 為 null，故以 getClientRects 判可見 */
 const focusablesIn=el=>[...el.querySelectorAll(FOCUSABLE)].filter(n=>n.getClientRects().length>0);
@@ -1760,6 +1826,105 @@ addEventListener('scroll',()=>{$('#top').classList.toggle('show',scrollY>600)},{
 render(cur);
 /* 深連結的初次捲動要在首次 render（區段已存在且未 hidden）之後 */
 if(pendingSec){const el=document.getElementById(pendingSec);if(el)el.scrollIntoView({block:'start'})}
+
+/* ── SCAI 助理（三項重大更新之三，#1a）──
+   展示模式＝規則式回答：直接讀取本頁 DATA（真實資料），零 token、零外部請求、
+   離線版照常可用；誠實標示「未連接 AI」。
+   #1b：SCAI_AI_CONFIG.endpoint 填入 Cloudflare Worker 網址後自動轉真 AI——
+   前端把當週摘要與觸發清單作為脈絡傳給後端，回覆附逐次 token 用量。 */
+window.SCAI_AI_CONFIG=window.SCAI_AI_CONFIG||{endpoint:''};
+const aiFab=$('#aifab'),aiPanel=$('#aipanel'),aiLog=$('#ailog'),aiQ=$('#aiq');
+let aiTok={i:0,o:0,n:0};
+function aiMsg(role,html,asText){const d=document.createElement('div');d.className='ai-m '+role;
+  if(asText)d.textContent=html;else d.innerHTML=html;
+  aiLog.appendChild(d);aiLog.scrollTop=aiLog.scrollHeight;return d}
+function aiOpen(){aiPanel.hidden=false;aiFab.setAttribute('aria-expanded','true');
+  if(!aiLog.children.length)aiMsg('a',`您好，我是 SCAI 助理。目前為<b>展示模式</b>——規則式回答，直接讀取本頁真實資料（零 token、未連接 AI）。可以問我：本週判定、任一劇本為何觸發、三家企業差異、資料可信度。`);
+  aiQ.focus({preventScroll:true})}
+function aiClose(){aiPanel.hidden=true;aiFab.setAttribute('aria-expanded','false');aiFab.focus({preventScroll:true})}
+aiFab.onclick=()=>aiPanel.hidden?aiOpen():aiClose();
+$('#aiclose').onclick=aiClose;
+aiPanel.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();aiClose()}});
+const AI_SUGS=['本週判定是什麼？','為什麼觸發 PB-07？','三家企業本週差在哪？','這些資料可信嗎？'];
+$('#aisug').innerHTML=AI_SUGS.map(s=>`<button type="button">${s}</button>`).join('');
+$$('#aisug button').forEach(b=>b.onclick=()=>{aiQ.value=b.textContent;aiAsk()});
+$('#aiform').onsubmit=e=>{e.preventDefault();aiAsk()};
+
+function aiAnswer(q){
+  const w=DATA.weeks[cur],n=w.week,CO=DATA.companies||[];
+  const coPlanOf=c=>c?(c.real?(w.companyPlan||null):((c.plans||{})[String(n)]||null)):(w.companyPlan||null);
+  const SRC=`<div class="ai-src">來源：本站 W${n}（${w.range}）資料｜規則式回答，零 token</div>`;
+  const t=q.toLowerCase();
+  const idm=q.match(/(PB|DA|DB)[-‐]?(\d{2})/i);
+  if(idm){
+    const id=(idm[1]+'-'+idm[2]).toUpperCase();
+    for(const c of (CO.length?CO:[null])){
+      const p=coPlanOf(c);if(!p)continue;
+      const f=(p.firedPlaybooks||[]).find(x=>x.id===id);
+      if(f)return `<b>${id}｜${f.title}</b>（${c?c.short:'欣銓'}，本週<b>已觸發</b>）<br>建議行動：${f.action}<br>觸發依據：${f.evidence}${SRC}`;
+      const d0=(p.dormantPlaybooks||[]).find(x=>x.id===id);
+      if(d0)return `<b>${id}｜${d0.title}</b>（${c?c.short:'欣銓'}，本週<b>未觸發</b>）<br>判定依據：${d0.evidence}${SRC}`;
+    }
+    return `找不到劇本 ${id}。欣銓為 PB-01～08；示範企業為 DA-01～05／DB-01～05。${SRC}`;
+  }
+  if(/(差|比較|三家|哪家|弘遠|凌樞)/.test(q)&&CO.length>1){
+    const rows=CO.map(c=>{const p=coPlanOf(c);const ids=((p&&p.firedPlaybooks)||[]).map(f=>f.id).join('、')||'無';
+      return `・<b>${c.short}</b>${c.real?'':'（虛構示範）'}：${ids}`}).join('<br>');
+    return `W${n} 三家企業的觸發劇本：<br>${rows}<br>同一週情境資料、不同企業畫像與劇本組，結果隨之不同——這就是引擎的可移植性。完整內容見「公司」分頁。${SRC}`;
+  }
+  if(/(本週|判定|情境|結論|現在怎)/.test(q)){
+    const f=((w.companyPlan||{}).firedPlaybooks)||[];
+    const top=DATA.kdf.map((k,j)=>({id:k.id,name:k.name,v:w.w[j]})).sort((a,b)=>b.v-a.v).slice(0,3);
+    return `W${n}（${w.range}）判定：<b>${w.scenario}</b>（${w.scenarioEn}），X ${fmt(w.xy.x)}、Y ${fmt(w.xy.y)}。<br>前三大 KDF：${top.map(k=>`#${k.id} ${k.name.replace(/（.*/,'')}（${k.v}）`).join('、')}。<br>欣銓觸發 ${f.length} 條劇本：${f.map(x=>x.id).join('、')||'無'}。詳見「總覽」與「公司」分頁。${SRC}`;
+  }
+  if(/(風險|雷達|提防|注意)/.test(q)){
+    const rs=w.riskRadar||[];
+    if(!rs.length)return `W${n} 無風險雷達紀錄（H+6 風險雷達為 2026-07-10 導入之機制，部分早期週次未回填——此為歷史事實，不回頭補寫）。${SRC}`;
+    return `W${n} 風險雷達（前 ${Math.min(3,rs.length)} 項）：<br>${rs.slice(0,3).map(r=>`・${r.risk}<br>　領先訊號：${r.signal}`).join('<br>')}${SRC}`;
+  }
+  if(/(x|y|軸|座標|象限|方法|kdf)/i.test(t)){
+    return `方法論：<b>X 軸＝地緣與供應鏈聚合</b>（−1 碎裂 ↔ +1 聚合）、<b>Y 軸＝資源與政策充沛</b>（−1 匱乏 ↔ +1 充沛），定位四情境後校準 25 項 KDF 權重（中性 50），每次調整附 Decision Trace。詳見「治理」分頁 §10。${SRC}`;
+  }
+  if(/(治理|token|護欄|控管|harness)/i.test(t)){
+    return `治理六面向見「治理」分頁 §09：任務分派（四層單向管線）、記憶（append-only）、工具（時間窗檢索）、護欄（缺漏防呆＋三道匯入門檻）、可觀測（Decision Trace＋自我稽核）、評估（確定性重算＋外部對抗審查）。Token 用量目前誠實留白——管線尚未首跑，不以估算值充數。${SRC}`;
+  }
+  if(/(可信|來源|真的|查證|假的)/.test(q)){
+    return `本站每則事件附可查證來源連結；每次權重調整附 Decision Trace；§07 自我稽核公開「判斷錯了會怎樣」；§10 揭露期間重疊與缺口等不利事實。X／Y 與建議屬分析判斷【推斷】，非官方數據、非投資建議。${SRC}`;
+  }
+  return `展示模式能回答：<br>・「本週判定是什麼」<br>・任一劇本編號（如「為什麼觸發 PB-07」）<br>・「三家企業差在哪」<br>・「風險雷達」「方法論」「治理」「資料可信嗎」<br>其餘問題待後端連接真 AI 後支援。${SRC}`;
+}
+
+async function aiAsk(){
+  const q=aiQ.value.trim();if(!q)return;
+  aiMsg('u',q,true);aiQ.value='';
+  const ep=(window.SCAI_AI_CONFIG||{}).endpoint;
+  if(ep){
+    const hold=aiMsg('a','思考中…');
+    try{
+      const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),15000);
+      const w=DATA.weeks[cur];const co=(DATA.companies||[]).find(c=>c.id===curCompany);
+      const fired=(co&&!co.real?(((co.plans||{})[String(w.week)]||{}).firedPlaybooks):((w.companyPlan||{}).firedPlaybooks))||[];
+      const r=await fetch(ep,{method:'POST',headers:{'content-type':'application/json'},signal:ctl.signal,
+        body:JSON.stringify({question:q,week:w.week,range:w.range,
+          scenario:w.scenarioEn||w.scenario,x:w.xy.x,y:w.xy.y,
+          company:co?co.short:'欣銓',fired:fired.map(f=>`${f.id} ${f.title}`)})});
+      clearTimeout(tm);
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const j=await r.json();
+      hold.remove();
+      const u=j.usage||{};aiTok.i+=u.input_tokens||0;aiTok.o+=u.output_tokens||0;aiTok.n++;
+      const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      aiMsg('a',`${esc(j.answer).replace(/\n/g,'<br>')}<div class="ai-src">模型：${esc(j.model||'AI')}｜本次 in ${u.input_tokens??'—'}／out ${u.output_tokens??'—'} tokens｜本階段累計 ${aiTok.i}／${aiTok.o}（${aiTok.n} 次）</div>`);
+      $('#aimode').textContent='AI 連線';
+      $('#ainote').textContent=`已連接後端（${j.model||'AI'}）。逐次 token 用量列於各回覆下方；問答內容不落地記錄。`;
+      return;
+    }catch(err){
+      hold.remove();
+      aiMsg('a',`<b>後端無回應</b>（${String(err&&err.message||err).slice(0,40)}），改用展示模式回答：`);
+    }
+  }
+  aiMsg('a',aiAnswer(q));
+}
 </script>
 <script>
 /* 滑鼠泡泡特效設定（2026-08-08 人類核定）

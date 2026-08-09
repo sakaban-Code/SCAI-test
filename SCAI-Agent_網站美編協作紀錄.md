@@ -1197,3 +1197,28 @@ git add -A; git commit -m "說明"; git push
 - 回歸掃描擴為 **8 週 ×（4 分頁＋公司分頁×3 企業）＝56 組**：7210 個對比節點 0 失敗、0 真實溢出、0 實體洩漏、0 可見死錨點。
 - 390 寬：切換器換行容納、統計卡完整、0 溢出。離線版外部請求仍 0。
 - Git commit：（見本節末補記）
+
+---
+
+## 2026-08-09｜第 26 輪：SCAI 助理面板（三項重大更新之三，#1a＋#1b 部署包）
+
+- 人類需求：「好，分工開始」；期間回報「開在這了」（Cloudflare 帳號已開好，dash 已登入）。
+- 執行者：Claude Code（Fable 5）
+- 分工：Claude 做前端面板＋規則引擎＋Worker 部署包；人類依 README 在儀表板貼上部署，回傳 Worker 網址後由 Claude 填入 endpoint 轉真 AI。
+
+### #1a 前端（已上線）
+- **展示模式＝規則式回答**：直接讀取本頁 DATA 真實資料（本週判定、任一劇本編號的觸發／未觸發依據、三家企業比較、風險雷達、方法論、治理、資料可信度），零 token、零外部請求、**離線版照常可用**；每則回答附「來源：本站 W{n} 資料｜規則式回答，零 token」——誠實標示未連接 AI。
+- 桌機右側欄（380px、z-index 95：粒子上／燈箱下）、手機 72vh 底部彈出、按鈕折疊（bottom:70px 避開回頂鈕）。Esc 關閉；焦點開啟入輸入框、關閉回按鈕；aria-modal 期間一併 inert；列印隱藏。
+- **注入防護**：使用者輸入以 textContent 寫入，實測 `<img onerror>` 0 個標籤。
+- `SCAI_AI_CONFIG.endpoint` 填入後自動轉真 AI：帶當週脈絡（週次／情境／座標／目前企業／觸發清單）呼叫後端，顯示逐次與累計 token 用量；15 秒逾時或後端錯誤**自動降級展示模式**，面板永不空白。
+
+### #1b 部署包（worker/scai-ask/，等人類貼上）
+- 模型鎖 **`@cf/openai/gpt-oss-20b`**（OpenAI 系列開放權重，合規；Llama／Qwen 不可用——同否決 Perplexity 之理由）；每日 10,000 Neurons 免費額度內**零成本產生真實 token 數據**，直接餵評分表那 20%。
+- 治理設計寫死後端：模型與 system prompt 前端不可指定；CORS 白名單；問題 300 字／輸出 512 tokens／每 IP 每分鐘 8 次；**不記錄問答內容**；回應附 usage。
+- README 以儀表板全點選路徑為主（Create Worker → 貼 worker.js → Bindings 加 Workers AI 名為 `AI` → 回傳網址），CLI 為替代；含日後切 Claude 的兩條路（AI Gateway Unified Billing 免自備 key／自備 key 核銷單純）與「同一 Gateway 可供週報管線共用」的預留。
+
+### 驗證
+面板開閉焦點、十種意圖（回答引用真實資料）、表單流程、注入、模態 inert 進出、列印規則、面板 17 節點 0 對比失敗；56 組全站回歸 0 失敗／溢出／洩漏／死錨點；離線版外部請求 0。
+**新增量測假象紀錄**：此面板對 `position:fixed` 元素的 `getBoundingClientRect` 整體偏移 +20px——computed style 證實 CSS 正確（`left:0/right:0/width=視窗寬），與 rAF 凍結、focus/blur 失真同類；fixed 元素的版面判定以 computed style 為準。
+
+- Git commit：（見本節末補記）
