@@ -226,7 +226,7 @@ def build_payload(root: pathlib.Path) -> dict:
     }
 
 
-def payload_js(root: pathlib.Path) -> str:
+def js_safe_json(payload) -> str:
     """序列化為可安全嵌入 <script> 的 JSON。
 
     `json.dumps` 不會跳脫 `<`，故資料中若出現 `</script>` 就能提前關閉標籤、
@@ -234,8 +234,11 @@ def payload_js(root: pathlib.Path) -> str:
     不完全可控）。將 `<` `>` `&` 改寫為 `\\u00XX`：這三個字元只可能出現在
     JSON 的字串值裡（結構字元僅 {}[],:"），改寫後**解析結果完全相同**。
     另跳脫 U+2028／U+2029——它們是合法的 JSON 字元卻是 JS 的行終止符。
+
+    這是全站唯一的注入咽喉點，`build_site` / `build_offline` / `build_token_app`
+    共用同一份。**不要在別處另寫一份**——重複的組裝邏輯是安全修補的隱形破口，
+    只在一邊修就會無聲分歧。
     """
-    payload = build_payload(root)
     raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     safe = (raw.replace("<", "\\u003c").replace(">", "\\u003e")
                .replace("&", "\\u0026")
@@ -243,3 +246,7 @@ def payload_js(root: pathlib.Path) -> str:
     if json.loads(safe) != payload:          # 等價性硬性保證，不等價即中止
         raise AssertionError("payload 跳脫後與原資料不等價")
     return safe
+
+
+def payload_js(root: pathlib.Path) -> str:
+    return js_safe_json(build_payload(root))

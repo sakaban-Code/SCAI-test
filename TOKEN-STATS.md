@@ -137,7 +137,44 @@ Anthropic 的 `input` / `cache_creation` / `cache_read` 則是**互斥三份**�
 
 ---
 
-## 5. 要做成本機應用的話
+## 5. 本機應用 — **已建置（2026-08-10）**
+
+```bash
+python src/build_token_app.py            # 讀現成 JSON 建置
+python src/build_token_app.py --rescan   # 先重掃三個來源（約 2 秒）再建置
+python src/build_token_app.py --open     # 建置後開啟
+```
+
+產物 `dashboard/token-usage.html`（約 293 KB）：資料與 Chart.js 全部內嵌，**雙擊即開、
+零外部請求**、零相依（僅標準庫）。模板在 `src/token_app_template.html`。
+
+跳脫走 `sitedata.js_safe_json()`——建置當初把 `payload_js()` 內的那段抽了出來，
+`build_site` / `build_offline` / `build_token_app` 共用同一個咽喉點。**不要在別處再寫一份。**
+
+建置器出檔前有四道硬性斷言，任一不過就中止而非產出一份看起來合理的錯數字：
+
+| 斷言 | 防的是 |
+|---|---|
+| `cw5m + cw1h == cacheCreate`（逐口徑） | 快取寫入拆分沒加回總數（見下方 ①） |
+| `billableInput` == 各成分乘倍率之和 | `rates` 與數字不同源，頁面自算出另一個值 |
+| 由 sessions 推導的 `byTool` == 原始 `byTool` | 明細與彙總分歧；頁面的分工具圖靠這個推導才能切口徑 |
+| 跳脫後 `json.loads` 等價、產物不含家目錄／帳號名 | 注入與隱私 |
+
+### 建置過程抓到的兩個既有缺陷（皆已修）
+
+**① `cw5m + cw1h` 會大於 `cacheCreate`。** 實測有 3 筆原始紀錄（去重後 1 筆）
+回報 `cache_creation_input_tokens=0` 卻同時給 `ephemeral_1h=1542`。原本的補差邏輯
+`cw5m = max(cw_total - cw1h, 0)` 只夾 5m、留著 1h，於是成分和多出 1,542，而且那截
+**是按最貴的 2× 計價**（+3,084 當量），與程式自己註解寫的「寧可低估不可高估」相反。
+→ 改成 `cw1h = min(cw1h, cw_total); cw5m = cw_total - cw1h`，不變式恆成立。
+
+**② 新出現的 session 會靜默變成 `excluded`。** `load_scope()` 對歸屬檔裡沒有的
+session 取預設值 `excluded`，畫面上和「人工判定與本專案無關」**完全一樣**，於是新工作
+被無聲排除在 core 之外，還沒有任何跡象提醒該去覆核。
+→ 每筆 session 加上 `reviewed` 欄位，主控台印出待覆核筆數，頁面上獨立標示並揭露
+其計價當量。**覆核前 core 是低估，這件事現在會自己講出來。**
+
+兩者都屬同一類：**數字看起來合理，所以沒人會去對。** 見金庫 [[看起來合理的數字最難察覺]]。
 
 ### 先講最重要的一件事：**不要建資料庫**
 
@@ -150,22 +187,26 @@ Anthropic 的 `input` / `cache_creation` / `cache_read` 則是**互斥三份**�
 資料量下**是純粹的複雜度**，還會引入「快取與真實檔案不同步」的一整類 bug。
 **每次重掃就好。**
 
-### 建議架構
+### 架構（實作）
 
 ```
 src/token_stats.py  --json   →   data/token_usage_dev.json
-                                          ↓
-                              單檔 HTML（讀同一份 JSON）
+                                          ↓  src/build_token_app.py
+                              dashboard/token-usage.html（資料已內嵌）
 ```
 
-- **後端**：不需要。真要即時重掃就用 stdlib `http.server` 包一層，
-  維持零相依 —— 與 `build_offline.py` 同精神。
-- **前端**：單檔 HTML + Chart.js。本專案 `docs/assets/chart.umd.min.js`
-  已有本機副本可直接內嵌，不必外連。
-- **樣式**：直接沿用 `src/site_template.html` 的 CSS 變數，
-  跟 SCAI 網站同一套視覺。
+- **後端**：沒有。資料直接內嵌進 HTML，連 `file://` 的 CORS 問題都不會遇到，
+  也不必為了看報表在本機開一個網路服務。要重掃就重跑建置器（含重掃約 2 秒）。
+- **前端**：單檔 HTML + Chart.js（`docs/assets/chart.umd.min.js` 的本機副本內嵌，不外連）。
+- **樣式**：沿用 `src/site_template.html` 的 CSS 變數，跟 SCAI 網站同一套視覺；
+  另加 `prefers-color-scheme` 深色。**兩色系皆 1667 節點 0 項未達 AA**
+  （淺色最低 4.54、深色最低 4.94；alpha 逐層合成後量測）。
+- **注入**：字串一律 `textContent`，全檔 **0 處** `.innerHTML =`——模型名稱等字串來自
+  三個工具的紀錄檔，不完全可控。`countingRules`／`caveats` 的 `**…**` 重點標記
+  由 `emph()` 拆成文字節點與 `<b>` 插入，**不走 innerHTML**；且只施用於這兩個陣列
+  ——`DATA.sources` 裡 `~/.claude/projects/**/*.jsonl` 的 `**` 是萬用字元不是強調。
 
-### 建議畫面（依「花在哪裡、如何優化」反推，不是憑喜好）
+### 畫面（依「花在哪裡、如何優化」反推，不是憑喜好）
 
 | 區塊 | 對應評審會問的問題 |
 |---|---|

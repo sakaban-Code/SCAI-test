@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>開發階段 Token 用量｜SCAI-Agent</title>
+<!--
+  本機單檔應用。由 src/build_token_app.py 產生，資料與 Chart.js 皆已內嵌。
+  刻意**不做任何外部請求**（無 CDN、無 webfont）：這支東西讀的是本機 AI 逐字稿的彙總，
+  離線可開才守得住 TOKEN-STATS.md §6 的隱私紅線。字型走系統堆疊。
+-->
+<style>
+:root{
+  /* muted 與 warn 以「最暗的可能底色 --dim(#f2efe9)」為準訂到 AA 4.5：
+     原本的 #736e66／#a97b1f 在 --surface 上勉強及格，一落到 --dim 就掉到 4.41／3.60。
+     警示色尤其不能將就——它承載的正是「有 N 個 session 未覆核」這類最該看清楚的訊息。 */
+  --bg:#faf9f7; --surface:#fffefd; --ink:#211f1c; --ink2:#4a4741; --muted:#716c64;
+  --line:#e8e4dd; --line2:#d6d0c6; --dim:#f2efe9; --line-soft:#f0ede7;
+  --accent:#a44a24; --ok:#2f7050; --warn:#8c661a; --err:#b03a30;
+  --c1:#38547a; --c2:#357355; --c3:#b07a28; --c4:#6f5486; --c5:#9c5058;
+  --r:10px; --maxw:1180px;
+  --sh1:0 1px 2px rgba(33,31,28,.05);
+  --sh2:0 1px 2px rgba(33,31,28,.06),0 6px 18px rgba(33,31,28,.045);
+  --hd-bg:#1e1c19; --hd-line:#35322b; --hd-line2:#413d35;
+  --tx-d:#e8e4db; --mut-d:#9a948a; --accent-br:#cf7a4c;
+  --sans:"Noto Sans TC","Microsoft JhengHei",-apple-system,"Segoe UI",sans-serif;
+  --mono:"Cascadia Mono",Consolas,"IBM Plex Mono","Microsoft JhengHei",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#191714; --surface:#221f1b; --ink:#e8e4db; --ink2:#c6c0b4; --muted:#9a948a;
+    --line:#35322b; --line2:#413d35; --dim:#2a2723; --line-soft:#2c2924;
+    --accent:#cf7a4c; --ok:#5aa17c; --warn:#cfa24a; --err:#d1685c;
+    --c1:#7896c2; --c2:#63ab86; --c3:#d0a153; --c4:#a288bd; --c5:#c78189;
+    --sh1:none; --sh2:none;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:74px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+a{color:var(--c1)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+/* ── header ── */
+header{position:sticky;top:0;z-index:50;background:var(--hd-bg);border-bottom:1px solid var(--hd-line);
+  background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:20px 20px}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  min-height:58px;padding:9px 0;flex-wrap:wrap}
+.bn{font-weight:700;font-size:15px;color:#f5f2ec;line-height:1.2}
+.bs{font-size:10.5px;color:var(--mut-d)}
+.hr{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.gen{font-size:11px;color:var(--mut-d);font-family:var(--mono)}
+.seg{display:flex;border:1px solid var(--hd-line2);border-radius:7px;overflow:hidden}
+.seg button{border:none;background:transparent;color:var(--mut-d);font-family:inherit;
+  font-size:12px;font-weight:500;padding:6px 12px;cursor:pointer;white-space:nowrap}
+.seg button.on{background:var(--accent);color:#fff;font-weight:600}
+/* header 恆為深色，故 .on 在兩個主題下都疊在 var(--accent) 上，但 accent 本身會變：
+   淺色 #a44a24 配白字 5.86 ✓；深色 #cf7a4c 配白字只有 3.21 ✗。深色改用深色文字（5.57）
+   而非調暗 accent——選中狀態要夠亮才看得出是選中的。 */
+@media (prefers-color-scheme:dark){ .seg button.on{color:#191714} }
+.seg button:not(.on):hover{color:#f2efe9;background:rgba(255,255,255,.07)}
+nav.toc{border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:40}
+nav.toc .wrap{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin}
+nav.toc a{padding:9px 11px;font-size:12px;color:var(--muted);text-decoration:none;white-space:nowrap;
+  border-bottom:2px solid transparent}
+nav.toc a:hover{color:var(--ink);border-bottom-color:var(--line2)}
+
+/* ── section ── */
+section{padding:34px 0 4px;scroll-margin-top:74px}
+h2{font-size:17px;margin:0 0 4px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+h2 .q{font-size:11.5px;color:var(--muted);font-weight:500}
+.lead{color:var(--ink2);font-size:12.5px;margin:0 0 16px;max-width:80ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--sh1);padding:16px 18px}
+.grid{display:grid;gap:14px}
+/* auto-fit 的 minmax 下限是硬下限：一旦大於視窗寬度，欄位就撐出去造成整頁橫向捲動，
+   而且 .card 本身沒有 overflow 容器，破的是版面不是內部捲軸。min() 夾住才安全。 */
+.grid.split{grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr))}
+.grid.split.narrow{grid-template-columns:repeat(auto-fit,minmax(min(330px,100%),1fr))}
+
+/* ── KPI ── */
+.kpis{grid-template-columns:repeat(auto-fit,minmax(min(215px,100%),1fr))}
+.kpi .lab{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.kpi .big{font-family:var(--mono);font-size:29px;font-weight:600;line-height:1.15;margin-top:5px;
+  letter-spacing:-.5px}
+.kpi .raw{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:2px}
+.kpi .fn{font-size:11px;color:var(--ink2);margin-top:8px;line-height:1.55}
+.kpi.hero{border-color:var(--accent);box-shadow:var(--sh2)}
+.kpi.hero .big{color:var(--accent);font-size:34px}
+.kpi.mute{background:var(--dim)}
+.kpi.mute .big{color:var(--muted);font-size:24px}
+.tag{font-size:10px;font-weight:600;padding:1.5px 6px;border-radius:4px;white-space:nowrap;
+  border:1px solid currentColor;line-height:1.5}
+.tag.cite{color:var(--accent)}
+.tag.warn{color:var(--warn)}
+.tag.dim{color:var(--muted)}
+
+/* ── table ── */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:7px 11px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line-soft)}
+th{background:var(--dim);font-weight:600;font-size:11.5px;color:var(--ink2);position:sticky;top:0}
+th:first-child,td:first-child{text-align:left}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--dim)}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
+tr.hl td{background:var(--dim);font-weight:600}
+tr.hl:hover td{background:var(--line-soft)}
+th.s{cursor:pointer;user-select:none}
+th.s:hover{color:var(--ink)}
+th.s::after{content:"";opacity:.35;margin-left:4px}
+th.s.asc::after{content:"▲";opacity:.8}
+th.s.desc::after{content:"▼";opacity:.8}
+.sc{font-size:10.5px;padding:1px 6px;border-radius:4px;border:1px solid var(--line2);color:var(--muted)}
+.sc.core{color:var(--ok);border-color:currentColor}
+.sc.excluded{color:var(--muted);opacity:.75}
+.sc.unrev{color:var(--warn);border-color:currentColor;font-weight:600}
+
+/* ── charts ── */
+.chart{position:relative;height:300px}
+.chart.tall{height:360px}
+.cap{font-size:11px;color:var(--muted);margin:9px 2px 0;line-height:1.6}
+
+/* ── lists ── */
+ol.rules,ul.plain{margin:0;padding-left:1.25em;font-size:12.5px;color:var(--ink2);line-height:1.75}
+ol.rules li,ul.plain li{margin-bottom:7px}
+ol.rules li::marker{color:var(--accent);font-weight:600}
+ul.caveats{list-style:none;margin:0;padding:0;font-size:12.5px;color:var(--ink2);line-height:1.75}
+ul.caveats li{padding-left:1.5em;position:relative;margin-bottom:9px}
+ul.caveats li::before{content:"⚠";position:absolute;left:0;color:var(--warn)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:12.5px;align-items:baseline}
+.kv dt{color:var(--muted);white-space:nowrap}
+.kv dd{margin:0;font-family:var(--mono);font-size:12px;word-break:break-all}
+
+/* ── filter bar ── */
+.fb{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:11px;font-size:12px}
+.fb select,.fb input{font-family:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--line2);
+  border-radius:6px;background:var(--surface);color:var(--ink)}
+.fb input{min-width:190px}
+.fb .cnt{color:var(--muted);margin-left:auto;font-family:var(--mono);font-size:11.5px}
+
+footer{margin-top:44px;border-top:1px solid var(--line);padding:20px 0 40px;
+  font-size:11.5px;color:var(--muted);line-height:1.8}
+code{font-family:var(--mono);font-size:.92em;background:var(--dim);padding:1px 5px;border-radius:4px}
+@media (max-width:640px){
+  .wrap{padding:0 15px}
+  .kpi .big{font-size:25px}.kpi.hero .big{font-size:28px}
+  .chart{height:250px}
+}
+@media print{header,nav.toc{position:static}.chart{height:250px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hd">
+    <div>
+      <div class="bn">開發階段 Token 用量</div>
+      <div class="bs">SCAI-Agent／本機統計　·　競賽評分第 3 項：花在哪裡、如何優化</div>
+    </div>
+    <div class="hr">
+      <span class="gen" id="gen"></span>
+      <div class="seg" id="scopeSeg" role="group" aria-label="口徑切換"></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc" aria-label="目錄"><div class="wrap">
+  <a href="#kpi">關鍵數字</a><a href="#scopes">三種口徑</a><a href="#where">花在哪裡</a>
+  <a href="#optimize">如何優化</a><a href="#trend">每日趨勢</a><a href="#sessions">Session 明細</a>
+  <a href="#rules">計數規則</a><a href="#caveats">已知限制</a><a href="#src">資料來源</a>
+</div></nav>
+
+<main class="wrap">
+
+<section id="kpi">
+  <h2>關鍵數字 <span class="q" id="kpiScope"></span></h2>
+  <p class="lead">數字取自三個工具的本機原始 <code>usage</code> 欄位，非估算。
+    刻意<strong>不提供單一「總 token」</strong>——四項直接相加會被快取重讀主導，
+    技術上為真但誤導一個數量級。</p>
+  <div class="grid kpis" id="kpiGrid"></div>
+</section>
+
+<section id="scopes">
+  <h2>三種口徑 <span class="q">「這數字怎麼來的？可信嗎？」</span></h2>
+  <p class="lead">歸屬決定逐檔記錄在 <code id="scopeFile"></code> 並進版控，
+    使「哪些 token 算 SCAI」這個判斷本身可被稽核。下界與上界一併給出，不挑對自己有利的講。</p>
+  <div class="tw"><table id="scopeTable">
+    <thead><tr>
+      <th>口徑</th><th>則</th><th>新輸入</th><th>快取寫</th><th>快取讀</th>
+      <th>output</th><th>輸入計價當量</th><th>處理總量</th><th>命中率</th>
+    </tr></thead><tbody></tbody>
+  </table></div>
+  <p class="cap">「處理總量」＝實際被處理的 token（含重讀快取），衡量工作規模；
+    「輸入計價當量」＝依快取倍率折算，反映成本結構。<strong>報告請引用後者。</strong></p>
+</section>
+
+<section id="where">
+  <h2>花在哪裡 <span class="q">依工具、依模型的成本結構</span></h2>
+  <p class="lead">長條長度是<strong>輸入計價當量</strong>（已折算倍率），並依成分堆疊，
+    看得出成本是被新輸入、快取寫入、還是快取重讀吃掉的。</p>
+  <div class="grid split">
+    <div class="card">
+      <h3 style="margin:0 0 2px;font-size:13.5px">依工具</h3>
+      <p class="cap" style="margin:0 0 8px" id="byToolScopeNote"></p>
+      <div class="chart"><canvas id="cTool"></canvas></div>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 2px;font-size:13.5px">依模型</h3>
+      <p class="cap" style="margin:0 0 8px">口徑固定為 core+related——
+        原始 JSON 的分模型彙總未分口徑輸出，這裡不假裝能切。</p>
+      <div class="chart"><canvas id="cModel"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<section id="optimize">
+  <h2>如何優化 <span class="q">快取把 16 億的重讀壓成多少？</span></h2>
+  <p class="lead">下表把輸入計價當量拆回各成分，並列出「若無快取折扣、全額計價」的對照。
+    最大的一筆通常不是你以為的那個——先看清楚再決定要優化什麼。</p>
+  <div class="grid split narrow">
+    <div class="card"><div class="chart"><canvas id="cMix"></canvas></div>
+      <p class="cap">各成分對<strong>輸入計價當量</strong>的貢獻（已乘倍率）。</p></div>
+    <div class="tw"><table id="mixTable">
+      <thead><tr><th>成分</th><th>原始 token</th><th>倍率</th><th>計價當量</th><th>占比</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </div>
+  <p class="cap" id="mixNote"></p>
+</section>
+
+<section id="trend">
+  <h2>每日趨勢 <span class="q">「開發節奏如何？」</span></h2>
+  <p class="lead">口徑固定為 core+related（同分模型，原始 JSON 未分口徑輸出）。
+    長條為輸入計價當量，折線為當日快取命中率。</p>
+  <div class="card"><div class="chart tall"><canvas id="cDay"></canvas></div></div>
+  <p class="cap" id="dayRoundNote"></p>
+</section>
+
+<section id="sessions">
+  <h2>Session 明細 <span class="q">逐檔歸屬可稽核</span></h2>
+  <p class="lead">每一列是一個工作階段。<code>mentions</code> 是該逐字稿提及 SCAI 的次數，
+    當初用來產生歸屬草稿；最終歸屬由人工覆核決定。<strong>本表只有 session ID 與數字，
+    不含檔案路徑與任何對話內容。</strong></p>
+  <p class="cap" id="unreviewedNote" hidden></p>
+  <div class="fb">
+    <label>工具 <select id="fTool"></select></label>
+    <label>口徑 <select id="fScope"></select></label>
+    <input id="fq" type="search" placeholder="搜尋 session ID／日期" aria-label="搜尋 session">
+    <span class="cnt" id="sCount"></span>
+  </div>
+  <div class="tw"><table id="sessTable">
+    <thead><tr>
+      <th class="s" data-k="tool">工具</th><th class="s" data-k="session">session</th>
+      <th class="s" data-k="scope">口徑</th><th class="s" data-k="mentions">SCAI</th>
+      <th class="s" data-k="msgs">則</th><th class="s desc" data-k="billableInput">計價當量 in</th>
+      <th class="s" data-k="output">output</th><th class="s" data-k="processed">處理總量</th>
+      <th class="s" data-k="cacheHitRate">命中率</th><th class="s" data-k="from">期間</th>
+    </tr></thead><tbody></tbody>
+  </table></div>
+</section>
+
+<section id="rules">
+  <h2>計數規則 <span class="q">「你怎麼確定沒重複計算？」</span></h2>
+  <p class="lead">下列規則由統計腳本寫進產物本身，不是事後補述。三個工具的紀錄格式各不相同，
+    沒有一個能用同一段程式相加。</p>
+  <div class="card"><ol class="rules" id="rulesList"></ol></div>
+</section>
+
+<section id="caveats">
+  <h2>已知限制 <span class="q">不利於自己的也一起端出來</span></h2>
+  <div class="card"><ul class="caveats" id="caveatList"></ul></div>
+  <p class="cap">與 SCAI 網站 §09「期間涵蓋與已知落差」同一個標準：
+    把缺漏印在報表上，比數字漂亮更有說服力。</p>
+</section>
+
+<section id="src">
+  <h2>資料來源與倍率</h2>
+  <div class="grid split narrow">
+    <div class="card"><h3 style="margin:0 0 9px;font-size:13.5px">本機原始紀錄</h3>
+      <dl class="kv" id="srcList"></dl>
+      <p class="cap" id="srcNote"></p></div>
+    <div class="card"><h3 style="margin:0 0 9px;font-size:13.5px">快取倍率</h3>
+      <dl class="kv" id="rateList"></dl>
+      <p class="cap"><strong>這是倍率不是金額。</strong>正式報告前請對照當時的官方定價頁覆核
+        ——OpenAI 側的快取折扣改過。</p></div>
+  </div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <div id="footNote"></div>
+  <div style="margin-top:9px">重新統計：<code>python src/build_token_app.py --rescan</code>
+    （會先重掃三個來源再重建本頁）。規格與踩過的坑見 <code>TOKEN-STATS.md</code>。</div>
+  <div style="margin-top:9px">本檔為<strong>本機產物</strong>，資料與圖表程式庫皆已內嵌，
+    開啟時不發出任何外部請求。</div>
+</footer>
+
+<script>/* Chart.js 4.4.1（內嵌，MIT）*/
+/*__CHARTJS__*/
+</script>
+<script>
+const DATA = /*__DATA__*/null;
+</script>
+<script>
+(function () {
+"use strict";
+const $ = s => document.querySelector(s);
+const el = (t, cls, txt) => { const n = document.createElement(t);
+  if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
+
+// 一律 textContent 注入。這頁的字串來自三個工具的紀錄檔（模型名稱等），不完全可控，
+// 而 innerHTML 會讓那些字串變成可執行的標記。建置端已做 <script> 跳脫，這裡是第二道。
+
+// countingRules／caveats 的原文以 **…** 標重點（同一份文字也給非 HTML 的消費端用）。
+// 直接 textContent 會把星號原樣印出來。這裡拆成文字節點與 <b>，維持「全頁不用 innerHTML」。
+// 只施用於這兩個陣列——DATA.sources 含 `~/.claude/projects/**/*.jsonl` 這種路徑，
+// 那裡的 ** 是萬用字元不是強調，不可轉換。
+const emph = (tag, cls, s) => {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  const parts = String(s == null ? "" : s).split(/\*\*(.+?)\*\*/g);
+  // split 帶捕獲組時，奇數索引即括號內容 → 那些才是要加粗的
+  parts.forEach((p, i) => {
+    if (!p) return;
+    if (i % 2) { const b = document.createElement("b"); b.textContent = p; n.appendChild(b); }
+    else n.appendChild(document.createTextNode(p));
+  });
+  return n;
+};
+const nf = n => (n == null ? "—" : n.toLocaleString("en-US"));
+function cjk(n) {                       // 大數字讀得懂：16.2 億 / 2,833 萬
+  if (n == null) return "—";
+  const a = Math.abs(n);
+  if (a >= 1e8) return (n / 1e8).toFixed(2) + " 億";
+  if (a >= 1e4) return (n / 1e4).toFixed(a >= 1e6 ? 0 : 1) + " 萬";
+  return nf(n);
+}
+const pct = r => (r == null ? "—" : (r * 100).toFixed(1) + "%");
+
+const SCOPES = ["core", "core+related", "all"];
+const SCOPE_LABEL = { "core": "core（下界）", "core+related": "core+related", "all": "all（上界）" };
+const MIX = [                            // 與 token_stats.py 的 enrich() 同一組成分與倍率
+  { k: "input",          label: "新輸入",        rate: "input",         c: "--c1" },
+  { k: "cw5m",           label: "快取寫入 5m",   rate: "cacheWrite5m",  c: "--c3" },
+  { k: "cw1h",           label: "快取寫入 1h",   rate: "cacheWrite1h",  c: "--c5" },
+  { k: "cacheRead",      label: "快取讀取",      rate: "cacheRead",     c: "--c2" },
+  { k: "codexCacheRead", label: "快取讀取(Codex)", rate: "codexCacheRead", c: "--c4" },
+];
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+let scope = "core";
+
+/* ── 由 sessions 逐筆推導任一口徑的分工具彙總 ──────────────────────────
+   原始 JSON 的 byTool/byModel/byDay 只在 core+related 口徑下彙總。tool 是 session
+   自帶的欄位，故分工具可以精確推導；分模型與分日不行（session 層沒有那兩個維度），
+   那兩張圖就老實標成 core+related，不假裝能切。
+   建置器對 core+related 做過等值斷言——推導結果與原始 byTool 逐欄相同才准出檔。 */
+const FIELDS = ["msgs","input","cacheCreate","cw5m","cw1h","cacheRead",
+                "codexCacheRead","output","outputUnknown"];
+function inScope(s, sc) {
+  return sc === "all" || (sc === "core" ? s.scope === "core"
+                                        : s.scope === "core" || s.scope === "related");
+}
+function blank() { const o = {}; FIELDS.forEach(f => o[f] = 0); return o; }
+function enrich(a) {
+  const readIn = a.input + a.cacheCreate + a.cacheRead + a.codexCacheRead;
+  const R = DATA.rates;
+  const cached = a.cacheRead + a.codexCacheRead;
+  return Object.assign({}, a, {
+    processed: readIn + a.output,
+    billableInput: Math.round(a.input * R.input + a.cw5m * R.cacheWrite5m
+      + a.cw1h * R.cacheWrite1h + a.cacheRead * R.cacheRead
+      + a.codexCacheRead * R.codexCacheRead),
+    cacheHitRate: readIn ? cached / readIn : null,
+  });
+}
+function byToolFor(sc) {
+  const out = {};
+  DATA.sessions.filter(s => inScope(s, sc)).forEach(s => {
+    const a = out[s.tool] || (out[s.tool] = blank());
+    FIELDS.forEach(f => a[f] += (s[f] || 0));
+  });
+  Object.keys(out).forEach(k => out[k] = enrich(out[k]));
+  return out;
+}
+
+/* ── header ───────────────────────────────────────────────────────── */
+$("#gen").textContent = "統計產出日 " + (DATA.generated || "未標示");
+SCOPES.forEach(s => {
+  const b = el("button", s === scope ? "on" : "", SCOPE_LABEL[s]);
+  b.type = "button"; b.setAttribute("aria-pressed", String(s === scope));
+  b.onclick = () => { scope = s;
+    [...$("#scopeSeg").children].forEach(x => {
+      const on = x.textContent === SCOPE_LABEL[s];
+      x.className = on ? "on" : ""; x.setAttribute("aria-pressed", String(on));
+    });
+    renderScoped();
+  };
+  $("#scopeSeg").appendChild(b);
+});
+
+/* ── KPI ──────────────────────────────────────────────────────────── */
+function renderKpi() {
+  const t = DATA.totals[scope];
+  $("#kpiScope").textContent = "口徑：" + SCOPE_LABEL[scope];
+  const cards = [
+    { cls: "hero", lab: "輸入計價當量", tag: ["cite", "報告引用這個"], big: cjk(t.billableInput),
+      raw: nf(t.billableInput) + " tokens",
+      fn: "依快取倍率折算後的輸入量，反映真實成本結構。" },
+    { cls: "", lab: "產出 output", tag: t.outputUnknown ? ["warn", "有缺漏"] : null,
+      big: cjk(t.output), raw: nf(t.output) + " tokens",
+      fn: t.outputUnknown
+        ? "另有 " + nf(t.outputUnknown) + " 則（Cowork）的 output 稽核紀錄不完整，"
+          + "計為不可得而非 0，未含在上列數字內——故 output 為低估。"
+        : "無缺漏紀錄。" },
+    { cls: "hero", lab: "快取命中率", tag: ["cite", "優化成效"], big: pct(t.cacheHitRate),
+      raw: cjk(t.cacheRead + t.codexCacheRead) + " / " + cjk(t.processed - t.output) + " 讀入",
+      fn: "讀入的 token 有這麼高比例來自快取，因此計價當量遠低於處理總量。" },
+    { cls: "", lab: "訊息則數", big: nf(t.msgs), raw: DATA.sessions.filter(s => inScope(s, scope)).length
+        + " 個 session　·　" + DATA.byDay.length + " 個日期",
+      fn: "已依 message.id 去重（一次回應會拆多行寫入，各帶完整 usage）。" },
+    { cls: "mute", lab: "處理總量", tag: ["dim", "勿當用量"], big: cjk(t.processed),
+      raw: nf(t.processed) + " tokens",
+      fn: "含重讀快取的實際處理量，衡量工作規模。拿它當「總 token 用量」會誤導一個數量級。" },
+  ];
+  const g = $("#kpiGrid"); g.textContent = "";
+  cards.forEach(c => {
+    const d = el("div", "card kpi " + c.cls);
+    const lab = el("div", "lab"); lab.appendChild(el("span", null, c.lab));
+    if (c.tag) lab.appendChild(el("span", "tag " + c.tag[0], c.tag[1]));
+    d.append(lab, el("div", "big", c.big), el("div", "raw", c.raw), el("div", "fn", c.fn));
+    g.appendChild(d);
+  });
+}
+
+/* ── 三種口徑 ─────────────────────────────────────────────────────── */
+function renderScopeTable() {
+  const tb = $("#scopeTable").querySelector("tbody"); tb.textContent = "";
+  SCOPES.forEach(s => {
+    const t = DATA.totals[s], tr = el("tr", s === scope ? "hl" : "");
+    const cells = [SCOPE_LABEL[s], nf(t.msgs), nf(t.input),
+      nf(t.cacheCreate), nf(t.cacheRead + t.codexCacheRead), nf(t.output),
+      nf(t.billableInput), nf(t.processed), pct(t.cacheHitRate)];
+    cells.forEach((v, i) => tr.appendChild(el("td", i ? "n" : "", v)));
+    tb.appendChild(tr);
+  });
+}
+
+/* ── 成分拆解 ─────────────────────────────────────────────────────── */
+function mixRows() {
+  const t = DATA.totals[scope];
+  const rows = MIX.map(m => {
+    const rate = DATA.rates[m.rate], raw = t[m.k] || 0;
+    return { label: m.label, raw, rate, bill: Math.round(raw * rate), c: m.c };
+  });
+  const sum = rows.reduce((a, r) => a + r.bill, 0) || 1;
+  rows.forEach(r => r.share = r.bill / sum);
+  return rows.sort((a, b) => b.bill - a.bill);
+}
+function renderMix() {
+  const rows = mixRows(), t = DATA.totals[scope];
+  const tb = $("#mixTable").querySelector("tbody"); tb.textContent = "";
+  rows.forEach(r => {
+    const tr = el("tr");
+    [r.label, nf(r.raw), "×" + r.rate, nf(r.bill), pct(r.share)]
+      .forEach((v, i) => tr.appendChild(el("td", i ? "n" : "", v)));
+    tb.appendChild(tr);
+  });
+  const tr = el("tr", "hl");
+  ["合計", nf(rows.reduce((a, r) => a + r.raw, 0)), "—",
+   nf(rows.reduce((a, r) => a + r.bill, 0)), "100.0%"]
+    .forEach((v, i) => tr.appendChild(el("td", i ? "n" : "", v)));
+  tb.appendChild(tr);
+
+  const top = rows[0];
+  const readIn = t.processed - t.output;
+  $("#mixNote").textContent =
+    "讀入 " + nf(readIn) + " tokens，若全額計價即同額；實際計價當量 "
+    + nf(t.billableInput) + "（" + pct(t.billableInput / readIn) + "）。"
+    + "最大的一筆成分是「" + top.label + "」，占計價當量 " + pct(top.share)
+    + "——優化要從這裡下手，不是從讀入量最大的那項。";
+}
+
+/* ── 圖表 ─────────────────────────────────────────────────────────── */
+const charts = {};
+function paint(id, cfg) {
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(document.getElementById(id), cfg);
+}
+function baseOpts(extra) {
+  return Object.assign({
+    responsive: true, maintainAspectRatio: false,
+    interaction: { mode: "index", intersect: false },
+    plugins: {
+      legend: { labels: { boxWidth: 11, boxHeight: 11, font: { size: 11 }, color: css("--ink2") } },
+      tooltip: { callbacks: { label: c => c.dataset.label + "：" + nf(c.parsed.x ?? c.parsed.y) } },
+    },
+  }, extra || {});
+}
+function gridColor() { return css("--line"); }
+function axisFont() { return { size: 10.5, family: css("--mono") || "monospace" }; }
+
+function renderCharts() {
+  Chart.defaults.font.family = css("--sans");
+  Chart.defaults.color = css("--muted");
+
+  // 依工具（可切口徑，由 sessions 推導）
+  const bt = byToolFor(scope);
+  const tools = Object.keys(bt).sort((a, b) => bt[b].billableInput - bt[a].billableInput);
+  $("#byToolScopeNote").textContent = "口徑：" + SCOPE_LABEL[scope] + "（由 session 明細逐筆推導）";
+  paint("cTool", {
+    type: "bar",
+    data: { labels: tools, datasets: MIX.map(m => ({
+      label: m.label, backgroundColor: css(m.c), borderWidth: 0,
+      data: tools.map(t => Math.round((bt[t][m.k] || 0) * DATA.rates[m.rate])),
+    })) },
+    options: baseOpts({
+      indexAxis: "y",
+      scales: {
+        x: { stacked: true, grid: { color: gridColor() }, ticks: { font: axisFont(), callback: cjk } },
+        y: { stacked: true, grid: { display: false }, ticks: { font: { size: 11.5 } } },
+      },
+    }),
+  });
+
+  // 依模型（僅 core+related）
+  const bm = Object.entries(DATA.byModel)
+    .filter(([, v]) => v.billableInput > 0)
+    .sort((a, b) => b[1].billableInput - a[1].billableInput);
+  paint("cModel", {
+    type: "bar",
+    data: { labels: bm.map(e => e[0]), datasets: [
+      { label: "輸入計價當量", backgroundColor: css("--c1"), borderWidth: 0,
+        data: bm.map(e => e[1].billableInput) },
+      { label: "output", backgroundColor: css("--accent"), borderWidth: 0,
+        data: bm.map(e => e[1].output) },
+    ] },
+    options: baseOpts({
+      indexAxis: "y",
+      scales: {
+        x: { type: "logarithmic", grid: { color: gridColor() }, ticks: { font: axisFont(), callback: cjk } },
+        y: { grid: { display: false }, ticks: { font: { size: 11 } } },
+      },
+      plugins: { tooltip: { callbacks: { label: c => c.dataset.label + "：" + nf(c.parsed.x) } } },
+    }),
+  });
+
+  // 成分圓環
+  const rows = mixRows().filter(r => r.bill > 0);
+  paint("cMix", {
+    type: "doughnut",
+    data: { labels: rows.map(r => r.label), datasets: [{
+      data: rows.map(r => r.bill), borderWidth: 2, borderColor: css("--surface"),
+      backgroundColor: rows.map(r => css(r.c)),
+    }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: "52%",
+      plugins: {
+        legend: { position: "right",
+          labels: { boxWidth: 11, boxHeight: 11, font: { size: 11 }, color: css("--ink2") } },
+        tooltip: { callbacks: { label: c => c.label + "：" + nf(c.parsed)
+          + "（" + (c.parsed / rows.reduce((a, r) => a + r.bill, 0) * 100).toFixed(1) + "%）" } },
+      },
+    },
+  });
+
+  // 每日趨勢（僅 core+related）
+  const days = DATA.byDay;
+  paint("cDay", {
+    type: "bar",
+    data: { labels: days.map(d => d.date), datasets: [
+      { label: "輸入計價當量", backgroundColor: css("--c1"), borderWidth: 0,
+        data: days.map(d => d.billableInput), order: 2, yAxisID: "y" },
+      { label: "output", backgroundColor: css("--accent"), borderWidth: 0,
+        data: days.map(d => d.output), order: 2, yAxisID: "y" },
+      { label: "快取命中率", type: "line", borderColor: css("--ok"), backgroundColor: css("--ok"),
+        borderWidth: 2, pointRadius: 2.5, tension: .25, order: 1, yAxisID: "y2",
+        data: days.map(d => d.cacheHitRate == null ? null : d.cacheHitRate * 100) },
+    ] },
+    options: baseOpts({
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: axisFont(), maxRotation: 60 } },
+        y: { stacked: true, grid: { color: gridColor() }, ticks: { font: axisFont(), callback: cjk } },
+        y2: { position: "right", min: 0, max: 100, grid: { display: false },
+              ticks: { font: axisFont(), callback: v => v + "%" } },
+      },
+      plugins: { tooltip: { callbacks: { label: c => c.dataset.label + "："
+        + (c.dataset.yAxisID === "y2" ? c.parsed.y.toFixed(1) + "%" : nf(c.parsed.y)) } } },
+    }),
+  });
+
+  // 逐日的 billableInput 各自四捨五入過，加總不必然等於上方大字（實測差個位數）。
+  // 差多少由資料算出來、有差才講——與本頁其他揭露同一個標準：寧可自曝也不讓人自己發現。
+  const dayNote = $("#dayRoundNote");
+  if (dayNote) {
+    const ref = (DATA.totals["core+related"] || {}).billableInput;
+    const sum = days.reduce((a, d) => a + (d.billableInput || 0), 0);
+    const gap = ref == null ? 0 : sum - ref;
+    dayNote.textContent = gap === 0 ? ""
+      : "逐日數值各自四捨五入，本圖長條加總 " + nf(sum) + " 與上方 " + nf(ref)
+        + " 相差 " + nf(Math.abs(gap)) + " tokens（" + (Math.abs(gap) / ref * 100).toFixed(6)
+        + "%）——四捨五入的必然誤差，非資料不一致。";
+  }
+}
+
+/* ── Session 明細 ─────────────────────────────────────────────────── */
+let sortKey = "billableInput", sortDir = -1;
+function renderSessions() {
+  const tool = $("#fTool").value, sc = $("#fScope").value, q = $("#fq").value.trim().toLowerCase();
+  const rows = DATA.sessions.filter(s =>
+    (tool === "*" || s.tool === tool) && (sc === "*" || s.scope === sc) &&
+    (!q || (s.session + " " + s.from + " " + s.to).toLowerCase().includes(q)));
+  rows.sort((a, b) => {
+    const x = a[sortKey], y = b[sortKey];
+    if (x == null && y == null) return 0;
+    if (x == null) return 1;
+    if (y == null) return -1;
+    return (typeof x === "number" ? x - y : String(x).localeCompare(String(y))) * sortDir;
+  });
+  const tb = $("#sessTable").querySelector("tbody"); tb.textContent = "";
+  rows.forEach(s => {
+    const tr = el("tr");
+    tr.appendChild(el("td", null, s.tool));
+    const c = el("td"); c.appendChild(el("code", null, s.session.slice(0, 8)));
+    c.title = s.session; tr.appendChild(c);
+    const sd = el("td");
+    // reviewed===false 代表歸屬檔裡沒這筆，excluded 是預設值而非人工判定——兩者不可混為一談
+    const unrev = s.reviewed === false;
+    const badge = el("span", "sc " + (unrev ? "unrev" : s.scope), unrev ? "未覆核" : s.scope);
+    if (unrev) badge.title = "尚未人工覆核歸屬，暫以 excluded 計（不進 core）";
+    sd.appendChild(badge); tr.appendChild(sd);
+    [nf(s.mentions), nf(s.msgs), nf(s.billableInput), nf(s.output), nf(s.processed),
+     pct(s.cacheHitRate), s.from === s.to ? s.from : s.from + "～" + s.to]
+      .forEach(v => tr.appendChild(el("td", "n", v)));
+    tb.appendChild(tr);
+  });
+  // 由原始成分重算再四捨五入一次。把各 session 已四捨五入的 billableInput 相加，
+  // 會與同口徑的 totals 差個一兩——數字對不上比少一位精度更容易讓人不信任整張表。
+  const sum = blank();
+  rows.forEach(s => FIELDS.forEach(f => sum[f] += (s[f] || 0)));
+  $("#sCount").textContent = rows.length + " / " + DATA.sessions.length
+    + " 個 session　·　計價當量 " + nf(enrich(sum).billableInput);
+}
+function initSessionUi() {
+  const tools = [...new Set(DATA.sessions.map(s => s.tool))].sort();
+  const scs = [...new Set(DATA.sessions.map(s => s.scope))].sort();
+  const fill = (sel, opts, allLabel) => {
+    sel.appendChild(new Option(allLabel, "*"));
+    opts.forEach(o => sel.appendChild(new Option(o, o)));
+    sel.onchange = renderSessions;
+  };
+  fill($("#fTool"), tools, "全部");
+  fill($("#fScope"), scs, "全部");
+  $("#fq").oninput = renderSessions;
+  document.querySelectorAll("#sessTable th.s").forEach(th => {
+    th.tabIndex = 0;
+    const go = () => {
+      const k = th.dataset.k;
+      sortDir = (k === sortKey) ? -sortDir : (["tool", "session", "scope", "from"].includes(k) ? 1 : -1);
+      sortKey = k;
+      document.querySelectorAll("#sessTable th.s").forEach(o => o.classList.remove("asc", "desc"));
+      th.classList.add(sortDir > 0 ? "asc" : "desc");
+      renderSessions();
+    };
+    th.onclick = go;
+    th.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } };
+  });
+}
+
+/* ── 靜態區塊 ─────────────────────────────────────────────────────── */
+function renderStatic() {
+  $("#scopeFile").textContent = DATA.scopeFile || "data/token_scope.json";
+
+  // 上次覆核之後才出現的 session 會落到預設值 excluded。不講的話，那和「人工判定
+  // 與本專案無關」在畫面上完全一樣，於是新工作被無聲排除在 core 之外。
+  const un = DATA.sessions.filter(s => s.reviewed === false);
+  if (un.length) {
+    const bi = enrich(un.reduce((a, s) => (FIELDS.forEach(f => a[f] += (s[f] || 0)), a), blank()));
+    const n = $("#unreviewedNote");
+    n.hidden = false;
+    n.textContent = "⚠ 有 " + un.length + " 個 session 不在歸屬檔裡（計價當量 "
+      + nf(bi.billableInput) + "），暫以 excluded 計、未進 core 口徑。"
+      + "excluded 在這裡是預設值不是判定——覆核前 core 為低估。";
+    n.style.color = "var(--warn)";
+  }
+  const rl = $("#rulesList");
+  (DATA.countingRules || []).forEach(r => rl.appendChild(emph("li", null, r)));
+  const cl = $("#caveatList");
+  (DATA.caveats || []).forEach(c => cl.appendChild(emph("li", null, c)));
+  const sl = $("#srcList");
+  Object.entries(DATA.sources || {}).forEach(([k, v]) => {
+    sl.appendChild(el("dt", null, k)); sl.appendChild(el("dd", null, v));
+  });
+  $("#srcNote").textContent = DATA.note || "";
+  const rat = $("#rateList");
+  const RLAB = { input: "新輸入", cacheWrite5m: "快取寫入 5m", cacheWrite1h: "快取寫入 1h",
+                 cacheRead: "快取讀取", codexCacheRead: "快取讀取（Codex）" };
+  Object.entries(DATA.rates || {}).forEach(([k, v]) => {
+    rat.appendChild(el("dt", null, RLAB[k] || k)); rat.appendChild(el("dd", null, "×" + v));
+  });
+  $("#footNote").textContent =
+    "產生器 " + (DATA.generator || "—") + "　·　階段：" + (DATA.stage || "—")
+    + "　·　歸屬檔 " + (DATA.scopeFile || "—")
+    + "　·　" + DATA.sessions.length + " 個 session、" + DATA.byDay.length + " 個日期、"
+    + Object.keys(DATA.byModel || {}).length + " 個模型";
+}
+
+/* ── 啟動 ─────────────────────────────────────────────────────────── */
+function renderScoped() { renderKpi(); renderScopeTable(); renderMix(); renderCharts(); }
+renderStatic();
+initSessionUi();
+renderScoped();
+renderSessions();
+
+// 系統主題切換時重畫——Chart.js 的顏色是建立當下取的 CSS 變數值，不會自己跟著變。
+if (window.matchMedia) {
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  (mq.addEventListener ? mq.addEventListener.bind(mq, "change") : mq.addListener.bind(mq))(renderCharts);
+}
+})();
+</script>
+</body>
+</html>

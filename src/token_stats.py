@@ -189,14 +189,19 @@ def scan_anthropic(path: pathlib.Path, tool: str):
             cw5m = int(cc.get("ephemeral_5m_input_tokens") or 0)
             cw_total = int(u.get("cache_creation_input_tokens") or 0)
             if cw1h + cw5m != cw_total:
-                cw5m, cw1h = cw_total - cw1h, cw1h        # 以總數為準補回差額
+                # 以總數為準補回差額。實測有紀錄回報 total=0 卻給 1h=1542（3 筆，
+                # 去重後 1 筆），此時補回值為負——**必須連 1h 一起夾**，只夾 5m 會讓
+                # 成分和大於回報總量，且多出來的那截還是用最貴的 2× 計價，與下面
+                # 「寧可低估不可高估」的原則相反。夾完恆有 cw5m + cw1h == cacheCreate。
+                cw1h = min(cw1h, cw_total)
+                cw5m = cw_total - cw1h
             records.append({
                 "id": mid,
                 "model": msg.get("model") or "?",
                 "ts": (obj.get("timestamp") or obj.get("_audit_timestamp") or "")[:10],
                 "input": int(u.get("input_tokens") or 0),
                 "cacheCreate": cw_total,
-                "cw5m": max(cw5m, 0),
+                "cw5m": cw5m,
                 "cw1h": cw1h,
                 "cacheRead": int(u.get("cache_read_input_tokens") or 0),
                 # 不可信的 output 計為「不可得」而非 0——0 會被當成真的沒產出
@@ -437,7 +442,18 @@ def main():
         scope = {f"{f['tool']}:{f['session']}": {"scope": suggest_scope(f)} for f in files}
 
     for f in files:
-        f["scope"] = (scope.get(f"{f['tool']}:{f['session']}") or {}).get("scope", "excluded")
+        rec = scope.get(f"{f['tool']}:{f['session']}")
+        f["scope"] = (rec or {}).get("scope", "excluded")
+        # 歸屬檔裡沒有的 session（上次覆核之後才出現的）會落到預設值 excluded，
+        # 那和「人工判定與本專案無關」長得一模一樣。標出來，否則新工作會無聲地
+        # 被排除在 core 之外，而且沒有任何跡象提醒該去覆核。
+        f["reviewed"] = rec is not None
+
+    unreviewed = [f for f in files if not f["reviewed"]]
+    if unreviewed:
+        print(f"\n[待覆核] {len(unreviewed)} 個 session 不在 {SCOPE_PATH.name} 裡，"
+              f"暫以 excluded 計（不進 core）。重跑 --init-scope 會重建整份草稿，"
+              f"覆核過的決定要自行併回。")
 
     core = [f for f in files if f["scope"] == "core"]
     related = [f for f in files if f["scope"] in ("core", "related")]
@@ -558,6 +574,7 @@ def main():
         "byDay": [{"date": k, **enrich(v)} for k, v in sorted(by_day.items())],
         "sessions": [{
             "tool": f["tool"], "session": f["session"], "scope": f["scope"],
+            "reviewed": f["reviewed"],      # false＝歸屬檔裡沒有，excluded 是預設值不是決定
             "mentions": f["mentions"], "from": f["from"], "to": f["to"],
             **enrich(f["totals"]),
         } for f in files],
