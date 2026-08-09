@@ -96,9 +96,14 @@ export default {
 
     let r;
     try {
-      // gpt-oss 於 Workers AI 採 Responses 風格輸入；若平台 schema 變動，退回 messages 格式
+      // gpt-oss 於 Workers AI 採 Responses 風格輸入；若平台 schema 變動，退回 messages 格式。
+      // reasoning effort 調低：縮短思考鏈、省 token（回答品質對本用途足夠）。
       try {
-        r = await env.AI.run(MODEL, { input: prompt, max_output_tokens: MAX_OUT });
+        r = await env.AI.run(MODEL, {
+          input: prompt,
+          max_output_tokens: MAX_OUT,
+          reasoning: { effort: "low" },
+        });
       } catch {
         r = await env.AI.run(MODEL, {
           messages: [
@@ -113,14 +118,22 @@ export default {
       return json({ error: "ai unavailable: " + String(e).slice(0, 100) }, 503, ch);
     }
 
-    // 各格式防禦性取值
-    let answer =
-      r?.output_text ??
-      r?.response ??
-      (Array.isArray(r?.output)
-        ? r.output.flatMap(o => o?.content || []).map(c => c?.text || "").join("")
-        : "") ??
-      "";
+    // gpt-oss 是推理模型：output 陣列含 type:"reasoning"（思考鏈）與 type:"message"（最終回答）。
+    // 只取 message，否則思考過程會整段漏給使用者（實測 output_text/response 都含推理）。
+    let answer = "";
+    if (Array.isArray(r?.output)) {
+      answer = r.output
+        .filter(o => o?.type === "message")
+        .flatMap(o => o?.content || [])
+        .map(c => c?.text || "")
+        .join("").trim();
+    }
+    if (!answer) {
+      const raw = String(r?.output_text ?? r?.response ?? "").trim();
+      // 退路：欄位混入推理時，取最後一段（gpt-oss 推理在前、答案在後）
+      const parts = raw.split(/\n{2,}/);
+      answer = (parts[parts.length - 1] || raw).trim();
+    }
     if (!answer) answer = "（模型未回傳內容）";
 
     const u = r?.usage || {};

@@ -1832,7 +1832,9 @@ if(pendingSec){const el=document.getElementById(pendingSec);if(el)el.scrollIntoV
    離線版照常可用；誠實標示「未連接 AI」。
    #1b：SCAI_AI_CONFIG.endpoint 填入 Cloudflare Worker 網址後自動轉真 AI——
    前端把當週摘要與觸發清單作為脈絡傳給後端，回覆附逐次 token 用量。 */
-window.SCAI_AI_CONFIG=window.SCAI_AI_CONFIG||{endpoint:''};
+/* 後端：Cloudflare Worker（2026-08-09 部署）。模型 @cf/openai/gpt-oss-20b（OpenAI 系列），
+   免費額度每日 10,000 Neurons；額度用罄或斷線時前端自動降級展示模式。 */
+window.SCAI_AI_CONFIG=window.SCAI_AI_CONFIG||{endpoint:'https://scai-ask.leozero0517.workers.dev'};
 const aiFab=$('#aifab'),aiPanel=$('#aipanel'),aiLog=$('#ailog'),aiQ=$('#aiq');
 let aiTok={i:0,o:0,n:0};
 function aiMsg(role,html,asText){const d=document.createElement('div');d.className='ai-m '+role;

@@ -1222,3 +1222,32 @@ git add -A; git commit -m "說明"; git push
 **新增量測假象紀錄**：此面板對 `position:fixed` 元素的 `getBoundingClientRect` 整體偏移 +20px——computed style 證實 CSS 正確（`left:0/right:0/width=視窗寬），與 rAF 凍結、focus/blur 失真同類；fixed 元素的版面判定以 computed style 為準。
 
 - Git commit：（見本節末補記）
+
+---
+
+## 2026-08-09｜第 27 輪：助理接上真 AI（#1b 完成，三項重大更新全數落地）
+
+- 人類需求：「選，或是你操作」→ 改由 Claude 以 wrangler CLI 操作，OAuth 授權頁由人類本人按 Allow（前兩次逾時，第三次成功——教訓：wrangler 開的是**系統預設瀏覽器**，與人類登入 Cloudflare 的瀏覽器未必相同）。
+- 執行者：Claude Code（Fable 5）
+- 部署：`https://scai-ask.leozero0517.workers.dev`（wrangler deploy，AI 綁定自動掛上）；`SCAI_AI_CONFIG.endpoint` 填入後網站面板自動轉「AI 連線」。
+
+### 部署後修掉的一個真問題
+**gpt-oss 是推理模型**：`output` 陣列含 `type:"reasoning"`（思考鏈）與 `type:"message"`（最終回答），而 `output_text`／`response` 欄位**兩者都含**——初版萃取把整段英文思考過程漏給使用者。修正：只取 `message` 型項目、退路取最後段；並將 `reasoning.effort` 調低——同題 out tokens 由 177 降至 64（也省免費額度）。
+
+### 實測（含線上）
+- 真 AI 回答正確引用當週脈絡（X −0.42／Y +0.48、觸發清單），PB-07 解釋合理。
+- 非白名單 origin → 403；CORS 僅放行 Pages 與 localhost。
+- 面板端到端：「AI 連線」標籤、**逐次與累計 token 用量上牆**（in 423／out 231）——**評分表 Token 20% 的真實數據自此開始累積**，且來源可稽核（Anthropic/Workers AI 回傳的 usage 欄位，非估算）。
+- 免費額度每日 10,000 Neurons（00:00 UTC 重置），用罄回 503、前端自動降級展示模式，面板永不空白。
+
+### 已知限制（誠實記錄）
+gpt-oss-20b 偶有簡體字滲入（「灾后恢复」）與細節幻覺（自創「L 要件」一詞）——展示用途可接受，真依據永遠在站上一鍵可查；日後經費到位切 Claude（AI Gateway Unified Billing）品質即升，前端與 Worker 介面零改動。
+
+### 三項重大更新總結
+| # | 內容 | 狀態 |
+|---|---|---|
+| 3 | 五分頁資訊架構＋Agent 治理頁＋白話副標 | ✅ `e0f7956`＋`a8649e9` |
+| 2 | 企業畫像可切換（欣銓＋兩家虛構示範） | ✅ `b725d13` |
+| 1 | AI 助理（展示模式＋真 AI＋三層降級） | ✅ `49dc396`＋本輪 |
+
+- Git commit：（見本節末補記）
