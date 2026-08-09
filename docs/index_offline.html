@@ -611,6 +611,8 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 }
 @media print{
   header,nav.secnav,#top,.wnav{display:none}
+  /* 分頁以 hidden 藏起的區段在列印時全部攤開，否則只印得出當前分頁 */
+  #main section[hidden]{display:block}
   body{background:#fff;font-size:12px;padding-left:0}
   .card,.pb,.evc,details{break-inside:avoid;border-color:#bbb}
   .brief,.actband{box-shadow:none;border-color:#bbb}
@@ -889,10 +891,23 @@ const SEC_TAB={};TABS.forEach(t=>t.secs.forEach(s=>SEC_TAB[s[0]]=t.k));
 let curTab='overview';
 function buildTabBar(){
   const bar=$('#tabbar');if(!bar)return;
+  /* innerHTML 重建會銷毀被聚焦的分頁鈕，鍵盤按 Enter 切頁後焦點會掉回文件開頭；
+     重建前記住焦點在列內，重建後交還給新的作用中分頁。 */
+  const hadFocus=bar.contains(document.activeElement);
   bar.innerHTML=TABS.map(t=>`<button type="button" class="tb${t.k===curTab?' on':''}" role="tab"
     data-tab="${t.k}" aria-selected="${t.k===curTab}"><span class="tb-l">${t.label}</span><span class="tb-h">${t.hint}</span></button>`).join('');
   $$('#tabbar .tb').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+  if(hadFocus){const on=bar.querySelector('.tb.on');if(on)on.focus({preventScroll:true})}
 }
+/* tablist 的方向鍵移動（容器不重建，掛一次即可） */
+$('#tabbar')&&$('#tabbar').addEventListener('keydown',e=>{
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+  const bs=$$('#tabbar .tb'),i=bs.indexOf(document.activeElement);if(i<0)return;
+  e.preventDefault();
+  const j=e.key==='Home'?0:e.key==='End'?bs.length-1
+    :e.key==='ArrowRight'?Math.min(bs.length-1,i+1):Math.max(0,i-1);
+  bs[j].focus();
+});
 function buildSecBar(){
   const bar=$('#secbar');if(!bar)return;
   const t=TABS.find(x=>x.k===curTab);
@@ -901,7 +916,7 @@ function buildSecBar(){
   bar.innerHTML=rows.map(([id,num,label,hint],j)=>
     `<a href="#${id}"${j===0?' class="on"':''}>${num?`<span class="ni">${num}</span>`:''}${label}<span class="nh">${hint}</span></a>`).join('');
 }
-function setTab(k,scrollId){
+function setTab(k,scrollId,keepScroll){
   if(!TABS.some(t=>t.k===k))return;
   curTab=k;
   $$('#main section[data-tab]').forEach(s=>{s.hidden=s.dataset.tab!==k});
@@ -911,8 +926,12 @@ function setTab(k,scrollId){
   if(typeof Chart!=='undefined')
     $$(`#main section[data-tab="${k}"] canvas`).forEach(c=>{const ch=Chart.getChart(c);if(ch)ch.resize()});
   if(scrollId){const el=document.getElementById(scrollId);
-    if(el){el.scrollIntoView({behavior:'smooth',block:'start'});return}}
-  scrollTo({top:0,behavior:'smooth'});
+    if(el){
+      /* 跨分頁錨點被 preventDefault 後網址不會更新，重新整理就回不到原處；補寫 hash */
+      try{history.replaceState(null,'','#'+scrollId)}catch(e){}
+      el.scrollIntoView({behavior:'smooth',block:'start'});return}}
+  /* keepScroll＝render() 重繪時沿用，避免每次換週都被捲回頁頂 */
+  if(!keepScroll)scrollTo({top:0,behavior:'smooth'});
 }
 /* 任何指向他頁區段的錨點（導覽列、「第一次看」導引、內文交叉連結）先切分頁再捲動 */
 document.addEventListener('click',e=>{
@@ -929,6 +948,11 @@ DATA.weeks.forEach((w,i)=>{const o=document.createElement('option');o.value=i;
 const hashW=(location.hash.match(/^#?w(\d+)$/i)||[])[1];
 let cur=hashW?Math.max(0,DATA.weeks.findIndex(x=>x.week==+hashW)):DATA.weeks.length-1;
 if(cur<0)cur=DATA.weeks.length-1;
+/* 區段深連結（#gov、#trace…）：開站時解析成對應分頁，首次 render 後捲至該區段。
+   沒有這段的話，直接開 index.html#gov 或重新整理都會落回總覽而目標被藏起來。 */
+const hashSec=location.hash.slice(1);
+let pendingSec=null;
+if(!hashW&&SEC_TAB[hashSec]){curTab=SEC_TAB[hashSec];pendingSec=hashSec}
 sel.value=cur;
 sel.onchange=()=>go(+sel.value);
 $('#wprev').onclick=()=>go(cur-1);
@@ -956,7 +980,9 @@ $('#vfull').onclick=()=>setView('full');
    觸發鈕上，Tab 還會走到覆蓋層背後的控制項。以堆疊管理（放大檢視中點資料點
    會再開週次講解，兩層並存），inert 為主、Tab 陷阱為備援不依賴 inert 支援度。 */
 const modalStack=[];
-const BG_SEL='header,nav.secnav,#main,footer,#top';
+/* .skip 與 .guide 也要納入：它們在 header 之外，漏掉的話 aria-modal 期間
+   輔助科技仍能直接聚焦背景連結 */
+const BG_SEL='header,nav.secnav,.guide,#main,footer,#top,.skip';
 const FOCUSABLE='a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 /* position:fixed 元素的 offsetParent 為 null，故以 getClientRects 判可見 */
 const focusablesIn=el=>[...el.querySelectorAll(FOCUSABLE)].filter(n=>n.getClientRects().length>0);
@@ -1135,7 +1161,7 @@ function buildCmp(){
       </div>
       <input type="search" class="cmppanel-q" id="cmpq" value="${cmpQuery.replace(/"/g,'&quot;')}"
         placeholder="搜尋週次、日期或情境（例：W5、07/14、Crossroads）" aria-label="搜尋週次">
-      <div class="cmppanel-l" role="listbox" aria-multiselectable="${pick}">${cmpRowsHTML()}</div>
+      <div class="cmppanel-l" role="listbox" aria-multiselectable="true">${cmpRowsHTML()}</div>
     </div>`;
   }
   const n=DATA.weeks.length;
@@ -1203,7 +1229,10 @@ function buildCmp(){
       const ks=new Set(s.ks||[]);
       if(ks.has(k)){if(ks.size>1)ks.delete(k)}else ks.add(k);
       cmpSel[cmpOpen]={mode:'pick',ks:[...ks].sort((x,y)=>x-y)};
-      buildCmp();$('#cmpq')&&$('#cmpq').focus();
+      buildCmp();
+      /* 焦點留在剛切換的那一列，連續勾選不必每次從搜尋框重走一遍清單 */
+      const back=document.querySelector(`#cmpui .wrow[data-k="${k}"]`);
+      (back||$('#cmpq'))&&(back||$('#cmpq')).focus();
       return;
     }
     if(cmpPend===null){cmpPend=k;buildCmp();$('#cmpq')&&$('#cmpq').focus();return}
@@ -1251,7 +1280,12 @@ function go(i){
   cur=i;sel.value=i;
   try{history.replaceState(null,'','#w'+DATA.weeks[i].week)}catch(e){}
   const m=$('#main');m.classList.add('fade');
-  setTimeout(()=>{render(i);m.classList.remove('fade')},160);
+  setTimeout(()=>{render(i);m.classList.remove('fade');
+    /* render 換掉整個 #main：若原焦點元素被銷毀（如週次講解的「跳轉到 W…」路徑），
+       焦點會掉回 body；接手交給週次選單，鍵盤流程不中斷 */
+    if(!document.activeElement||document.activeElement===document.body){
+      const t=$('#wsel');if(t)t.focus({preventScroll:true})}
+  },160);
 }
 
 /* ── render ── */
@@ -1538,8 +1572,8 @@ function render(i){
   $$('.zoombtn').forEach(b=>b.onclick=()=>openLB(b.dataset.zoom));
   heroFx();
   /* setTab 內含 bindSpy 與圖表 resize；圖表先畫再切分頁，藏起來的那些會在
-     使用者切到該頁時由 setTab 的 resize 補正尺寸。 */
-  setTab(curTab);
+     使用者切到該頁時由 setTab 的 resize 補正尺寸。keepScroll＝重繪不捲頂。 */
+  setTab(curTab,null,true);
 }
 
 /* 圖表資料點講解的鍵盤路徑。原本 showWeekPop() 只能經 Chart.js 的 onClick 進入，
@@ -1551,9 +1585,21 @@ function bindChartKeys(id,liveId){
   const cv=$('#'+id),live=$('#'+liveId);
   if(!cv)return;
   chartKbIdx[id]=cur;                       /* 每次重繪都回到本週，行為可預期 */
+  /* 明眼鍵盤使用者也要看得到目前落點：以 Chart.js 的 active elements 亮起
+     該週資料點並帶出 tooltip，與滑鼠 hover 同一套視覺；失焦即清除。 */
+  const mark=on=>{try{const ch=Chart.getChart(cv);if(!ch)return;
+    const k=chartKbIdx[id];
+    const els=on?ch.data.datasets.map((d,di)=>({datasetIndex:di,index:k}))
+      .filter(x=>(ch.data.datasets[x.datasetIndex].data||[]).length>k):[];
+    ch.setActiveElements(els);
+    if(ch.tooltip)ch.tooltip.setActiveElements(els,{x:0,y:0});
+    ch.update('none');
+  }catch(e){}};
   const say=()=>{const w=DATA.weeks[chartKbIdx[id]];
-    if(live&&w)live.textContent=`W${w.week}　${w.range}　按 Enter 開啟該週講解`};
+    if(live&&w)live.textContent=`W${w.week}　${w.range}　按 Enter 開啟該週講解`;
+    mark(true)};
   cv.onfocus=say;
+  cv.onblur=()=>mark(false);
   cv.onkeydown=e=>{
     const max=cur;let k=chartKbIdx[id];
     if(e.key==='Enter'||e.key===' '||e.key==='Spacebar'){e.preventDefault();showWeekPop(k);return}
@@ -1710,6 +1756,8 @@ function bindSpy(){
 addEventListener('scroll',()=>{$('#top').classList.toggle('show',scrollY>600)},{passive:true});
 
 render(cur);
+/* 深連結的初次捲動要在首次 render（區段已存在且未 hidden）之後 */
+if(pendingSec){const el=document.getElementById(pendingSec);if(el)el.scrollIntoView({block:'start'})}
 </script>
 <script>
 /* 滑鼠泡泡特效設定（2026-08-08 人類核定）

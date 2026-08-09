@@ -88,7 +88,10 @@ def escape_html_deep(obj):
     if isinstance(obj, list):
         return [escape_html_deep(v) for v in obj]
     if isinstance(obj, dict):
-        return {k: escape_html_deep(v) for k, v in obj.items()}
+        # 鍵也要跳脫：tokenUsage.byStep 這類「鍵名本身會被顯示」的結構，
+        # 惡意鍵一樣能進 innerHTML。既有 schema 鍵名皆為英數，跳脫後不變。
+        return {(escape_html_deep(k) if isinstance(k, str) else k): escape_html_deep(v)
+                for k, v in obj.items()}
     return obj
 
 

@@ -55,6 +55,14 @@ def resolve_window() -> tuple[str, str, datetime.date, datetime.date, bool]:
             try:
                 last_end = parse_range_end(last["range"])
             except ValueError:
+                # 解析失敗不可靜默放行：last_end=None 會讓下面自動退回「最近 7 天」，
+                # 等於未經 --force 就繞過所有錨定與防呆（fail-open）。
+                if not a.force:
+                    sys.exit(
+                        f"[錯誤] 最後一週 {last.get('week')} 的 range 無法解析："
+                        f"{last.get('range')!r}。\n"
+                        f"       無法錨定本週窗口起點。請先修正 data/weeks.json，"
+                        f"或加 --force 以最近 7 天強行執行。")
                 last_end = None
 
         # 缺漏防呆：距上一週迄日超過 8 天代表中間有週次沒產出。
@@ -81,6 +89,16 @@ def resolve_window() -> tuple[str, str, datetime.date, datetime.date, bool]:
                     f"[錯誤] 上一週 {last['week']} 迄日為 {last_end}，本次觸發於 {e}，"
                     f"尚無可涵蓋的新區間。\n"
                     f"       請待窗口累積後再跑，或以 --start/--end 明確指定區間。")
+            # 窗口未滿 7 天不得成週：提早手動跑會固化一個殘週（append-only 修不回來），
+            # 且下次排程只剩更短的畸零區間——例如 08/09 手跑產出 6 天的 W9，
+            # 08/10 排程就只能把 W10 標成 1 天。滿週才放行，寧可請使用者晚點跑。
+            days = (e - s).days + 1
+            if days < 7:
+                ready = s + datetime.timedelta(days=6)
+                sys.exit(
+                    f"[錯誤] 窗口尚未滿一週：{fmt_range(s, e)} 僅 {days} 天。\n"
+                    f"       W{n} 應涵蓋至 {ready}，請於該日或之後再跑；"
+                    f"或以 --start/--end 明確指定完整區間。")
         else:
             s = e - datetime.timedelta(days=6)   # 含頭尾 7 天
 
@@ -104,9 +122,9 @@ QUERIES = [
 def fetch_tavily() -> list[dict]:
     from tavily import TavilyClient
     client = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
-    # 回補模式用 start_date/end_date 鎖定歷史區間；一般週跑維持 days=7
-    window = ({"start_date": START.isoformat(), "end_date": END.isoformat()}
-              if BACKFILL else {"days": 7})
+    # 一律以宣告窗口的起訖日鎖定搜尋區間。原本一般週跑用 days=7 滾動窗，
+    # 與錨定後的宣告窗口會漂移：08/11 延遲觸發宣告 08/04–08/11，days=7 卻抓不到 08/04。
+    window = {"start_date": START.isoformat(), "end_date": END.isoformat()}
     items = []
     for q in QUERIES:
         try:
@@ -133,14 +151,18 @@ RSS_FEEDS = [
 
 def fetch_rss() -> list[dict]:
     import feedparser
-    cutoff = datetime.datetime.now() - datetime.timedelta(days=7)
     items = []
     for feed_url in RSS_FEEDS:
         try:
             feed = feedparser.parse(feed_url)
             for e in feed.entries[:20]:
+                # 以宣告窗口過濾（原為「現在−7 天」滾動窗，與宣告區間會漂移）。
+                # 無日期的項目一律剔除：無法證明落在窗口內，與匯入門檻的時序可查證要求一致。
                 pub = e.get("published_parsed") or e.get("updated_parsed")
-                if pub and datetime.datetime(*pub[:6]) < cutoff:
+                if not pub:
+                    continue
+                d = datetime.date(*pub[:3])
+                if d < START or d > END:
                     continue
                 items.append({
                     "title":  e.get("title", ""),

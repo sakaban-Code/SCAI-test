@@ -1138,3 +1138,30 @@ git add -A; git commit -m "說明"; git push
 - 側欄視覺順序與 DOM 可聚焦順序在新增分頁列後**仍一致**。
 - 390 寬五個分頁皆 0 溢出、分頁列不需橫捲、治理卡片單欄。
 - Git commit：（見本節末補記）
+
+---
+
+## 2026-08-09｜第 24 輪：Codex 第二輪審查（12 commit 全量）與 12 項修補
+
+- 人類需求：「code review 一次，確認全站無問題後就推」→ 推送後接企業畫像可切換。
+- 執行者：Claude Code（Fable 5）＋ Codex CLI（gpt-5.3；審查軌）
+- 審查範圍：`66e5242..e0f7956` 十二個未經外部審查的 commit。Codex 產出 **12 項發現（2 High／4 Med／6 Low）＋ 7 類確認非問題**（排程 W9 窗口正確、錨點攔截範圍、hidden→visible 圖表 resize、模態堆疊、helper 遷移完整、新增 XSS sink 皆安全、離線零外洩）。**12 項逐一核實全數屬實、全數修復**。
+
+### 兩個 High
+1. **列印只印當前分頁**：分頁把非作用中區段標 `hidden`，print CSS 未攤開——我在派審前自行發現、Codex 獨立確認。修：`@media print{#main section[hidden]{display:block}}`。
+2. **提早手動跑會固化殘週**：窗口錨定改革（第 18 輪）只擋 `e<s`，沒擋「未滿 7 天」——08/09 手動跑會產出 6 天的 W9，08/10 排程只剩 1 天的 W10，append-only 修不回來。修：滿週守門，未滿中止並指出可跑日。**第 18 輪的修正自己留了一個洞，被第二輪審查抓到**——單輪驗證只驗了自己想到的案例（準點／延遲／缺漏），沒驗「提早」。
+
+### 值得記的 Medium
+- **宣告窗口與抓取窗口漂移**（Med3）：Tavily 一般週跑仍用 `days=7` 滾動窗、RSS 用「現在−7 天」，與錨定後的宣告窗口對不上；且治理頁已寫了「檢索鎖定時間窗」——**先有宣稱、後補實作會變成不實陳述**。修：Tavily 一律帶起訖日；RSS 以宣告窗口過濾並剔除無日期項目。
+- **區段深連結不可重整**（Med5）：`#gov` 直開落回總覽。修：啟動解析區段 hash、跨分頁錨點寫回 hash；連帶發現並修掉「每次換週被捲回頁頂」的行為退化。
+- **fail-open**（Med6）：range 解析失敗靜默退回最近 7 天＝未經 `--force` 繞過全部防呆。修：中止。
+
+### 驗證
+- 管線九案（替身日期直呼 `resolve_window`）全過：含新守門的 6 天／1 天中止、`--force` 與明示回補放行、壞 range 中止。
+- 模板十二項逐一實測；focus／blur 在面板不可靠者依既有教訓**直呼 handler**（`onfocus()` 後 active=5、`onblur()` 後 0）。
+- 全站回歸 8 週 × 5 分頁 = 40 組：5044 對比節點 0 失敗、0 溢出、0 洩漏、0 死錨點、0 殘留 inert。
+
+### 順帶定案（同回合另行查證）
+網頁 AI 問答架構（第三項重大更新）採「**GitHub Pages 靜態站＋Cloudflare Worker＋AI Gateway**」：Workers AI 免費額度先跑通（**模型須釘選 `@cf/openai/gpt-oss-20b`**——Llama/Qwen 違反競賽三大系列限制，同否決 Perplexity 之理由）；經費到後切 Claude（Unified Billing 可用 Cloudflare 預付額度呼叫 Anthropic，免自備 key，額度購買 +5%）；**同一 Gateway 預留給週報管線**（Anthropic 相容端點），W9 起自動週報與網站問答共用額度池。三層降級：真 AI → 預錄問答 → 離線版隱藏面板。
+
+- Git commit：（見本節末補記）
