@@ -1,3 +1,10 @@
 __pycache__/
 *.pyc
 .env
+
+# Cloudflare Wrangler 本機建置快取（含 deploy 暫存與 workerd 產物，非原始碼）
+worker/**/.wrangler/
+
+# weeks.json 匯入前的本機快照。append-only 的稽核軌跡由 git 歷史提供，
+# 這兩份只是動手前的保險，不進倉庫（各 130KB，內容與 weeks.json 高度重複）。
+data/weeks_before_*.json

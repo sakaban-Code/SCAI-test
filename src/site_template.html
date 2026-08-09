@@ -1592,7 +1592,39 @@ function render(i){
       <div class="card gov"><div class="gov-t"><span class="gov-k">Evaluation</span>評估</div>
         <div class="gov-b">規畫層以確定性引擎<b>重算比對</b>，逐欄位差異須為零才准匯入；八週逐週模擬確認規則修訂不污染歷史；另引入<b>外部 AI 對抗式審查</b>並以實機量測驗證（版面溢出、對比度、鍵盤焦點、注入防護）。</div></div>
     </div>
-    <div class="cap" style="margin-top:14px"><b>Token 用量</b>：雲端管線尚未首跑（API 金鑰未就緒），故本站目前<b>無真實 token 數據</b>。此處刻意留白而非填入估算值——估算的 token 數無法查證，與本站其餘內容的可稽核標準不一致。首跑後將逐模型、逐步驟列出輸入／輸出量。</div>
+    ${(()=>{const t=DATA.tokenDev;
+      if(!t)return `<div class="cap" style="margin-top:14px"><b>Token 用量</b>：尚未統計。此處刻意留白而非填入估算值——估算的 token 數無法查證，與本站其餘內容的可稽核標準不一致。</div>`;
+      const num=n=>Number(n||0).toLocaleString('en-US');
+      /* 產物的規則／限制字串以 **…** 標重點（同一份文字也給非 HTML 的消費端用）。
+         此處轉成 <b>：DATA.tokenDev 已於建置時整棵跳脫，字串內不可能有生的 '<'，
+         故這裡引入的標籤必定只有我們自己這一對。 */
+      const md=s=>String(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+      const big=n=>{n=Number(n||0);return n>=1e8?(n/1e8).toFixed(2)+' 億':n>=1e4?(n/1e4).toFixed(0)+' 萬':num(n)};
+      const c=t.core,hr=c.cacheHitRate!=null?(c.cacheHitRate*100).toFixed(1)+'%':'—';
+      const tools={'claude-code':'Claude Code','cowork':'Cowork','codex':'Codex'};
+      const tl=Object.entries(t.byTool||{}).sort((a,b)=>b[1].billableInput-a[1].billableInput)
+        .map(([k,v])=>`${tools[k]||k} ${big(v.billableInput)}`).join('、');
+      const ml=Object.entries(t.byModel||{}).sort((a,b)=>b[1].billableInput-a[1].billableInput)
+        .map(([k,v])=>`${k} ${big(v.billableInput)}`).join('、');
+      return `<div class="pf" style="margin-top:16px">
+      <div class="it"><div class="k">輸入計價當量</div><div class="v">${big(c.billableInput)}</div>
+        <div class="n">${num(c.billableInput)} tokens・依快取倍率折算</div></div>
+      <div class="it"><div class="k">產出</div><div class="v">${big(c.output)}</div>
+        <div class="n">${num(c.output)} tokens${c.outputUnknown?`・另 ${num(c.outputUnknown)} 則 <span class="tbc">不可得</span>`:''}</div></div>
+      <div class="it"><div class="k">快取命中率</div><div class="v">${hr}</div>
+        <div class="n">重讀快取占輸入端 ${hr}，計價為新輸入的 0.1 倍</div></div>
+      <div class="it"><div class="k">對話則數</div><div class="v">${num(c.msgs)}</div>
+        <div class="n">跨 ${t.days} 天、三個工具${t.generated?`・統計至 ${t.generated}`:''}</div></div>
+    </div>
+    <div class="covbox">
+      <div class="t">Token 用量：怎麼算出來的</div>
+      <div class="d"><b>開發階段</b>用量，直接讀 Claude Code、Cowork、Codex 三個工具的本機原始紀錄取 <code>usage</code> 欄位，<b>非估算</b>。依工具：${tl}。依模型：${ml}。</div>
+      <ul>
+        <li><b>不提供單一「總 token」</b>：四項輸入直接相加會被重讀快取主導（占 ${hr}），得到 ${big(c.processed)} 這種技術上為真、實務上誤導一個數量級的數字。應引用上方的<b>輸入計價當量</b>與<b>產出</b>。</li>
+        ${(t.rules||[]).filter(r=>!/^不提供單一/.test(r)).map(r=>`<li>${md(r)}</li>`).join('')}
+      </ul>
+      <div class="d2"><b>已知限制</b>（與上方期間涵蓋同一個揭露標準）：${(t.caveats||[]).map(md).join('　／　')}</div>
+    </div>`})()}
   </section>
 
   <section id="method" data-tab="gov">

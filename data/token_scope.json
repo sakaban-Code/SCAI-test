@@ -1,0 +1,1176 @@
+{
+  "_說明": "逐檔歸屬決定。本檔進版控，使得『哪些 token 算 SCAI』這個判斷本身可被稽核。",
+  "_口徑": {
+    "core": "純 SCAI 工作階段，計入核心口徑（確定下界）",
+    "related": "混合階段但含 SCAI 相關工作，計入 core+related 口徑",
+    "excluded": "與 SCAI 無關，不計入（但仍計入 all 上界）"
+  },
+  "_產生方式": "由 src/token_stats.py --init-scope 依提及密度建議（≥20.0/MB→core、≥1.0/MB→related），**建議值需人工覆核後才具效力**",
+  "files": {
+    "claude-code:219534d4-4902-4da4-b5f3-ab19ddfdc3db": {
+      "scope": "core",
+      "mentions": 16598,
+      "density": 583.7,
+      "from": "2026-06-19",
+      "to": "2026-08-09",
+      "confirmed": true
+    },
+    "claude-code:2fbeb2a7-383d-4d8a-a474-986456f73d60": {
+      "scope": "core",
+      "mentions": 364,
+      "density": 17.4,
+      "from": "2026-06-20",
+      "to": "2026-08-08",
+      "confirmed": true
+    },
+    "claude-code:89584c07-15b7-4944-9ef8-ce52bb4834eb": {
+      "scope": "core",
+      "mentions": 11,
+      "density": 1.8,
+      "from": "2026-07-06",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "cowork:adab0c05-06ff-401b-b128-e388f300305b": {
+      "scope": "core",
+      "mentions": 844,
+      "density": 93.9,
+      "from": "2026-06-19",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-05-10T21-36-02-019e121a-1f5f-74b1-af97-b75f056fd421": {
+      "scope": "excluded",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-05-17",
+      "to": "2026-05-17",
+      "confirmed": true,
+      "why": "期間 2026-05-17 早於專案起點 2026-06-11（W1 為 06/11–06/17），不可能是 SCAI 開發"
+    },
+    "claude-code:ccec1307-d349-4d70-9018-8eabd73d6097": {
+      "scope": "core",
+      "mentions": 762,
+      "density": 360.2,
+      "from": "2026-07-06",
+      "to": "2026-08-08",
+      "confirmed": true
+    },
+    "claude-code:8017983a-2bc6-4fc7-89d0-1af057f07379": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-17",
+      "confirmed": true
+    },
+    "claude-code:b7193821-67f1-4b06-875b-a2d55fadddb6": {
+      "scope": "core",
+      "mentions": 123,
+      "density": 47.5,
+      "from": "2026-07-15",
+      "to": "2026-07-31",
+      "confirmed": true
+    },
+    "claude-code:cef832e1-86c0-488e-8c69-6f732d2e0af9": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-06",
+      "to": "2026-08-06",
+      "confirmed": true
+    },
+    "cowork:ebcfa90d-02c4-44af-ade6-54bd9e2a2f13": {
+      "scope": "core",
+      "mentions": 175,
+      "density": 66.2,
+      "from": "2026-08-04",
+      "to": "2026-08-08",
+      "confirmed": true
+    },
+    "cowork:8bf26aa5-0a4d-4e51-a363-26e068cfa785": {
+      "scope": "core",
+      "mentions": 301,
+      "density": 200.9,
+      "from": "2026-07-31",
+      "to": "2026-07-31",
+      "confirmed": true
+    },
+    "cowork:4da11c8a-a738-48c6-9191-3451aebc3b1c": {
+      "scope": "core",
+      "mentions": 124,
+      "density": 23.1,
+      "from": "2026-07-06",
+      "to": "2026-07-06",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-09T22-01-36-019fe6d4-27ff-7a43-9678-0e3974d09905": {
+      "scope": "core",
+      "mentions": 522,
+      "density": 643.6,
+      "from": "2026-08-09",
+      "to": "2026-08-09",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-08T21-39-10-019fe199-41d8-7213-a12f-93cfa9151ee9": {
+      "scope": "core",
+      "mentions": 226,
+      "density": 437.8,
+      "from": "2026-08-08",
+      "to": "2026-08-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-08T21-38-07-019fe198-4a94-7223-94b0-575446509c32": {
+      "scope": "core",
+      "mentions": 474,
+      "density": 707.7,
+      "from": "2026-08-08",
+      "to": "2026-08-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-08T21-38-54-019fe199-0377-76e2-a257-2f0211294032": {
+      "scope": "core",
+      "mentions": 198,
+      "density": 357.8,
+      "from": "2026-08-08",
+      "to": "2026-08-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-09T14-29-43-019fe536-7136-7193-b4a3-46b924c07cd7": {
+      "scope": "core",
+      "mentions": 298,
+      "density": 456.6,
+      "from": "2026-08-09",
+      "to": "2026-08-09",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-09T14-32-16-019fe538-c84f-7b83-a1f6-8ed6c5bd48b9": {
+      "scope": "core",
+      "mentions": 196,
+      "density": 345.5,
+      "from": "2026-08-09",
+      "to": "2026-08-09",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-09T22-02-56-019fe6d5-612b-7060-aaf5-98e3e3b1cae6": {
+      "scope": "core",
+      "mentions": 229,
+      "density": 317.3,
+      "from": "2026-08-09",
+      "to": "2026-08-09",
+      "confirmed": true
+    },
+    "cowork:c0b1c289-e877-4ec5-98cb-e7e266baf961": {
+      "scope": "core",
+      "mentions": 124,
+      "density": 204.8,
+      "from": "2026-07-13",
+      "to": "2026-07-13",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-08T21-39-25-019fe199-7d99-7690-b66b-55b8de457d7f": {
+      "scope": "core",
+      "mentions": 103,
+      "density": 183.3,
+      "from": "2026-08-08",
+      "to": "2026-08-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-09T22-03-13-019fe6d5-a1f1-7a20-83b8-fec92063f7b7": {
+      "scope": "core",
+      "mentions": 202,
+      "density": 339.0,
+      "from": "2026-08-09",
+      "to": "2026-08-09",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-09T14-32-00-019fe538-881f-70f1-b130-0e3656345821": {
+      "scope": "core",
+      "mentions": 104,
+      "density": 178.3,
+      "from": "2026-08-09",
+      "to": "2026-08-09",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T09-27-23-019f6362-c00a-7290-bcf5-16f1feb06743": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-09T14-31-43-019fe538-47a0-7682-be1c-8c8f55f0a7f4": {
+      "scope": "core",
+      "mentions": 73,
+      "density": 159.0,
+      "from": "2026-08-09",
+      "to": "2026-08-09",
+      "confirmed": true
+    },
+    "cowork:fcde9a77-565e-42da-bb20-13b23c795f56": {
+      "scope": "core",
+      "mentions": 52,
+      "density": 39.2,
+      "from": "2026-07-01",
+      "to": "2026-07-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-06-02T18-26-17-019e87de-aa06-7570-89a8-978c7cb3a074": {
+      "scope": "excluded",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-06-02",
+      "to": "2026-06-02",
+      "confirmed": true,
+      "why": "期間 2026-06-02 早於專案起點 2026-06-11（W1 為 06/11–06/17），不可能是 SCAI 開發"
+    },
+    "codex:rollout-2026-07-15T09-36-49-019f636b-6275-7e82-b5de-c1dd8b68d528": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-09T22-03-28-019fe6d5-de86-7bd1-8993-3e37ba575c56": {
+      "scope": "core",
+      "mentions": 111,
+      "density": 318.9,
+      "from": "2026-08-09",
+      "to": "2026-08-09",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T09-36-37-019f636b-33fe-7d82-b7d6-1b9e4d325827": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T09-36-44-019f636b-4c95-7ab3-a660-264ea0e11f80": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "cowork:bc7e9793-a708-4733-9668-8df9c59eb2ef": {
+      "scope": "core",
+      "mentions": 184,
+      "density": 585.1,
+      "from": "2026-08-04",
+      "to": "2026-08-04",
+      "confirmed": true
+    },
+    "claude-code:e42c2bc2-dbe5-497e-bf2d-5fe1eb5b4d5a": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-06",
+      "to": "2026-08-06",
+      "confirmed": true
+    },
+    "claude-code:f8b155e8-0ccb-43e5-b96a-45c9590abd08": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-06",
+      "to": "2026-08-06",
+      "confirmed": true
+    },
+    "cowork:23db1423-4974-42c4-9921-adcb9c7fe2a4": {
+      "scope": "core",
+      "mentions": 50,
+      "density": 87.6,
+      "from": "2026-06-25",
+      "to": "2026-06-25",
+      "confirmed": true
+    },
+    "cowork:9ced5279-f134-4460-be92-cedb18d8604d": {
+      "scope": "core",
+      "mentions": 194,
+      "density": 587.7,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "cowork:b68c90c9-def1-497b-9408-85dffea55f98": {
+      "scope": "core",
+      "mentions": 183,
+      "density": 599.6,
+      "from": "2026-07-10",
+      "to": "2026-07-31",
+      "confirmed": true
+    },
+    "cowork:9303c34a-679c-48b6-8dfa-e4dded8219de": {
+      "scope": "core",
+      "mentions": 144,
+      "density": 504.8,
+      "from": "2026-08-08",
+      "to": "2026-08-08",
+      "confirmed": true
+    },
+    "cowork:15e85e7b-97d3-4e8a-85e6-603ead33d55a": {
+      "scope": "core",
+      "mentions": 13,
+      "density": 85.5,
+      "from": "2026-08-08",
+      "to": "2026-08-08",
+      "confirmed": true
+    },
+    "cowork:35d86cf3-a737-4938-8ecb-19ce57a9e28d": {
+      "scope": "core",
+      "mentions": 13,
+      "density": 76.1,
+      "from": "2026-08-04",
+      "to": "2026-08-04",
+      "confirmed": true
+    },
+    "cowork:7ed7e6c7-bf18-47a8-ada7-bede883f6d8b": {
+      "scope": "core",
+      "mentions": 68,
+      "density": 361.9,
+      "from": "2026-08-06",
+      "to": "2026-08-06",
+      "confirmed": true
+    },
+    "cowork:e3c4f4b7-f94f-4f0c-a91e-48c4fc6cc06d": {
+      "scope": "core",
+      "mentions": 13,
+      "density": 97.9,
+      "from": "2026-08-07",
+      "to": "2026-08-07",
+      "confirmed": true
+    },
+    "claude-code:agent-aa3e679eb905e2c03": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-06-28",
+      "to": "2026-06-28",
+      "confirmed": true
+    },
+    "claude-code:agent-ad6b4a07ef6f9339a": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-06-28",
+      "to": "2026-06-28",
+      "confirmed": true
+    },
+    "cowork:6d07e9b6-5fe6-4ce0-adbc-0ee86807d771": {
+      "scope": "core",
+      "mentions": 86,
+      "density": 452.8,
+      "from": "2026-08-06",
+      "to": "2026-08-06",
+      "confirmed": true
+    },
+    "cowork:554fe3b7-d5c2-45c1-946f-817d93d4ec51": {
+      "scope": "core",
+      "mentions": 13,
+      "density": 112.1,
+      "from": "2026-08-06",
+      "to": "2026-08-06",
+      "confirmed": true
+    },
+    "cowork:541719d0-cc9d-462f-a9bb-122bd4616388": {
+      "scope": "core",
+      "mentions": 97,
+      "density": 524.3,
+      "from": "2026-08-04",
+      "to": "2026-08-04",
+      "confirmed": true
+    },
+    "cowork:d2a1cfa5-aca9-4c79-9372-d6ad37793f30": {
+      "scope": "core",
+      "mentions": 13,
+      "density": 97.9,
+      "from": "2026-08-09",
+      "to": "2026-08-09",
+      "confirmed": true
+    },
+    "cowork:8d9b06ae-45b5-4d30-b7cb-5776ee0e8730": {
+      "scope": "core",
+      "mentions": 58,
+      "density": 385.8,
+      "from": "2026-08-07",
+      "to": "2026-08-07",
+      "confirmed": true
+    },
+    "cowork:7060bc97-95f1-4b73-a3c3-d8ea361a0327": {
+      "scope": "core",
+      "mentions": 158,
+      "density": 407.6,
+      "from": "2026-07-31",
+      "to": "2026-07-31",
+      "confirmed": true
+    },
+    "claude-code:agent-a0a3d52e191d3b4d2": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-06-28",
+      "to": "2026-06-28",
+      "confirmed": true
+    },
+    "cowork:a65dbf81-be6c-4923-9562-a3b222265d1d": {
+      "scope": "core",
+      "mentions": 38,
+      "density": 272.3,
+      "from": "2026-06-29",
+      "to": "2026-06-29",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T09-51-40-019f6378-f717-7f41-8256-7c90e94c2c5f": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-06-08T19-13-42-019ea6f0-3b74-7933-ace2-20f4dbb8e17a": {
+      "scope": "excluded",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-06-08",
+      "to": "2026-06-08",
+      "confirmed": true,
+      "why": "期間 2026-06-08 早於專案起點 2026-06-11（W1 為 06/11–06/17），不可能是 SCAI 開發"
+    },
+    "codex:rollout-2026-07-14T02-12-21-019f5cae-0624-7bb1-9346-c2382597587e": {
+      "scope": "core",
+      "mentions": 22,
+      "density": 226.3,
+      "from": "2026-07-13",
+      "to": "2026-07-13",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-13T20-11-42-019f5b63-d679-73f2-a1a2-68f38a63e7f7": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-13",
+      "to": "2026-07-13",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T09-48-49-019f6376-5d3c-7d90-bd83-4c375f9c5132": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-06-04T01-04-45-019e8e71-d762-7bb3-8372-95730e7ce2fe": {
+      "scope": "excluded",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-06-03",
+      "to": "2026-06-03",
+      "confirmed": true,
+      "why": "期間 2026-06-03 早於專案起點 2026-06-11（W1 為 06/11–06/17），不可能是 SCAI 開發"
+    },
+    "codex:rollout-2026-07-06T22-28-30-019f37d4-a5fc-7bd1-8d0d-aaa386f830de": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-06",
+      "to": "2026-07-06",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T09-51-33-019f6378-dd4f-7162-97e7-deaec6e2a830": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-14T02-17-07-019f5cb2-6207-7011-8730-e1cc76641d62": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-13",
+      "to": "2026-07-13",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-13T20-04-01-019f5b5c-ccab-7d30-abd7-85501b8f2b0e": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-13",
+      "to": "2026-07-13",
+      "confirmed": true
+    },
+    "claude-code:448b7c08-7bcb-46e8-a5ee-141d076079d9": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-03",
+      "to": "2026-08-03",
+      "confirmed": true
+    },
+    "claude-code:bedc8a62-2ba0-4b21-8f43-d6c620436d81": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-02",
+      "to": "2026-08-02",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T09-13-31-019f6356-0b90-71e3-af28-35bd570e9fdb": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "claude-code:agent-a28423a180527d164": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-06-28",
+      "to": "2026-06-28",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T08-57-00-019f6346-d8e5-77d2-9f36-049a1d9268fa": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T02-50-24-019fbea9-b115-7120-abf2-d97b596582ba": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T09-17-07-019f6359-57cf-78d1-8aad-1525b9e98f04": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-14T01-36-49-019f5c8d-7da5-78e1-a17c-3da633107224": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-13",
+      "to": "2026-07-13",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T09-51-08-019f6378-680a-7180-b53a-42d658b4469f": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T09-23-28-019f635f-1456-7fa1-b8ed-852262bb2dba": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T08-45-10-019f633c-04f7-78d3-b2e1-2352bb989823": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T09-13-10-019f6355-a652-7633-a505-9626f1d1a884": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T09-48-45-019f6376-38dd-7550-9934-d3beef043432": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T08-38-14-019f6335-ac51-7d70-8ea7-d629851ae9e9": {
+      "scope": "core",
+      "mentions": 4,
+      "density": 67.8,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T08-32-23-019f6330-4fb3-7e91-8e9c-f2996f90e3f8": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-14T07-56-23-019f5de8-fe5a-7cc0-a022-dbc29f1984d7": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-13",
+      "to": "2026-07-13",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T04-05-21-019f623b-d61a-7e82-aa00-1a8688eb99a1": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-14",
+      "to": "2026-07-14",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-14T08-02-50-019f5dee-e68a-7d91-bbfa-193546d05548": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-14",
+      "to": "2026-07-14",
+      "confirmed": true
+    },
+    "claude-code:agent-a6aef28fb701e876d": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "claude-code:agent-a96322c2e06e626db": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-06-28",
+      "to": "2026-06-28",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-14T08-10-28-019f5df5-e33e-7381-8f4b-ec9a8255a9e5": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-14",
+      "to": "2026-07-14",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-09T21-16-05-019f4705-582a-7121-9e17-5a381b4899c9": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-09",
+      "to": "2026-07-09",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-14T07-51-35-019f5de4-9aa6-7c60-b6ff-456556fd00b5": {
+      "scope": "core",
+      "mentions": 10,
+      "density": 181.2,
+      "from": "2026-07-13",
+      "to": "2026-07-13",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-14T02-26-57-019f5cbb-6239-7fd3-b7af-feeb1b9c3e3a": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-13",
+      "to": "2026-07-13",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-14T01-55-51-019f5c9e-e8cd-7a20-a433-679aba84497b": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-13",
+      "to": "2026-07-13",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-14T02-01-10-019f5ca3-c7ba-71d0-af67-18ec5e5a7b43": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-13",
+      "to": "2026-07-13",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-15T09-51-29-019f6378-cd41-7d22-98da-c695c989f942": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-15",
+      "to": "2026-07-15",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-08T14-04-17-019f4053-aa10-7d13-8934-7d50259385b3": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "claude-code:7899571a-11d8-4e95-82a1-b0c594ced64b": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-17",
+      "to": "2026-07-17",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-09T21-22-35-019f470b-4a53-74d0-92a1-5db9a89f2cfb": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-09",
+      "to": "2026-07-09",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T01-35-45-019fbe65-57b3-7a41-a3d4-86b66d13b08c": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "claude-code:agent-a3594542e5d15b8ad": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-07T02-07-39-019f389d-341c-7472-84e9-797d89ae4796": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-06",
+      "to": "2026-07-06",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-08T14-35-23-019f4070-2297-7382-85cc-cc3054ddc112": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-08T14-20-53-019f4062-dadd-72f1-87c3-8f9e64090873": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-01T00-46-23-019fb911-c932-7d81-9010-6c2ab2931231": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-31",
+      "to": "2026-07-31",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T00-46-04-019fbe37-daae-7f93-a680-9c7cc9dfea08": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-31T23-55-45-019fb8e3-6c38-75b0-a76f-f1af4289806a": {
+      "scope": "core",
+      "mentions": 4,
+      "density": 62.5,
+      "from": "2026-07-31",
+      "to": "2026-07-31",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-01T23-45-58-019fbe00-d37d-74a1-8fb9-976e36e836ca": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T00-40-48-019fbe33-08c1-7233-8df7-aab35061cfc1": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T02-46-51-019fbea6-6e27-7de0-92a2-4ccae165d809": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T00-49-14-019fbe3a-c021-7580-85fb-64533fabc9df": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T01-18-52-019fbe55-e402-79a2-b090-887b58a74d5a": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-01T23-47-26-019fbe02-2b6f-7c41-8ae5-a6d2d62b77e8": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T02-02-16-019fbe7d-a05e-7232-830c-4453b196b666": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-01T01-03-09-019fb921-214e-7772-ad12-715975086390": {
+      "scope": "core",
+      "mentions": 2,
+      "density": 31.8,
+      "from": "2026-07-31",
+      "to": "2026-07-31",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-01T23-35-33-019fbdf7-4a70-7c82-8035-16d0b282b8ef": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T02-43-07-019fbea3-0694-7b41-8e05-1bf2d8fd4934": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T00-52-56-019fbe3e-265b-7912-8db7-f028cca33b37": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T05-41-09-019fbf46-034d-7a80-b4e0-f6eedc06ec0b": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T02-12-13-019fbe86-b965-7a63-b582-8f735c21e512": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-01T01-14-46-019fb92b-c479-7a80-836f-a9056302b496": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-31",
+      "to": "2026-07-31",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-01T00-53-53-019fb918-a5c1-7371-b3bb-91cb600cab24": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-31",
+      "to": "2026-07-31",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T01-27-32-019fbe5d-d0b5-7de2-aa49-448f0d172eac": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T01-28-40-019fbe5e-db2e-7733-a230-59d8a0f1f6f7": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T04-52-59-019fbf19-e962-7ba3-bef1-251970709189": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T02-05-35-019fbe80-a63d-7410-84f8-1b28226eed06": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T01-34-09-019fbe63-e07c-7780-b764-bfa755e5d22b": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T01-48-32-019fbe71-0d8f-7510-8b31-bdc5e4011e08": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T01-37-36-019fbe67-0a55-7c31-a191-9ee1e91a333c": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T01-31-53-019fbe61-cca1-7683-90c9-360a8d25d045": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-01T00-02-22-019fb8e9-7ebe-7e53-8b93-b3f985905692": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-31",
+      "to": "2026-07-31",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-01T00-07-33-019fb8ee-3a21-7872-a5bb-e0cf4f752220": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-31",
+      "to": "2026-07-31",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-16T22-13-29-019f6b46-67ed-7a21-aa2d-b78aa325e9f3": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-16",
+      "to": "2026-07-16",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-16T22-06-43-019f6b40-371e-7133-a738-1d45859c2def": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-16",
+      "to": "2026-07-16",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-17T23-14-45-019f70a4-dbdd-7343-800b-7ea3085a2401": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-17",
+      "to": "2026-07-17",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-16T22-28-44-019f6b54-618c-7d51-9ee5-e6bf5285898e": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-16",
+      "to": "2026-07-16",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-08T14-23-16-019f4065-0935-7613-a7e0-b98e7fc708dc": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-08T13-53-59-019f404a-3a2e-7d13-a589-00930113ae08": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-08T14-17-56-019f4060-2a4d-7000-95a5-8f4c66727f6b": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-08T13-41-27-019f403e-c00f-7982-addc-4852ab42b868": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-08T14-12-57-019f405b-9852-72f2-b86b-208863b2c4b1": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-08T13-42-34-019f403f-c6e4-79f0-9113-266a18e0cbe9": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-08T14-16-21-019f405e-b719-7563-ab6c-b9f8b367f66d": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-08T15-05-35-019f408b-c8cc-7db0-bc49-1c012c097fa8": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-08T14-03-05-019f4052-91d3-75d2-9300-078c417747bb": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "codex:rollout-2026-08-02T02-21-48-019fbe8f-7fe4-7150-8d72-82ee3c88fa21": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-08-01",
+      "to": "2026-08-01",
+      "confirmed": true
+    },
+    "codex:rollout-2026-07-08T14-25-41-019f4067-420b-7640-aa64-3c594d1c3df9": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-07-08",
+      "to": "2026-07-08",
+      "confirmed": true
+    },
+    "claude-code:agent-a09b7d94a29e2ce9b": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-06-28",
+      "to": "2026-06-28",
+      "confirmed": true
+    },
+    "claude-code:agent-a70a72d29e59fafb4": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-06-28",
+      "to": "2026-06-28",
+      "confirmed": true
+    },
+    "claude-code:agent-adfb8439cbff9502e": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-06-28",
+      "to": "2026-06-28",
+      "confirmed": true
+    },
+    "claude-code:agent-ae4c4c0899af41f3c": {
+      "scope": "core",
+      "mentions": 0,
+      "density": 0.0,
+      "from": "2026-06-28",
+      "to": "2026-06-28",
+      "confirmed": true
+    },
+    "cowork:50ee04e8-ed2d-4aa0-95b2-935b8b874d72": {
+      "scope": "core",
+      "mentions": 9,
+      "density": 1564.3,
+      "from": "",
+      "to": "",
+      "confirmed": true
+    }
+  },
+  "_覆核": "2026-08-09 人工決定：專案期間內一律計入 core。理由是逐一區分 SCAI 與非 SCAI 的成本高於其帶來的精度，且寧可高估自己的用量也不低估。唯一排除的是期間早於專案起點者（2026-06-11），那類無論如何都不可能屬於本專案。"
+}

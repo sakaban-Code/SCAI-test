@@ -149,6 +149,42 @@ def build_companies(root: pathlib.Path, weeks: list, prof: dict, pb: dict):
     return companies
 
 
+def build_token_dev(root: pathlib.Path):
+    """開發階段 token 用量（由 src/token_stats.py 產出，見 TOKEN-STATS.md）。
+
+    只取網站要顯示的欄位——原檔含 145 筆 session 明細共 88KB，全塞進頁面沒有意義。
+    檔案不存在時回傳 None，模板據此退回「尚未統計」的說明，不顯示半套數字。
+
+    刻意**不**在此重算或補值：數字的唯一來源是那支腳本，網站只負責呈現。
+    """
+    p = root / "data" / "token_usage_dev.json"
+    if not p.exists():
+        return None
+    try:
+        d = load(p)
+        core = d["totals"]["core"]
+    except Exception:
+        return None          # 格式不符即整區不顯示，寧可不講也不講半真的
+
+    def slim(m):
+        return {k: m.get(k) for k in
+                ("msgs", "billableInput", "output", "outputUnknown",
+                 "processed", "cacheHitRate")}
+
+    return {
+        "generated": d.get("generated") or "",
+        "core": slim(core),
+        "all": slim(d["totals"].get("all") or core),
+        "byTool": {k: slim(v) for k, v in (d.get("byTool") or {}).items()},
+        "byModel": {k: slim(v) for k, v in (d.get("byModel") or {}).items()
+                    if (v or {}).get("billableInput")},   # 濾掉 <synthetic> 等 0 用量項
+        "rules": d.get("countingRules") or [],
+        "caveats": d.get("caveats") or [],
+        "days": len(d.get("byDay") or []),
+        "sessions": len(d.get("sessions") or []),
+    }
+
+
 def build_payload(root: pathlib.Path) -> dict:
     weeks = copy.deepcopy(load(root / "data" / "weeks.json"))
     for w in weeks:
@@ -173,7 +209,10 @@ def build_payload(root: pathlib.Path) -> dict:
 
     coverage = build_coverage(weeks)      # 以未跳脫的原值推導日期，須早於跳脫
     companies = build_companies(root, weeks, prof, pb)   # 亦須用未跳脫的原值計算
+    token_dev = build_token_dev(root)
     return {
+        # 模型名稱來自各工具的紀錄檔（非自家設定檔），與 weeks 同樣施用跳脫
+        "tokenDev": escape_html_deep(token_dev) if token_dev else None,
         "companies": escape_html_deep(companies) if companies else None,
         "weeks": escape_html_deep(weeks),
         "kdf": cfg["kdf"],
