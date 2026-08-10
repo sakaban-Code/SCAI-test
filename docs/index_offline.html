@@ -598,12 +598,20 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
    .vtoggle 上，且 .wnav 右緣衝出畫面。以 .hr{display:contents} 攤平（同 ≥1100px 側欄手法），
    第一行品牌＋檢視切換、第二行週次控制整條。斷點取 600 而非 560，否則 561–580 仍會破。 */
 @media(max-width:600px){
-  .hd{height:auto;flex-wrap:wrap;row-gap:9px;padding:10px 0 11px}
+  /* 內距用縱向 longhand：三值簡寫 padding:10px 0 11px 會把 .wrap 的水平內距一併歸零，
+     header 整條貼齊螢幕邊緣（brand 左緣 0），且 .wnav 滿版後 space-between 的零頭
+     造成全頁 4px 橫向捲動。改 longhand 後 .wrap 的 24px／≤560px 的 16px 自然生效。 */
+  .hd{height:auto;flex-wrap:wrap;row-gap:9px;padding-top:10px;padding-bottom:11px}
   .hr{display:contents}
   .brand{flex:1 1 auto;min-width:0}
   .vtoggle{flex:0 0 auto}
-  .wnav{flex:1 0 100%;justify-content:space-between}
-  .wnav select{flex:1 1 auto;min-width:0}
+  /* min-width:0 不可省：flex item 預設 min-width:auto，會卡在 min-content 不肯縮。
+     ≤340px 時三顆鈕＋選單的 min-content 大於可用寬，.wnav 會撐破容器（320px 實測溢出 6.2px）。 */
+  .wnav{flex:1 0 100%;min-width:0;justify-content:space-between}
+  /* max-width:none 不可省：base 的 select 有 max-width:200px，少了這句 flex:1 撐不開，
+     剩餘空間會跑去 space-between 的空隙（實測撐成 20.4px，宣告值是 5px）。
+     同一意圖在 ≥1100px 側欄的 #wsel 已寫成 max-width:none，此處對齊。 */
+  .wnav select{flex:1 1 auto;min-width:0;max-width:none}
   /* 手機黏性 header 已佔 23% 螢幕高；收起分頁鈕副標省一行，標籤本身已足夠白話 */
   .tb-h{display:none}
   .tb{padding:9px 13px}
