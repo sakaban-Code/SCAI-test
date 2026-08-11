@@ -1670,6 +1670,34 @@ function render(i){
       ${DATA.dims.map((d,j)=>`<span class="dimtag"><span class="sw" style="background:${DC[j]}"></span>${d.name}（${d.members.length} 項）</span>`).join('')}
     </div>
     <div class="cap" style="margin-top:12px">每週流程：外部事件擷取（附來源）→ 雙軸衝擊評估 → 情境判定 → 25 KDF 權重校準（附 Decision Trace）→ H+6 風險雷達 → 企業劇本比對 → 報告與通知。全程自動，人工只需審閱。</div>
+    <!-- 判讀底層：憲法 LAYER 10-3／10-4 的呈現層。**正本為 cowork/CLAUDE.md**，此處為渲染副本，
+         改動須兩邊同步（同 X／Y 軸敘述的既有做法）。原本這兩層只存在於憲法，站上完全看不到。 -->
+    <div class="sh" style="margin-top:26px"><h2 style="font-size:15px">判讀底層</h2><span class="q">為什麼是這樣判，而不是跟著新聞情緒走？</span></div>
+    <div class="cap" style="margin-bottom:12px">每週 X／Y 與 KDF 的移動，須能對應下列其中一個框架，否則依「決策四問」視為<b>為做而做</b>，不納入報告（憲法 LAYER 10-1、10-3）。</div>
+    <div class="mgrid">
+      <div class="sc-card"><div class="n">情境思維</div><div class="st">雙軸不確定性</div>
+        <div class="m">不做單點預測，改以四象限描述可能的未來，每週更新落點與軌跡。</div></div>
+      <div class="sc-card"><div class="n">結構性競爭分析</div><div class="st">五力・價值鏈・微笑曲線</div>
+        <div class="m">看議價力與價值捕獲位置的移動，而非只看營收數字的漲跌。</div></div>
+      <div class="sc-card"><div class="n">產業週期與系統動力學</div><div class="st">矽循環・長鞭效應・產能前置期</div>
+        <div class="m">需求訊號到產能反應之間有時間差，用以避免把短期波動讀成趨勢反轉。</div></div>
+      <div class="sc-card"><div class="n">實質選擇權</div><div class="st">不確定下的階段性可逆投資</div>
+        <div class="m">劇本的「停損訊號」即源於此——先取得選擇權，再依訊號決定是否行使。</div></div>
+      <div class="sc-card"><div class="n">技術經濟學</div><div class="st">摩爾・萊特定律・學習曲線・PPAC</div>
+        <div class="m">成本下降有其結構性節奏，用以檢驗一條技術路線是否撐得住。</div></div>
+      <div class="sc-card"><div class="n">地緣賽局思維</div><div class="st">憲法 v2.1 新增之第六軸</div>
+        <div class="m">管制與補貼是賽局手段而非孤立事件，判讀時須推對手的下一步。</div></div>
+    </div>
+    <div class="covbox">
+      <div class="t">三大領域爭議：本站目前站在哪一邊【推斷】</div>
+      <div class="d">這個領域有三個尚無定論的爭議。判讀時必須自問站在哪一方、為什麼——<b>不表態就會在不同週之間前後矛盾而不自知</b>。立場可隨證據改變，改變本身記錄於 Decision Trace。</div>
+      <ul>
+        <li><b>出口管制有效性</b>　一方認為管制能實質延緩對手的技術進程；另一方認為只會推升全球成本並加速自主替代。<b>本站傾向後者、但不走極端</b>：W9 中國鎢材對日出口歸零，日系兩大 WF6 廠停產（約占全球四分之一供給）、關鍵製程氣體漲約九成——管制確實造成實質衝擊，但形式是<b>成本與交期</b>，不是技術斷絕。</li>
+        <li><b>AI 資本支出：超級循環還是泡沫</b>　一方以雲端資本支出與訂單能見度為據；另一方指估值已透支未來需求。<b>本站尚未選邊，且明說未選</b>：W5 標記疑慮後以「三連燈」追蹤，Y 軸自 W5 觸底連四週回升至 W9 的 +0.53，但 Nvidia 8/26 財報仍列為分水嶺——<b>第三盞燈未亮之前不下結論</b>。</li>
+        <li><b>在地化：韌性還是效率</b>　一方認為分散產能是必要保險；另一方認為重複建置侵蝕成本競爭力。<b>本站傾向前者，且本期有一次兌現</b>：W8 熊本 M7.1 地震後，JASM 於 8/2 恢復全產能，W9 據此解除天災下修——同一組資料裡，韌性投資的價值被驗證了一次。</li>
+      </ul>
+      <div class="d2">以上為分析性判斷【推斷】，非投資建議。三項爭議與六個框架之正本為《週報運作憲法》LAYER 10-3／10-4；本區塊為其呈現層。</div>
+    </div>
     ${(()=>{const c=DATA.coverage;if(!c)return '';const li=[];
       if(c.irregular.length)li.push(`<li><b>非 7 天期別</b>：${c.irregular.map(x=>`W${x.week}（${x.days} 天）`).join('、')}。排程中斷後，以單一報告涵蓋整段期間，未事後補拆成多期。</li>`);
       c.overlaps.forEach(o=>li.push(`<li><b>期間重疊</b>：W${o.a} 與 W${o.b} 重複涵蓋 ${o.from}–${o.to} 共 ${o.days} 天。成因為早期的窗口起日接續「上一期產出日」而非「上一期窗口迄日」。</li>`));

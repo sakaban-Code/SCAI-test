@@ -87,8 +87,11 @@
     { "id": "tech", "name": "技術投資", "desc": "SLT／堆疊測試／矽光子／chiplet 測試能力", "speed": "季～年", "owner": "研發／工程" },
     { "id": "inventory", "name": "關鍵耗材庫存策略", "desc": "鎢靶材、CMP 漿料等安全庫存月數與供應來源分散", "speed": "週～季", "owner": "採購" },
     { "id": "site", "name": "據點布局", "desc": "海外測試據點或與海外封測廠結盟", "speed": "年～多年", "owner": "策略／董事會" },
-    { "id": "talent", "name": "人才與工程能量", "desc": "高階測試工程師招募與留任", "speed": "季～年", "owner": "人資／工程" }
+    { "id": "talent", "name": "人才與工程能量", "desc": "高階測試工程師招募與留任", "speed": "季～年", "owner": "人資／工程" },
+    { "id": "quality", "name": "品質與良率保證", "desc": "測試涵蓋率與 overkill／underkill 取捨、量測系統分析、車用等高可靠度應用之流程要求與客戶稽核維持", "speed": "季～年", "owner": "品保／工程" },
+    { "id": "infosec", "name": "資訊安全與客戶資料保護", "desc": "測試程式與客戶設計資料屬高敏感 IP；機台與廠務網路分區、供應鏈資安要求（如 SEMI E187）、營運中斷復原", "speed": "季～年", "owner": "資訊／資安" }
   ],
+  "_levers_note": "七項決策槓桿對應產銷人發財品資：產＝capacity／銷＝customer／人＝talent／發＝tech／財＝capex／品＝quality／資＝infosec，另有 inventory（採購）與 site（策略）兩項跨部門槓桿。quality 與 infosec 於 2026-08-10 依指導教授回饋補入；此二者描述的是欣銓「可調整的決策面」，非對其現有認證或資安等級之陳述——現況屬未公開資訊，須【待公司確認】。目前 playbook.json 尚無劇本以此二槓桿為主，與既有的 talent 相同。",
   "scenario_stance": {
     "_note": "四情境下欣銓的預設戰略姿態【推斷】，作為規畫引擎的基準",
     "Spring": "積極擴張：加速龍潭增建、擴大 AI／ASIC 產能與人才招募",
