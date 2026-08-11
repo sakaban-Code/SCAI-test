@@ -9,6 +9,7 @@
       "三項全過才 append 進 data/weeks.json。門檻③於 2026-08-10 實際擋下 W9——cowork 的 playbook.json 落後 7 天，產出的 PB-07 是升級前版本，而該週正好有颱風與地震。該產出格式完全合法、無任何環節報錯。"
     ],
     "_與 cowork 版本的已知差異": "cowork/data/week_schema.json 是真正的 JSON Schema（draft-07，有 required／enum／additionalProperties），本檔是散文說明——兩者不是同一種東西。**且對 week 欄位的記載相反**：cowork 為 integer（generate_report.py 會做 wk['week']-1 運算，不可改），本檔為字串 'W9'。匯入時需轉換，這是實際踩過的坑。",
+    "_cowork 側已補上結構驗證（2026-08-10 稍晚）": "查證發現 cowork 那份 schema 自己也過期：companyPlan（九週都有）未宣告，配上 additionalProperties:false 使 W1–W9 全部不通過。已補宣告（9/9 通過）並新增 cowork/scripts/validate_week.py（零相依，實作 draft-07 子集），六種合成違規全部擋下、對照組放行。**它只驗結構，抓不到語意漂移**——W9 那份過期 PB-07 的欄位結構完全合法，該驗證器會放行。結構與語意兩道互不取代：結構＝cowork 側 validate_week.py，語意＝匯入門檻③以正本 plan_engine 重算後逐欄比對。",
     "source_of_truth": "憲法 v2.2（cowork/CLAUDE.md）＋ data/kdf_config.json（25 KDF 凍結正本＝提案書 1–25 編號）",
     "note": "25 KDF 順序凍結；新增項目或改變順序＝破壞性變更，需人工批准。data/weeks.json 為趨勢唯一真實來源（append-only），儀表板 WEEKS 陣列由 pipeline.py 整批注入。W1–W4 由 Cowork 人工判定回填；W5 起原規劃由雲端管線自動產出，但因補助未撥款、API 金鑰未設定，W5–W9 實際仍由 Cowork 產出後經三道門檻匯入。",
     "axes": {
