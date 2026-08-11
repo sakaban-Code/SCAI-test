@@ -1063,9 +1063,20 @@ sel.value=cur;
 sel.onchange=()=>go(+sel.value);
 $('#wprev').onclick=()=>go(cur-1);
 $('#wnext').onclick=()=>go(cur+1);
-/* 以 location.href 去掉 hash 為基底，而非 origin+pathname——離線版走 file://
-   時 origin 是字串 "null"，會複製出 null/C:/…/index_offline.html#w8 這種壞連結。 */
-$('#wcopy').onclick=async()=>{const u=location.href.split('#')[0]+'#w'+DATA.weeks[cur].week;
+/* 離線判定集中一處：build_offline.py 會置 __SCAI_OFFLINE__，或直接以 file:// 開啟。
+   下方 AI 面板（AI_OFFLINE）沿用同一判定，勿各寫一份。 */
+const IS_OFFLINE=(window.__SCAI_OFFLINE__===true)||location.protocol==='file:';
+/* 複製本週連結的基底：
+   線上版＝當前網址去掉 hash（不用 origin+pathname——file:// 時 origin 是字串 "null"，
+   會複製出 null/C:/…#w8 這種壞連結）。
+   離線版＝改用 og:url 的線上網址。離線檔走 file:// 時 location 是 file:///C:/Users/…，
+   那種連結對收件者無用、且含使用者名稱；斷網情境下複製的意義本來就是「事後能打開」。
+   og:url 是全站唯一一處線上網址，不在此另存一份。 */
+const SITE_URL=((document.querySelector('meta[property="og:url"]')||{}).content||'').replace(/#.*$/,'');
+if(IS_OFFLINE&&SITE_URL)$('#wcopy').title='複製本週連結（線上網址）';
+$('#wcopy').onclick=async()=>{
+  const base=(IS_OFFLINE&&SITE_URL)?SITE_URL:location.href.split('#')[0];
+  const u=base+'#w'+DATA.weeks[cur].week;
   try{await navigator.clipboard.writeText(u);$('#wcopy').textContent='✓';setTimeout(()=>$('#wcopy').textContent='⧉',1200)}
   catch(e){prompt('複製此連結：',u)}};
 /* 回頂：捲動後把焦點交給頁首，否則鍵盤使用者會停在即將隱藏的按鈕上 */
@@ -1926,8 +1937,8 @@ window.SCAI_AI_CONFIG=window.SCAI_AI_CONFIG||{endpoint:''};
 const aiFab=$('#aifab'),aiPanel=$('#aipanel'),aiLog=$('#ailog'),aiQ=$('#aiq');
 let aiTok={i:0,o:0,n:0},aiSeq=0;
 /* 離線備援檔（file:// 或建置時標記）一律不外連：斷網保險的意義就在於零外部請求。
-   build_offline.py 會把 __SCAI_OFFLINE__ 置為 true。 */
-const AI_OFFLINE=(window.__SCAI_OFFLINE__===true)||location.protocol==='file:';
+   判定沿用前面週次控制區定義的 IS_OFFLINE，不重複實作（原本兩處各寫一份同樣的運算式）。 */
+const AI_OFFLINE=IS_OFFLINE;
 if(AI_OFFLINE)window.SCAI_AI_CONFIG.endpoint='';
 const aiEP=()=>((window.SCAI_AI_CONFIG||{}).endpoint||'');
 /* 模式標示須反映「下一題會怎麼走」，不能寫死：設了 endpoint 就是會外送，
