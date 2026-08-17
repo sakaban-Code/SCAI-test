@@ -201,6 +201,28 @@ def build_payload(root: pathlib.Path) -> dict:
         w["start"] = start.isoformat()
         w["end"] = end.isoformat()
 
+    # 風險雷達的事後結果：獨立檔於此合併，weeks.json 不動（append-only）。
+    # 與 coverage 同一模式——衍生／後補的顯示值一律不寫回正本。
+    oc_path = root / "data" / "risk_outcomes.json"
+    if oc_path.exists():
+        oc = load(oc_path)["outcomes"]
+        used = set()
+        for w in weeks:
+            for i, r in enumerate(w.get("riskRadar") or []):
+                key = f"W{w['week']}-{i}"
+                hit = oc.get(key)
+                if hit:
+                    used.add(key)
+                    r["status"] = hit["status"]
+                    if hit.get("followUp"):
+                        r["followUp"] = hit["followUp"]
+        # 鍵是「週次＋索引」，某週的 riskRadar 一旦增刪就會整排錯位而無聲貼錯風險。
+        # 對不上的鍵直接中止，不要讓錯誤的結果判定上站。
+        orphan = sorted(set(oc) - used)
+        if orphan:
+            raise SystemExit(f"[錯誤] risk_outcomes.json 有 {len(orphan)} 個鍵找不到對應風險："
+                             f"{orphan}——riskRadar 筆數已變動，請重新核對索引")
+
     cfg = load(root / "data" / "kdf_config.json")
     prof = load(root / "data" / "company_profile.json")
     pb = load(root / "data" / "playbook.json")
@@ -218,6 +240,10 @@ def build_payload(root: pathlib.Path) -> dict:
         "kdf": cfg["kdf"],
         "dims": cfg["dimensions"],
         "horizons": pb["horizons"],
+        # 觸發條件原文，供前端規則模擬器重跑判定。playbook.json 是版本控管的自家檔，
+        # 與 horizons 同樣不施跳脫。只帶欣銓正本這一組——示範企業各有劇本組，
+        # 模擬器僅對 co.real 開放。
+        "triggers": {p["id"]: {"title": p["title"], **p["trigger"]} for p in pb["playbooks"]},
         "levers": {l["id"]: l for l in prof["decision_levers"]},
         "profile": prof,
         "kdfDefs": extras.get("kdfDefs", {}),

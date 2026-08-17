@@ -1067,6 +1067,29 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
   .brand{flex:1 1 auto;min-width:0}
   .wnav{flex:1 1 auto}
 }
+/* ── 規則模擬器 ── */
+.sim{margin-top:14px}
+.sim-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:11px}
+.sim-h b{font-size:13.5px}
+.sim-q{font-size:12.5px;color:var(--ink2)}
+.sim-chk{font-size:11px;color:var(--ok);margin-left:auto}
+.sim-chk.bad{color:var(--err);font-weight:700}
+.sim-ax{display:grid;grid-template-columns:auto 1fr;gap:7px 12px;align-items:center;margin-bottom:11px}
+.sim-ax label{font-size:11.5px;color:var(--ink2);white-space:nowrap}
+.sim-ax label b{font-family:"IBM Plex Mono","Noto Sans TC",monospace;color:var(--ink);margin-left:8px}
+.sim-ax input{width:100%;accent-color:var(--accent)}
+.sim-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:11px;font-size:12.5px;color:var(--ink2)}
+.sim-r{display:grid;grid-template-columns:20px 48px 1fr;gap:3px 8px;align-items:baseline;
+  padding:7px 11px;border-radius:12px;font-size:12px;color:var(--muted)}
+.sim-r+.sim-r{margin-top:4px}
+.sim-r.on{background:rgba(68,83,214,.08);color:var(--ink2)}
+.sim-r i{font-style:normal}
+.sim-r.on i{color:var(--ok);font-weight:700}
+.sim-r b{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:11px}
+.sim-r em{grid-column:2/-1;font-style:normal;font-size:10.5px;line-height:1.65}
+.sim-note{margin-top:11px;font-size:11px;color:var(--muted);line-height:1.7}
+@media(max-width:600px){.sim-ax{grid-template-columns:1fr}.sim-r{grid-template-columns:20px 1fr}}
+
 /* ── 決賽投影：1280×720 的首屏緊縮 ────────────────────────────────────
    決賽現場投影為 720p。實測總覽分頁的「本週行動建議」帶底緣落在 727px
    （W5/W8/W9/W10）與 750px（W6/W7，情境敘述較長使封面高 403px），
@@ -1721,6 +1744,66 @@ function go(i){
   },160);
 }
 
+/* ── 規則模擬器：以 JS 重跑 plan_engine 的觸發判定 ──────────────────────────
+   條件三型別（axis／kdf／keyword）與 AND/OR 完全比照 src/plan_engine.py 的
+   check()／evaluate()。KDF 與關鍵字維持該週實際值——它們來自事件內容，不是
+   雙軸的函數，跟著滑桿動就是造假。
+   ⚠ 一致性自檢：滑桿回到本週實際座標時，算出的觸發集合必須等於報告中的
+   firedPlaybooks。不相等就在面板上明說「與引擎不一致」並列出兩邊——寧可自曝，
+   也不讓一個會說謊的模擬器上台。 */
+function simText(w){                       // 對齊 plan_engine.week_text()
+  const p=[w.scenarioDesc||''];
+  (w.events||[]).forEach(e=>p.push(e.title||'',e.summary||''));
+  (w.decisionTrace||[]).forEach(t=>{p.push(t.event||'');(t.keywords||[]).forEach(k=>p.push(k))});
+  (w.riskRadar||[]).forEach(r=>p.push(r.risk||'',r.signal||''));
+  return p.join(' ');
+}
+const SIMCMP={'<=':(a,b)=>a<=b,'>=':(a,b)=>a>=b,'<':(a,b)=>a<b,'>':(a,b)=>a>b,'==':(a,b)=>a===b};
+function simCheck(c,xy,w,text){
+  if(c.type==='axis'){const v=xy[c.axis];
+    return[SIMCMP[c.op](v,c.value),`${c.axis.toUpperCase()}=${fmt(v)} ${c.op} ${c.value}`]}
+  if(c.type==='kdf'){const v=w.w[c.id-1];
+    return[SIMCMP[c.op](v,c.value),`KDF#${c.id}=${v} ${c.op} ${c.value}`]}
+  if(c.type==='keyword'){const hit=(c.any||[]).filter(k=>text.indexOf(k)>=0);
+    return[hit.length>0,hit.length?'命中：'+hit.join('、'):'無命中關鍵字']}
+  return[false,'未知條件'];
+}
+function simEval(xy,w,text){
+  return Object.keys(DATA.triggers).sort().map(id=>{
+    const t=DATA.triggers[id];
+    const rs=(t.conditions||[]).map(c=>simCheck(c,xy,w,text));
+    return {id,title:t.title,conds:rs,
+      ok:(t.logic||'AND')==='AND'?rs.every(r=>r[0]):rs.some(r=>r[0])};
+  });
+}
+function wireSim(){
+  const box=$('#sim'); if(!box||!DATA.triggers)return;
+  const w=DATA.weeks[cur], text=simText(w), real={x:w.xy.x,y:w.xy.y};
+  const sx=$('#simx'), sy=$('#simy');
+  const draw=()=>{
+    const xy={x:+sx.value,y:+sy.value};
+    $('#simxv').textContent=fmt(xy.x); $('#simyv').textContent=fmt(xy.y);
+    /* 象限判定照凍結正本：左上 Crossroads、右上 Spring、右下 Adaptation、左下 Inferno */
+    $('#simscen').innerHTML='情境：<b>'+(xy.x>=0
+      ?(xy.y>=0?'Spring 全球共榮的盛夏':'Adaptation 孤島韌性突圍')
+      :(xy.y>=0?'Crossroads 溫室裡的舞者':'Inferno 末日求生戰役'))+'</b>';
+    const res=simEval(xy,w,text);
+    $('#simout').innerHTML=res.map(r=>`<div class="sim-r${r.ok?' on':''}">`
+      +`<i>${r.ok?'✓':'✗'}</i><b>${r.id}</b><span>${r.title}</span>`
+      +`<em>${r.conds.map(c=>(c[0]?'✓ ':'✗ ')+c[1]).join('　·　')}</em></div>`).join('');
+    const mine=res.filter(r=>r.ok).map(r=>r.id).sort().join('、');
+    const eng=(((w.companyPlan||{}).firedPlaybooks)||[]).map(f=>f.id).sort().join('、');
+    const atReal=Math.abs(xy.x-real.x)<1e-9&&Math.abs(xy.y-real.y)<1e-9;
+    const chk=$('#simchk');
+    chk.textContent=!atReal?'':(mine===eng?'✓ 與本週報告的觸發結果一致'
+      :'⚠ 與引擎不一致：模擬得 '+(mine||'無')+'，報告為 '+(eng||'無'));
+    chk.className='sim-chk'+(atReal&&mine!==eng?' bad':'');
+  };
+  const reset=()=>{sx.value=real.x;sy.value=real.y;draw()};
+  sx.oninput=draw; sy.oninput=draw; $('#simreset').onclick=reset;
+  reset();
+}
+
 /* ── render ── */
 function render(i){
   charts.forEach(c=>c.destroy());charts=[];kdfChart=null;
@@ -1868,6 +1951,24 @@ function render(i){
         ${S?`<details class="ev-d"><summary>觸發依據（✓＝條件成立、✗＝未成立）</summary><div class="ev" style="margin-top:6px">${evTag(f.evidence)}</div></details>`:`<div class="ev">觸發依據：${evTag(f.evidence)}</div>`}
       </div>`).join('')||'<div class="card" style="color:var(--muted);font-size:12.5px">本週各劇本觸發門檻均未達成。</div>'}
     </div>
+    ${co&&co.real&&DATA.triggers?`<div class="card sim" id="sim">
+      <div class="sim-h"><b>規則模擬器</b>
+        <span class="sim-q">如果雙軸移到別的位置，建議會怎麼變？</span>
+        <span class="sim-chk" id="simchk"></span></div>
+      <div class="sim-ax">
+        <label for="simx">X 軸　地緣與供應鏈聚合<b id="simxv"></b></label>
+        <input type="range" id="simx" min="-1" max="1" step="0.01"
+          aria-describedby="simxv" aria-label="模擬 X 軸座標">
+        <label for="simy">Y 軸　資源與政策充沛<b id="simyv"></b></label>
+        <input type="range" id="simy" min="-1" max="1" step="0.01"
+          aria-describedby="simyv" aria-label="模擬 Y 軸座標">
+      </div>
+      <div class="sim-bar"><span id="simscen"></span>
+        <button type="button" class="cmp-more" id="simreset">回到本週實際值</button></div>
+      <div id="simout" aria-live="polite"></div>
+      <div class="sim-note">25 項 KDF 權重與關鍵字命中維持本週實際值——它們來自事件內容，不是雙軸的函數。
+        因此僅受雙軸約束的劇本會隨滑桿變動，其餘維持不變，這本身就顯示了哪些建議由地緣情勢決定、哪些由企業能力決定。</div>
+    </div>`:''}
   </section>
 
   <section id="risk" data-tab="intel">
@@ -2081,6 +2182,7 @@ function render(i){
     const nb=document.querySelector(`.co-b[data-co="${curCompany}"]`);
     if(nb)nb.focus({preventScroll:true});
   });
+  wireSim();
   heroFx();
   /* setTab 內含 bindSpy 與圖表 resize；圖表先畫再切分頁，藏起來的那些會在
      使用者切到該頁時由 setTab 的 resize 補正尺寸。keepScroll＝重繪不捲頂。 */
