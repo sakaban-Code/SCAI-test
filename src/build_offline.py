@@ -122,16 +122,32 @@ def main():
          "<script>/* Chart.js 4.4.1（內嵌，MIT）*/\n" + chart_js + "\n</script>", "chartjs")
 
     # ── 4. 圖片內嵌為 data URI ──
-    for name in ("scai-logo-light-bg.png", "scai-logo-dark-bg.png", "scai-header-pattern.png"):
+    # 改為「掃模板實際引用了什麼就嵌什麼」，不再寫死清單：
+    #   · 寫死清單在美編換素材時會兩頭錯——舊素材已無人引用卻仍被嵌進去（白佔體積），
+    #     新素材有人引用卻沒被嵌（離線時破圖）。2026-08-18 海香菇改版即同時踩到兩者。
+    #   · 只認「相對路徑」的引用：前一個字元必須是引號或括號。og:image 寫的是
+    #     https://…/assets/scai-og-1200x630.png，前一字元為 /，故不會被誤嵌、
+    #     也不會把那串絕對網址改壞。
+    #   · Chart.js 已於步驟 3 移除，故此處不會再看到 assets/chart.umd.min.js。
+    MIME = {".png": "image/png", ".webp": "image/webp", ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg", ".gif": "image/gif", ".svg": "image/svg+xml"}
+    refs = sorted(set(re.findall(r'["\'(]assets/([A-Za-z0-9._-]+)', html)))
+    if not refs:
+        sys.exit("[錯誤] 模板未以相對路徑引用任何 assets/ 素材——模板結構已變，請更新本腳本")
+    for name in refs:
         f = assets / name
         if not f.exists():
-            sys.exit(f"[錯誤] 缺少素材 {f}")
-        uri = b64_data_uri(f.read_bytes(), "image/png")
+            sys.exit(f"[錯誤] 模板引用了 assets/{name} 但檔案不存在：{f}")
+        mime = MIME.get(f.suffix.lower())
+        if mime is None:
+            sys.exit(f"[錯誤] 不認得的素材型別 {f.suffix}（{name}）——請在 MIME 表補上")
         n = html.count(f"assets/{name}")
-        if n == 0:
-            sys.exit(f"[錯誤] 模板未引用 {name}")
-        html = html.replace(f"assets/{name}", uri)
-        print(f"[圖片] {name} 內嵌 {n} 處（{f.stat().st_size // 1024} KB）")
+        html = html.replace(f"assets/{name}", b64_data_uri(f.read_bytes(), mime))
+        print(f"[素材] {name} 內嵌 {n} 處（{f.stat().st_size // 1024} KB，{mime}）")
+    unused = sorted(p.name for p in assets.iterdir()
+                    if p.is_file() and p.name not in refs and p.name != "chart.umd.min.js")
+    if unused:
+        print(f"[素材] docs/assets 內模板未以相對路徑引用者（未內嵌）：{'、'.join(unused)}")
 
     # ── 5. 標題標示離線版，避免 Demo 時混淆 ──
     must("<title>SCAI-Agent｜半導體前瞻戰略情報</title>",

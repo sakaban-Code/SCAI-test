@@ -23,19 +23,41 @@
 <script>window.Chart||document.write('<script src="assets/chart.umd.min.js"><\/script>')</script>
 <style>
 :root{
-  --bg:#faf9f7; --surface:#fffefd; --ink:#211f1c; --ink2:#4a4741; --muted:#736e66;
-  --line:#e8e4dd; --line2:#d6d0c6; --dim:#f2efe9;
-  --accent:#a44a24; --ok:#2f7050; --warn:#a97b1f; --err:#b03a30;
-  --c1:#38547a; --c2:#357355; --c3:#b07a28; --c4:#6f5486; --c5:#9c5058;
-  --r:10px; --maxw:1120px; --gut:20px;
-  --line-soft:#f0ede7;
-  --shadow:0 1px 2px rgba(33,31,28,.07),0 6px 20px rgba(33,31,28,.05);
-  --shadow-hover:0 2px 4px rgba(33,31,28,.08),0 16px 36px rgba(33,31,28,.14);
-  --ink-bg:#1e1c19; --ink-surface:#24221e; --ink-line:#35322b; --ink-line2:#413d35;
-  --tx-d:#e8e4db; --tx-d2:#c6c0b4; --mut-d:#9a948a; --accent-br:#cf7a4c;
-  --sh1:0 1px 2px rgba(33,31,28,.05);
-  --sh2:0 1px 2px rgba(33,31,28,.06),0 6px 18px rgba(33,31,28,.045);
-  --sh3:0 2px 6px rgba(33,31,28,.08),0 20px 48px rgba(33,31,28,.10);
+  color-scheme:light;
+  /* ── 海香菇 V3.3 設計代幣（朋友交付之視覺方向；版面與文字仍為本站）── */
+  --blue:#006dff; --cyan:#00d4ff; --violet:#7b61ff; --pink:#ff7ac8;
+  --glass:rgba(255,255,255,.66); --glass-strong:rgba(255,255,255,.82);
+  --brand-gradient:linear-gradient(90deg,#006dff 0%,#5868ff 38%,#8a5cff 67%,#ff7ac8 100%);
+  --ocean-gradient:linear-gradient(90deg,#00d4ff 0%,#488cff 50%,#9b88ff 100%);
+  --card-shadow:0 14px 42px rgba(84,82,170,.085),inset 0 1px 0 rgba(255,255,255,.92);
+  --radius-small:14px; --radius-card:24px; --radius-large:36px;
+  --radius-organic:48px; --radius-pill:999px;
+
+  /* ── 既有變數名一律保留、只換值：全站 600 行既有樣式因此自動改色，
+        不必逐條改寫。凡在此改動的色票，全部經 contrast.py 分層 alpha 合成
+        逐底色驗過 AA，最不利底色是 .brief 的 Hero 面板（rgba(245,235,255,.88)）。 ── */
+  --bg:#f7f3ff; --surface:rgba(255,255,255,.85); --ink:#202a3a; --ink2:#3e4a6b;
+  /* #8a94b0（朋友原 --muted）在最不利底色僅 2.64，遠低於 AA；加深至 5.24 */
+  --muted:#55628a;
+  --line:rgba(121,129,218,.16); --line2:rgba(120,130,214,.30); --dim:rgba(120,130,214,.09);
+  --accent:#4453d6; --ok:#0d6c86; --warn:#9a5b1e; --err:#b0106a;
+  /* 五維色＝海香菇維度色加深版。原值（#4d62ff／#008094／#b85a12／#8c57dc／#d52a88）
+     作圖形用途過 3:1，但 .cmp-lab 等處是「文字」需 4.5——加深後兩種用途同時過，
+     故只留一組，避免圖表與文字各一套而日後改一邊忘另一邊。 */
+  --c1:#3f55ff; --c2:#007689; --c3:#aa5311; --c4:#834ad9; --c5:#c5277e;
+  --r:24px; --maxw:1200px; --gut:20px;
+  --line-soft:rgba(120,130,214,.09);
+  --shadow:0 10px 33px rgba(92,78,172,.065),inset 0 0 0 1px rgba(143,139,235,.05);
+  --shadow-hover:0 14px 44px rgba(106,91,198,.105),inset 0 0 0 1px rgba(128,139,255,.07);
+  /* 深墨 chrome 全面翻成淺玻璃：海香菇沒有深色外框，側欄／masthead／Snapshot
+     一律改玻璃面。變數名不動，值改掉即可讓 header、select、.wbtn、.secnav、
+     .brief-mast、.snap 一次全部跟著換。 */
+  --ink-bg:rgba(255,255,255,.81); --ink-surface:rgba(255,255,255,.84);
+  --ink-line:rgba(121,129,218,.16); --ink-line2:rgba(126,141,213,.30);
+  --tx-d:#253668; --tx-d2:#3e4a6b; --mut-d:#55628a; --accent-br:#4453d6;
+  --sh1:0 4px 14px rgba(92,78,172,.05);
+  --sh2:0 10px 33px rgba(92,78,172,.065),inset 0 0 0 1px rgba(143,139,235,.05);
+  --sh3:0 14px 44px rgba(106,91,198,.11),inset 0 0 0 1px rgba(128,139,255,.07);
 }
 *{box-sizing:border-box}
 /* 黏性 header ＝ 工具列 ＋ 分頁列 ＋ 區段列，實測約 149px；錨點捲動須讓開 */
@@ -55,12 +77,12 @@ a{color:var(--c1)}
 
 /* ── header + nav ── */
 header{position:sticky;top:0;z-index:50;background:var(--ink-bg);
-  background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:20px 20px;
+  background-image:radial-gradient(rgba(86,104,255,.16) 1px,transparent 1px);background-size:20px 20px;
   border-bottom:1px solid var(--ink-line)}
 .hd{display:flex;align-items:center;justify-content:space-between;height:58px;gap:12px}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
 .logo{width:34px;height:34px;flex-shrink:0;display:block;object-fit:contain}
-.bn{font-family:"Space Grotesk","Noto Sans TC",sans-serif;font-weight:700;font-size:14.5px;letter-spacing:0;line-height:1.15;white-space:nowrap;color:#f5f2ec}
+.bn{font-family:"Space Grotesk","Noto Sans TC",sans-serif;font-weight:700;font-size:14.5px;letter-spacing:0;line-height:1.15;white-space:nowrap;color:#253668}
 .bs{font-size:10.5px;color:var(--mut-d);white-space:nowrap}
 .hr{display:flex;align-items:center;gap:10px}
 .stat{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mut-d);white-space:nowrap}
@@ -75,18 +97,18 @@ header{position:sticky;top:0;z-index:50;background:var(--ink-bg);
   .d3{animation-delay:300ms}.d4{animation-delay:380ms}
 }
 .wnav{display:flex;align-items:center;gap:5px}
-.wbtn{width:28px;height:32px;border:1px solid var(--ink-line2);background:rgba(255,255,255,.06);border-radius:7px;
-  cursor:pointer;font-size:13px;color:#d8d3c9;display:flex;align-items:center;justify-content:center;
+.wbtn{width:28px;height:32px;border:1px solid var(--ink-line2);background:rgba(255,255,255,.62);border-radius:7px;
+  cursor:pointer;font-size:13px;color:#55628a;display:flex;align-items:center;justify-content:center;
   transition:border-color .15s,background .15s,color .15s}
 .wbtn:disabled{opacity:.35;cursor:default}
 .ic{width:14px;height:14px;display:block;fill:none;stroke:currentColor;stroke-width:1.3;
   stroke-linecap:round;stroke-linejoin:round}
-.wbtn:not(:disabled):hover{border-color:#5a554b;background:rgba(255,255,255,.11);color:#fff}
+.wbtn:not(:disabled):hover{border-color:#7d8ad3;background:#fff;color:#253668}
 .vtoggle{display:flex;border:1px solid var(--ink-line2);border-radius:7px;overflow:hidden;flex-shrink:0}
 .vtoggle button{border:none;background:transparent;color:var(--mut-d);font-family:inherit;
   font-size:12px;font-weight:500;padding:6px 11px;cursor:pointer;transition:color .15s,background .15s}
 .vtoggle button.on{background:var(--accent);color:#fff;font-weight:600}
-.vtoggle button:not(.on):hover{color:#f2efe9}
+.vtoggle button:not(.on):hover{color:#253668}
 .ngroup{font-size:10px;color:#7d7870;letter-spacing:.5px;padding:9px 4px 9px 10px;white-space:nowrap;align-self:center}
 .ndiv{width:1px;align-self:stretch;background:var(--ink-line2);margin:8px 6px}
 .ev-d{background:none;border:none;padding:0;margin:10px 0 0;box-shadow:none}
@@ -135,16 +157,16 @@ header{position:sticky;top:0;z-index:50;background:var(--ink-bg);
   font-family:inherit;font-size:12.5px;color:var(--ink);
   transition:border-color .18s,background .18s}
 .wpick:hover{border-color:var(--ink2)}
-.wpick.on{border-color:var(--accent);background:#fdf6f2}
+.wpick.on{border-color:var(--accent);background:rgba(68,83,214,.07)}
 .wpick-v{font-weight:600;font-variant-numeric:tabular-nums}
-.wpick-n{font-size:11px;color:#6f6a62}
+.wpick-n{font-size:11px;color:#55628a}
 .wpick-c{font-size:12px;color:var(--muted);margin-left:2px}
 .cmppanel{margin:10px 0 14px;border:1px solid var(--line2);border-radius:8px;
   background:var(--surface);box-shadow:var(--sh2);overflow:hidden}
 .cmppanel-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;
-  border-bottom:1px solid var(--line);background:#f7f5f1}
+  border-bottom:1px solid var(--line);background:rgba(255,255,255,.55)}
 .cmppanel-h b{font-size:12.5px}
-.cmppanel-hint{font-size:11.5px;color:#6f6a62}
+.cmppanel-hint{font-size:11.5px;color:#55628a}
 .cmppanel-h .sp{flex:1 1 8px}
 .cmppanel-x{border:1px solid var(--line2);background:var(--surface);border-radius:6px;
   width:26px;height:26px;cursor:pointer;color:var(--ink2);font-family:inherit;font-size:12px;
@@ -152,7 +174,7 @@ header{position:sticky;top:0;z-index:50;background:var(--ink-bg);
 .cmppanel-x:hover{border-color:var(--ink2);color:var(--ink)}
 .cmppanel-q{width:100%;border:none;border-bottom:1px solid var(--line);padding:10px 14px;
   font-family:inherit;font-size:12.5px;color:var(--ink);background:var(--surface)}
-.cmppanel-q:focus{outline:none;border-bottom-color:var(--accent);background:#fffdfb}
+.cmppanel-q:focus{outline:none;border-bottom-color:var(--accent);background:rgba(255,255,255,.92)}
 .cmppanel-l{max-height:250px;overflow-y:auto}
 .cmppanel-e{padding:16px 14px;font-size:12.5px;color:var(--muted)}
 .wrow{display:grid;grid-template-columns:52px 148px 1fr auto;gap:10px;align-items:center;
@@ -161,14 +183,14 @@ header{position:sticky;top:0;z-index:50;background:var(--ink-bg);
   transition:background .16s}
 .wrow:last-child{border-bottom:none}
 .wrow:hover{background:var(--dim)}
-.wrow.in{background:#fdf6f2}
-.wrow.lo{background:#f7ede6;box-shadow:inset 2px 0 0 var(--accent)}
+.wrow.in{background:rgba(68,83,214,.07)}
+.wrow.lo{background:rgba(68,83,214,.13);box-shadow:inset 2px 0 0 var(--accent)}
 .wrow-w{font-weight:600;font-size:12.5px;color:var(--ink)}
 .wrow-r{font-size:11.5px;color:var(--ink2)}
-.wrow-s{font-size:11.5px;color:#6f6a62;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wrow-s{font-size:11.5px;color:#55628a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wrow-t{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:10px;letter-spacing:.06em;
-  color:var(--accent);border:1px solid #e6cdbf;border-radius:4px;padding:1px 6px;white-space:nowrap}
-.wrow-t.on{color:#6f6a62;border-color:var(--line2)}
+  color:var(--accent);border:1px solid rgba(68,83,214,.32);border-radius:4px;padding:1px 6px;white-space:nowrap}
+.wrow-t.on{color:#55628a;border-color:var(--line2)}
 @media(max-width:640px){
   .wrow{grid-template-columns:46px 1fr auto;gap:8px}
   .wrow-s{display:none}
@@ -182,22 +204,22 @@ header{position:sticky;top:0;z-index:50;background:var(--ink-bg);
    溝寬也算進去，導致對話框比可視區寬幾個 px。 */
 @media(max-width:560px){.lb{padding:0}.lb-box{width:100%;height:100%;border-radius:0}}
 select{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:12px;font-weight:500;padding:6px 9px;
-  border:1px solid var(--ink-line2);border-radius:7px;background:rgba(255,255,255,.06);color:#f2efe9;
+  border:1px solid var(--ink-line2);border-radius:7px;background:rgba(255,255,255,.62);color:#253668;
   cursor:pointer;font-variant-numeric:tabular-nums;max-width:200px;transition:border-color .15s,background .15s}
-select:hover{border-color:#5a554b;background:rgba(255,255,255,.1)}
-select option{background:var(--ink-bg);color:#f2efe9}
+select:hover{border-color:#7d8ad3;background:rgba(255,255,255,.86)}
+select option{background:#fff;color:#253668}
 nav.secnav{border-top:1px solid var(--ink-line)}
 .secnav .wrap{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
 .secnav .wrap::-webkit-scrollbar{display:none}
 .secnav a .ni{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:9.5px;
-  color:#8b857b;margin-right:9px;letter-spacing:.05em}
+  color:#55628a;margin-right:9px;letter-spacing:.05em}
 .secnav a.on .ni{color:var(--accent-br)}
 @media(max-width:1099px){.secnav a .ni{display:none}}
 .secnav a{color:var(--mut-d);text-decoration:none;font-size:12.5px;font-weight:500;
   padding:9px 12px;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s;position:relative}
 .secnav a::after{content:"";position:absolute;left:12px;right:12px;bottom:-2px;height:2px;
   background:var(--accent-br);transform:scaleX(0);transform-origin:left;transition:transform .18s ease-out}
-.secnav a:hover{color:#f2efe9}
+.secnav a:hover{color:#253668}
 .secnav a:not(.on):hover::after{transform:scaleX(1)}
 .secnav a.on{color:#fff;border-bottom-color:var(--accent-br);font-weight:600}
 
@@ -231,7 +253,7 @@ details,.card:has(.zoombtn){transition:border-color .2s ease-out,box-shadow .2s 
   details:hover{border-color:var(--line2);box-shadow:var(--sh1)}
   .card:has(.zoombtn):hover{border-color:var(--line2)}
   .card:has(.zoombtn):hover .zoombtn{border-color:var(--ink2);color:var(--ink)}
-  tbody tr:hover td{background:#f4eee2}
+  tbody tr:hover td{background:rgba(68,83,214,.06)}
   .fchip:hover{transform:translateY(-1px);border-color:var(--ink2)}
   .src a:hover .arw,.evc .f a:hover .arw{transform:translate(3px,-2px)}
 }
@@ -308,20 +330,23 @@ tbody td{transition:background .12s}
   padding:8px 24px;border-bottom:1px solid var(--ink-line)}
 .brief-mast .ix{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:10.5px;font-weight:500;
   color:var(--tx-d2);letter-spacing:.06em;border:1px solid var(--ink-line2);border-radius:4px;
-  padding:1px 6px;background:rgba(255,255,255,.05);flex-shrink:0}
-.brief-mast .mt{font-size:12.5px;font-weight:700;letter-spacing:.1em;color:#f2efe9}
+  padding:1px 6px;background:rgba(255,255,255,.62);flex-shrink:0}
+.brief-mast .mt{font-size:12.5px;font-weight:700;letter-spacing:.1em;color:#253668}
 .brief-mast .mn{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:11px;
   color:var(--mut-d);letter-spacing:.03em}
 .brief-mast .sp{flex:1 1 8px}
-.brief-mast .chip{border-color:var(--ink-line2);color:var(--mut-d);background:rgba(255,255,255,.04)}
-.brief-mast .chip.cc{background:rgba(47,112,80,.16);border-color:#3d5c4b;color:#83c4a2}
-.brief-mast .chip.cc.lo{background:rgba(176,58,48,.14);border-color:#663b36;color:#e39387}
+.brief-mast .chip{border-color:var(--ink-line2);color:var(--mut-d);background:rgba(255,255,255,.62)}
+.brief-mast .chip.cc{background:rgba(14,116,144,.10);border-color:rgba(14,116,144,.34);color:#0d6c86}
+.brief-mast .chip.cc.lo{background:rgba(176,16,106,.09);border-color:rgba(176,16,106,.32);color:#b0106a}
 .brief-body{display:grid;grid-template-columns:repeat(12,minmax(0,1fr))}
 .brief-main{grid-column:span 8;position:relative;padding:24px 24px 20px;min-width:0}
 .brief-main>*{position:relative;z-index:2}
 .brief-fx{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
 .brief-fx i{position:absolute;inset:0;display:block}
-.brief-fx .pat{background:url("assets/scai-header-pattern.png") right -60px center/auto 165% no-repeat;
+/* 底紋圖已於海香菇改版換成 hero 海香菇群（見下方版面層的同名規則）。
+   此處直接改字串而非只在後面覆蓋——留著舊 url 會讓 build_offline 白白內嵌
+   98 KB 用不到的 png。 */
+.brief-fx .pat{background:url("assets/hero-mushroom-cluster-v4.webp") right -18px center/auto 152% no-repeat;
   opacity:.4;transform:translate3d(var(--px,0px),var(--py,0px),0);transition:transform .32s ease-out;
   /* 硬性限制在右側外圍：左半完全遮掉，確保不干擾文字（人類指示） */
   -webkit-mask-image:linear-gradient(to left,#000 0,rgba(0,0,0,.45) 26%,transparent 52%);
@@ -336,14 +361,14 @@ tbody td{transition:background .12s}
 .brief.fx .glow{opacity:1}
 .snap{grid-column:span 4;background:var(--ink-surface);color:var(--tx-d);padding:16px 20px;
   border-left:1px solid var(--ink-line);display:flex;flex-direction:column;min-width:0}
-.snap h3{margin:0 0 12px;font-size:11.5px;font-weight:700;letter-spacing:.08em;color:#cfc9bd}
+.snap h3{margin:0 0 12px;font-size:11.5px;font-weight:700;letter-spacing:.08em;color:#3e4a6b}
 .sr-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;
   border-top:1px solid var(--ink-line)}
 .sr-row:first-of-type{border-top:none;padding-top:0}
 .sr-k{font-size:11px;color:var(--mut-d);white-space:nowrap}
 .sr-v{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:12.5px;font-weight:500;
-  color:#f2efe9;font-variant-numeric:tabular-nums;text-align:right;line-height:1.45}
-.sr-v .u{color:#6fbf95}.sr-v .d{color:#e18f84}
+  color:#253668;font-variant-numeric:tabular-nums;text-align:right;line-height:1.45}
+.sr-v .u{color:#0d6c86}.sr-v .d{color:#b0106a}
 .sr-v .sm{font-family:"Noto Sans TC",sans-serif;font-size:11px;color:var(--tx-d2);margin-left:5px}
 .snap .note{margin-top:auto;padding-top:10px;border-top:1px solid var(--ink-line);font-size:10.5px;
   color:var(--mut-d);line-height:1.6}
@@ -352,7 +377,7 @@ tbody td{transition:background .12s}
 .actband{margin-top:14px;background:var(--surface);border:1px solid var(--line-soft);
   border-radius:var(--r);box-shadow:var(--sh2);overflow:hidden}
 .actband-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 20px;
-  border-bottom:1px solid var(--line);background:#f7f5f1}
+  border-bottom:1px solid var(--line);background:rgba(255,255,255,.55)}
 .actband-h b{font-size:13.5px;font-weight:700}
 .actband-h .q{font-size:12.5px;color:var(--ink2);font-weight:500}
 .actband-h .q::before{content:"問：";color:var(--muted);font-weight:400}
@@ -365,7 +390,7 @@ tbody td{transition:background .12s}
 .act .i{flex-shrink:0;font-size:11px;line-height:1.9}
 .act.y .i{color:var(--ok)}.act.y b{color:var(--ok)}
 .act.n .i{color:var(--err)}.act.n b{color:var(--err)}
-.actband-f{padding:8px 20px;border-top:1px solid var(--line);background:#faf9f7;
+.actband-f{padding:8px 20px;border-top:1px solid var(--line);background:rgba(255,255,255,.5);
   font-size:11.5px;color:var(--muted);line-height:1.7}
 .actband-f b{color:var(--ink)}
 
@@ -397,7 +422,7 @@ tbody td{transition:background .12s}
 .mi .k{font-size:10.5px;color:var(--muted);margin-bottom:2px}
 .mi .v{font-size:11.5px;color:var(--ink2);line-height:1.5}
 .ev{font-size:10.5px;color:var(--muted);margin-top:10px;font-variant-numeric:tabular-nums;
-  background:#f8f6f2;border:1px solid var(--line);border-radius:6px;padding:8px 10px;line-height:1.75}
+  background:rgba(255,255,255,.64);border:1px solid var(--line);border-radius:6px;padding:8px 10px;line-height:1.75}
 
 /* ── tables ── */
 table{width:100%;border-collapse:collapse;font-size:12.5px}
@@ -451,12 +476,12 @@ details[open] summary::after{content:"−"}
 .sa-list{display:grid;gap:12px}
 .sa{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
 .sa-h{display:flex;gap:10px;align-items:baseline;margin-bottom:12px}
-.sa-n{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:11px;color:#6f6a62;
+.sa-n{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:11px;color:#55628a;
   border:1px solid var(--line2);border-radius:4px;padding:1px 6px;flex-shrink:0}
 .sa-h b{font-size:13.5px;font-weight:650;line-height:1.6}
 .sa-r{display:grid;grid-template-columns:82px 1fr;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
 .sa .k{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:10px;letter-spacing:.06em;
-  color:#6f6a62;line-height:1.9}
+  color:#55628a;line-height:1.9}
 .sa .v{font-size:12.5px;color:var(--ink2);line-height:1.75}
 .sa-d{display:grid;grid-template-columns:82px 1fr;gap:12px;margin-top:12px;padding:10px 12px;
   background:#fdf6ec;border:1px solid #f0dcc0;border-radius:6px}
@@ -512,7 +537,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
      否則 Tab 會從視覺上最下方的檢視切換開始、再跳回上方的週次控制。
      改視覺而非改 DOM：DOM 一動會連帶影響 600–1100px 與 ≤600px 兩個版型。 */
   .brand{order:1;padding:18px 16px 14px}
-  .wnav{order:3;margin:2px 14px 6px;padding:9px 10px;background:rgba(255,255,255,.05);
+  .wnav{order:3;margin:2px 14px 6px;padding:9px 10px;background:rgba(255,255,255,.6);
     border:1px solid var(--ink-line);border-radius:8px;flex-wrap:wrap}
   /* 選單獨佔第一列、四顆鈕落第二列。238px 側欄扣掉邊距內距只剩 206px 內容寬，
      四顆鈕就吃掉 132px，單行時選單僅 56px——「W9　2026/08/04–08/10」需 172px，
@@ -525,10 +550,10 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
   nav.secnav{order:5;flex:1;border-top:1px solid var(--ink-line);margin-top:6px}
   .secnav .wrap{flex-direction:column;padding:10px 10px 12px;gap:1px;overflow:visible}
   .secnav a{display:block;padding:7px 12px;border-bottom:none;border-left:2px solid transparent;border-radius:0 6px 6px 0}
-  .nh{display:block;font-size:9.5px;line-height:1.45;color:#8d877d;margin-top:2px}
+  .nh{display:block;font-size:9.5px;line-height:1.45;color:#55628a;margin-top:2px}
   .secnav a::after{display:none}
-  .secnav a:hover{background:rgba(255,255,255,.06)}
-  .secnav a.on{background:rgba(255,255,255,.05);border-left-color:var(--accent-br)}
+  .secnav a:hover{background:rgba(255,255,255,.72)}
+  .secnav a.on{background:rgba(68,83,214,.10);border-left-color:var(--accent-br)}
   .ngroup{padding:14px 12px 5px;letter-spacing:1px}
   .ndiv{display:none}
   .vtoggle{order:2;margin:0 16px 10px;display:flex}
@@ -600,14 +625,14 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
   .card,.pb,.evc,details{break-inside:avoid;border-color:#bbb}
   .brief,.actband{box-shadow:none;border-color:#bbb}
   .brief-mast,.snap{background:#fff!important;border-color:#bbb}
-  .brief-mast *,.snap *{color:#211f1c!important}
+  .brief-mast *,.snap *{color:#202a3a!important}
   .brief-fx{display:none}
   section{padding:16px 0 0}
 }
 /* ── 第 9 輪覆蓋層（置於末端，優先於前面的分區規則） ── */
 .g2,.movers,.axbox{grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gut)}
 .g2>*,.movers>*,.axbox>*{grid-column:span 6;min-width:0}
-.trendsum{box-shadow:none;background:#f8f6f2}
+.trendsum{box-shadow:none;background:rgba(255,255,255,.64)}
 .pf{gap:16px 18px}
 .pf .it{border:none;border-top:2px solid var(--ink);border-radius:0;padding:10px 0 0;
   background:none;box-shadow:none}
@@ -619,9 +644,9 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 .ax-t{flex-wrap:wrap}
 .audit{overflow-x:auto}
 .sr-v .sm{display:block;margin-left:0;line-height:1.5}
-.ngroup{color:#8b857b}
+.ngroup{color:#55628a}
 /* 新增的 10px 微標籤若沿用 --muted 僅 3.4:1，加深至 5:1 以上 */
-.mlab,.pf .k,.sh .ix{color:#6f6a62}
+.mlab,.pf .k,.sh .ix{color:#55628a}
 .ev{padding:8px 12px}
 .pf .it{padding:12px 0 0}
 /* 觸控命中區補到 44px：以透明 ::after 擴大，桌面視覺尺寸完全不變 */
@@ -649,21 +674,21 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
   background:transparent;border:none;border-bottom:2px solid transparent;padding:8px 14px 7px;
   cursor:pointer;white-space:nowrap;transition:color .16s,border-color .16s,background .16s}
 .tb-l{font-size:12.5px;font-weight:600;color:var(--mut-d)}
-/* #7d7870 疊在深墨底上只有 3.88:1；加亮至 #8d877d 取得 4.7:1 以上 */
-.tb-h{font-size:9.5px;letter-spacing:.04em;color:#8d877d}
-.tb.on{background:rgba(255,255,255,.05);border-bottom-color:var(--accent-br)}
-.tb.on .tb-l{color:#f5f2ec}
+/* 原為深墨底上的淺字；chrome 改淺玻璃後改用 #55628a（最不利底色 5.24:1） */
+.tb-h{font-size:9.5px;letter-spacing:.04em;color:#55628a}
+.tb.on{background:rgba(68,83,214,.10);border-bottom-color:var(--accent-br)}
+.tb.on .tb-l{color:#253668}
 .tb.on .tb-h{color:var(--mut-d)}
-.tb:not(.on):hover .tb-l{color:#f2efe9}
+.tb:not(.on):hover .tb-l{color:#253668}
 .tb:focus-visible{outline:2px solid var(--accent-br);outline-offset:-2px}
 /* 區段導覽的白話副標：橫向工具列沒有直向空間，僅在側欄版顯示。
    ≥1100px 的規則必須一起放在本覆蓋層內——前面區塊裡的同名規則特異性相同，
    會被本層後出現的 display:none 蓋掉（第 9 輪已踩過同一個坑）。 */
 .nh{display:none}
 @media(min-width:1100px){
-  /* 選中項帶 rgba(255,255,255,.05) 底色，底色一亮淺字對比反而降到 4.16；
-     取 #9a938a 讓最不利的那個情境也有 4.8 以上 */
-  .nh{display:block;font-size:9.5px;line-height:1.45;color:#9a938a;margin-top:2px}
+  /* chrome 已改淺玻璃，選中項底色改 rgba(68,83,214,.10)；
+     副標統一 #55628a，逐底色驗過最差 5.24:1 */
+  .nh{display:block;font-size:9.5px;line-height:1.45;color:#55628a;margin-top:2px}
 }
 /* §09 Agent 治理 */
 .govgrid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gut)}
@@ -673,7 +698,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 .gov-k{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:9.5px;letter-spacing:.07em;
   text-transform:uppercase;color:#fff;background:var(--ink);padding:2px 7px;border-radius:4px}
 .gov-b{font-size:12px;line-height:1.78;color:var(--ink2)}
-.gov-b code{font-family:"IBM Plex Mono",monospace;font-size:11px;background:#f0ece6;padding:1px 5px;border-radius:3px}
+.gov-b code{font-family:"IBM Plex Mono",monospace;font-size:11px;background:rgba(120,130,214,.13);padding:1px 5px;border-radius:3px}
 @media(max-width:820px){.govgrid{grid-template-columns:1fr}.card.gov{grid-column:auto}}
 /* SCAI 助理（#1a 展示模式：規則式回答；#1b 設定 endpoint 後轉真 AI） */
 #aifab{position:fixed;right:20px;bottom:70px;width:44px;height:44px;border-radius:50%;
@@ -688,15 +713,15 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
   box-shadow:-8px 0 30px rgba(33,31,28,.12);display:flex;flex-direction:column}
 #aipanel[hidden]{display:none}
 .ai-h{display:flex;align-items:center;gap:9px;padding:12px 16px;border-bottom:1px solid var(--ink-line);background:var(--ink-bg)}
-.ai-h b{font-size:13.5px;color:#f5f2ec;letter-spacing:.04em}
+.ai-h b{font-size:13.5px;color:#253668;letter-spacing:.04em}
 .ai-mode{font-size:9.5px;letter-spacing:.07em;padding:2px 8px;border-radius:9px;
   background:#f3e9d8;color:#6d5120;border:1px solid #e2d2b4}
 .ai-h .lb-x{position:static;width:28px;height:28px}
 .ai-log{flex:1;overflow-y:auto;padding:14px 14px 6px;display:flex;flex-direction:column;gap:9px}
 .ai-m{max-width:92%;font-size:12.5px;line-height:1.75;border-radius:10px;padding:9px 12px;overflow-wrap:anywhere}
 .ai-m.u{align-self:flex-end;background:var(--ink);color:#fff;border-bottom-right-radius:3px}
-.ai-m.a{align-self:flex-start;background:#f6f4ef;border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:3px}
-.ai-src{margin-top:7px;padding-top:6px;border-top:1px dashed var(--line);font-size:10px;color:#6f6a62}
+.ai-m.a{align-self:flex-start;background:rgba(255,255,255,.74);border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:3px}
+.ai-src{margin-top:7px;padding-top:6px;border-top:1px dashed var(--line);font-size:10px;color:#55628a}
 .ai-sug{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px}
 .ai-sug button{font-family:inherit;font-size:11px;color:var(--ink2);background:var(--surface);
   border:1px solid var(--line);border-radius:14px;padding:4px 11px;cursor:pointer;
@@ -709,9 +734,9 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 #aiq:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .ai-send{font-family:inherit;font-size:12px;font-weight:600;color:#fff;background:var(--accent);
   border:none;border-radius:8px;padding:9px 16px;cursor:pointer;transition:background .15s}
-.ai-send:hover{background:#8f3f1f}
+.ai-send:hover{background:#3a47bb}
 .ai-send:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-.ai-note{padding:8px 14px 12px;font-size:10px;line-height:1.6;color:#6f6a62;border-top:1px dashed var(--line)}
+.ai-note{padding:8px 14px 12px;font-size:10px;line-height:1.6;color:#55628a;border-top:1px dashed var(--line)}
 @media(max-width:600px){
   /* 手機：底部彈出。用 left:0 讓寬度由左右錨定推得，不寫 width:100%
      （100% 會解析成含捲軸溝寬的視窗寬而右溢數 px）。 */
@@ -758,26 +783,343 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
   border:1px solid var(--line2);border-radius:3px;font-size:10px;color:#fff;flex-shrink:0}
 .wrow.in .wrow-cb{background:var(--accent);border-color:var(--accent)}
 .cmpnote{margin-top:9px;font-size:11px;line-height:1.65;color:var(--ink2);
-  background:#f8f6f2;border-left:2px solid var(--accent);border-radius:0 6px 6px 0;padding:8px 11px}
+  background:rgba(255,255,255,.64);border-left:2px solid var(--accent);border-radius:0 6px 6px 0;padding:8px 11px}
 /* §09 期間涵蓋揭露：內容由建置時推導的 DATA.coverage 產生，資料變動即自動同步 */
 .covbox{margin-top:16px;border:1px solid var(--line);border-left:3px solid var(--accent);
-  border-radius:8px;padding:14px 16px;background:#f8f6f2}
+  border-radius:8px;padding:14px 16px;background:rgba(255,255,255,.64)}
 .covbox .t{font-size:12px;font-weight:600;color:var(--ink);letter-spacing:.02em;margin-bottom:6px}
 .covbox .d{font-size:11.5px;color:var(--ink2);line-height:1.7}
 .covbox ul{margin:8px 0 0;padding-left:17px}
 .covbox li{font-size:11.5px;color:var(--ink2);line-height:1.75;margin-bottom:4px}
 .covbox li b{color:var(--ink);font-weight:600}
-.covbox .d2{font-size:10.5px;color:#6f6a62;margin-top:9px;padding-top:8px;border-top:1px solid var(--line)}
+.covbox .d2{font-size:10.5px;color:#55628a;margin-top:9px;padding-top:8px;border-top:1px solid var(--line)}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   海香菇 V3.3 版面層（2026-08-18）
+   同學與教授三案選 C（全海香菇版）。C 的預覽 dashboard/preview4.html 是把
+   11 區段 × 9 週預先烤成 99 段靜態 HTML 的「比較用」產物，不能直接上線：
+   零 section id、hero-module／summary-module 各重複 9 次、無圖表／區間對比／
+   放大檢視／AI 面板／鍵盤模態／safeUrl 注入防線／離線建置路徑。
+   故改為把 C 的版面與視覺回寫進本模板，既有功能一項不減。
+   本層置於樣式表最末，刻意覆蓋前面所有分區規則（含 ≥1100px 舊側欄佈局）。
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 底層：頁面漸層與粒點紋（取自 V3.3 base.css）── */
+html{min-height:100%;background:#f7f3ff;scroll-padding-top:20px}
+body{min-width:320px;overflow-x:hidden;padding-left:0;
+  background-color:#f7f3ff;
+  background-image:
+    radial-gradient(ellipse at 48% -4%,rgba(181,166,255,.36),transparent 31%),
+    radial-gradient(circle at 84% 24%,rgba(255,178,223,.30),transparent 31%),
+    radial-gradient(circle at 7% 91%,rgba(123,202,255,.30),transparent 29%),
+    linear-gradient(124deg,#fff 0%,#fff9fd 33%,#f8f2ff 68%,#f2f8ff 100%);
+  background-attachment:fixed}
+/* 粒點紋改用 ::before，body 的 background-image 已被上面四層漸層佔滿 */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.18;
+  background-image:radial-gradient(rgba(86,104,255,.20) .55px,transparent .7px);
+  background-size:26px 26px;
+  -webkit-mask-image:linear-gradient(118deg,#000,transparent 73%);
+  mask-image:linear-gradient(118deg,#000,transparent 73%)}
+.ambient-wash{position:fixed;z-index:-1;border-radius:50%;pointer-events:none;filter:blur(3px)}
+.wash-a{width:360px;height:360px;right:-145px;top:8%;
+  background:radial-gradient(circle,rgba(255,126,202,.19),transparent 68%)}
+.wash-b{width:330px;height:330px;left:6%;bottom:-155px;
+  background:radial-gradient(circle,rgba(0,192,255,.16),transparent 68%)}
+
+/* ── 玻璃外框：側欄 ＋ 工作區兩欄 ── */
+.product-frame{position:relative;isolation:isolate;display:grid;
+  grid-template-columns:238px minmax(0,1fr);gap:10px;
+  width:min(1320px,calc(100% - 24px));margin:12px auto;padding:0 8px 8px;
+  border:1px solid rgba(255,255,255,.96);border-radius:41px;
+  background-color:rgba(255,255,255,.55);
+  background-image:
+    radial-gradient(circle at 51% 0%,rgba(168,146,255,.18),transparent 28%),
+    linear-gradient(145deg,rgba(255,255,255,.55),rgba(255,245,252,.40) 55%,rgba(240,246,255,.42));
+  box-shadow:0 30px 100px rgba(101,79,180,.105),inset 0 1px 0 #fff;
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+/* overflow 不設 hidden：C 的預覽可以，因為它整頁不捲；本站區段很長，
+   一旦 hidden 就會把 sticky 側欄的黏著容器裁掉，側欄跟著捲走。 */
+.product-frame::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  border-radius:inherit;
+  background:
+    radial-gradient(circle at 65% 24%,rgba(0,199,255,.08),transparent 22%),
+    radial-gradient(circle at 73% 70%,rgba(255,102,199,.09),transparent 28%)}
+/* 角落海香菇：獨立一層裁切容器。
+   ⚠ 不可改成在 .product-frame 上加 overflow:hidden——那會讓外框成為
+   sticky 側欄的捲動容器並把它裁掉，側欄第二屏就消失。
+   實測：不裁切時 corner-right 右緣達 1338px（視窗 1280），造成全頁橫向捲動。 */
+.frame-deco{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+  border-radius:inherit}
+/* height:auto 不可省：img 帶 height="400" 屬性，只給 CSS width 會留下 310×400 的
+   盒子（圖本身 1200×400，contain 後只佔 310×103），下緣多出近 300px 的空盒。 */
+.corner-habitat{position:absolute;pointer-events:none;object-fit:contain;height:auto;
+  filter:saturate(.92) brightness(1.07) drop-shadow(0 16px 25px rgba(78,87,219,.13))}
+.corner-left{left:-70px;bottom:-65px;width:310px;opacity:.42}
+.corner-right{right:-86px;bottom:-76px;width:285px;opacity:.28;transform:scaleX(-1)}
+/* wash-a 是 position:fixed 且 right:-145px，本身不撐文件寬，但仍以 clip 保險 */
+.ambient-wash{clip-path:inset(0)}
+
+/* ── header → 玻璃側欄（取代舊的深墨固定欄）── */
+header{position:sticky;top:12px;align-self:start;z-index:4;
+  width:auto;max-height:calc(100vh - 24px);
+  display:flex;flex-direction:column;padding:17px 12px 14px;
+  overflow:hidden auto;overscroll-behavior:contain;
+  border:0;border-radius:34px;
+  background-color:rgba(255,255,255,.81);
+  background-image:linear-gradient(180deg,rgba(255,255,255,.81),rgba(255,249,253,.64));
+  box-shadow:0 15px 50px rgba(104,88,190,.075),inset -1px 0 rgba(159,147,255,.08)}
+/* sticky 而非 C 原本的靜態欄：C 的預覽一次只顯示一個區段所以不會捲，
+   本站 11 個區段連續呈現，靜態側欄會在第二屏就消失、導覽再也點不到。
+   視覺仍是 C 的玻璃長欄，只是捲動時跟著。 */
+.product-frame .wrap{max-width:none;margin:0;padding:0}
+.hd,.hr{display:contents}
+.brand{order:1;display:flex;align-items:center;gap:9px;padding:0 4px 12px;min-height:74px}
+.brand-emblem{width:52px;height:58px;flex:none;object-fit:contain;
+  filter:saturate(.98) brightness(1.05) drop-shadow(0 8px 12px rgba(101,80,240,.16))}
+.bn{color:#253b80;font-size:17px;font-weight:900;letter-spacing:-.035em;line-height:1.1}
+.bs{color:#55628a;font-size:9.7px;font-weight:600;margin-top:1px}
+.vtoggle{order:2;display:flex;margin:0 2px 10px;border:1px solid var(--ink-line2);
+  border-radius:var(--radius-pill);overflow:hidden;background:rgba(255,255,255,.62)}
+.vtoggle button{flex:1;padding:7px 11px;color:#55628a}
+.vtoggle button.on{background:#5263ed;color:#fff;font-weight:700;
+  box-shadow:0 7px 16px rgba(123,97,255,.23)}
+.wnav{order:3;display:flex;align-items:center;flex-wrap:wrap;gap:5px;
+  margin:0 2px 8px;padding:9px 10px;border-radius:18px;
+  background:rgba(255,255,255,.66);border:1px solid rgba(126,141,213,.10);
+  box-shadow:inset 0 1px rgba(255,255,255,.95)}
+#wsel{flex:1 0 100%;min-width:0;max-width:none;margin-bottom:6px}
+select{border-radius:12px;border-color:rgba(126,141,213,.22);color:#3e4a6b}
+.wbtn{width:33px;height:33px;border-radius:50%;border-color:rgba(126,141,213,.14);color:#55628a}
+.wbtn:not(:disabled):hover{transform:translateY(-2px);
+  box-shadow:0 8px 18px rgba(88,81,170,.11)}
+nav.tabnav{display:none}   /* 分頁列改掛到工作區的 topbar，見下方 .topbar */
+nav.secnav{order:5;flex:1 1 auto;border-top:1px solid var(--ink-line);
+  margin-top:6px;padding-top:8px}
+.secnav .wrap{display:grid;gap:4px;padding:2px 0 8px;overflow:visible}
+.secnav a{display:block;min-height:38px;padding:8px 13px;border:0;
+  border-radius:var(--radius-pill);color:#55618c;font-weight:650;
+  text-decoration:none;transition:200ms ease}
+.secnav a::after{display:none}
+.secnav a:hover{color:#3e4a6b;background:rgba(255,255,255,.72);transform:translateX(2px)}
+.secnav a.on{color:#fff;background:#5263ed;font-weight:700;
+  box-shadow:0 9px 24px rgba(123,97,255,.21),inset 0 1px 0 rgba(255,255,255,.28)}
+/* 不可用 rgba(255,255,255,.86)：在 #5263ed 上只有 4.00。純白為 4.81，
+   層級改由字級（9.5px vs 12.5px）表達，不靠降低對比。 */
+.secnav a.on .ni,.secnav a.on .nh{color:#fff}
+.secnav a .ni{color:#55628a}
+.ngroup{padding:14px 12px 5px;letter-spacing:1px;color:#55628a}
+.ndiv{display:none}
+.stat{order:6;margin:auto 4px 0;padding:12px 6px 4px;border-top:1px solid var(--ink-line);
+  color:#55628a}
+
+/* ── 工作區 ── */
+.workspace{position:relative;z-index:3;min-width:0;padding-bottom:8px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  min-height:49px;padding:0 6px}
+.topbar .tabnav{display:block;border:0;margin:0;min-width:0;flex:1 1 auto}
+/* flex-direction 必須明寫：舊模板 @media(min-width:1100px) 有
+   .tabnav .wrap{flex-direction:column}（那時分頁列在直向側欄裡），
+   不覆蓋會讓五個分頁在 topbar 內直向堆疊成 174px 高。 */
+.topbar .tabnav .wrap{display:flex;flex-direction:row;align-items:center;
+  gap:clamp(8px,1.15vw,18px);min-width:0;overflow-x:auto;scrollbar-width:none;padding:0}
+.topbar .tabnav .wrap::-webkit-scrollbar{display:none}
+/* width:auto 不可省：舊模板 @media(min-width:1100px) 有 .tb{width:100%}（分頁列
+   當時在直向側欄裡），不覆蓋的話五個分頁各自撐成容器全寬 963px、scrollWidth 4875，
+   實際只看得到第一個。全頁不會橫向捲動（外層有 overflow-x:auto），所以純看截圖
+   不一定察覺——是溢出檢查抓到的。 */
+.tb{flex-direction:row;align-items:center;gap:7px;flex:none;width:auto;padding:0;
+  border:0;background:transparent;color:#596182;font-size:10px;font-weight:750;
+  white-space:nowrap}
+.tb::before{content:counter(tbn,decimal-leading-zero);counter-increment:tbn;
+  display:grid;place-items:center;width:23px;height:23px;border-radius:50%;
+  color:#5245cf;background:rgba(132,116,255,.11);font-size:9px;font-weight:800;flex:none}
+.topbar .tabnav .wrap{counter-reset:tbn}
+.tb.on{background:transparent;border:0;color:#465987}
+.tb.on::before{color:#fff;background:#5263ed;box-shadow:0 7px 16px rgba(123,97,255,.23)}
+.tb .tb-l{font-size:11px;font-weight:750;color:inherit}
+.tb.on .tb-l{color:#465987}
+.tb:not(.on):hover .tb-l{color:#3e4a6b}
+.tb-h{display:none}
+.top-tools{display:flex;align-items:center;gap:7px;padding-left:12px;color:#55628a;
+  font-size:9px;white-space:nowrap}
+
+/* ── 主要內容：卡片一律換成海香菇的玻璃圓角 ── */
+main{padding-top:2px}
+section{padding:22px 0 2px}
+.sh h2{color:#253668;font-weight:850;letter-spacing:-.02em}
+.sh::after{background:var(--line)}
+.card,.pb,.evc,details,.sa,.sc-card,.axc,.trendsum,.cmppanel,.actband,.brief,.wp-box,.lb-box{
+  border-radius:var(--radius-card);border-color:rgba(255,255,255,.92)}
+.card,.pb,.evc,.sa,.sc-card,.axc{
+  background-color:rgba(255,255,255,.85);
+  background-image:linear-gradient(155deg,rgba(255,255,255,.85),rgba(255,250,254,.71));
+  box-shadow:0 10px 33px rgba(92,78,172,.065),inset 0 0 0 1px rgba(143,139,235,.05)}
+details,.trendsum{background:rgba(255,255,255,.72);border-color:rgba(120,130,214,.18);
+  border-radius:18px}
+.pb::before,.evc::before{background:var(--accent)}
+.ev{background:rgba(255,255,255,.64);border-radius:12px}
+.chip,.kw,.hz,.imp,.tbc,.axword,.plain{border-radius:var(--radius-pill)}
+.kw{background:rgba(77,98,255,.10);color:#3a4bd0;font-weight:700}
+.plain{background:rgba(255,255,255,.72);border:1px solid rgba(120,130,214,.18);
+  border-radius:18px}
+.bar{background:rgba(100,115,180,.14);border-radius:var(--radius-pill)}
+.bar i{border-radius:inherit}
+.guide{background:transparent;border:0;margin:0 6px 12px}
+.guide .wrap{display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:9px 18px;border-radius:var(--radius-pill);
+  background:rgba(255,255,255,.62);border:1px solid rgba(120,130,214,.18)}
+footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
+  background:rgba(255,255,255,.6);border:1px solid rgba(120,130,214,.16);color:#4a5878}
+#top{background:#5263ed;box-shadow:0 9px 24px rgba(123,97,255,.28)}
+.fchip,.co-b,.cmp-preset,.wpick,.zoombtn,.cmp-more,.cmppanel-x,.lb-x,.wrow-t{
+  border-radius:var(--radius-pill);background:rgba(255,255,255,.74)}
+.cmppanel{border-radius:20px}
+.wrow{background:transparent}
+.nochart{background:rgba(120,130,214,.09);border-radius:18px}
+
+/* ── Hero（.brief）→ 海香菇 hero-panel ── */
+.brief{border-radius:46px 72px 46px 46px;border:1px solid rgba(255,255,255,.97);
+  background-color:rgba(245,235,255,.88);
+  background-image:
+    radial-gradient(circle at 79% 16%,rgba(81,144,255,.32),transparent 34%),
+    radial-gradient(circle at 72% 86%,rgba(255,111,201,.25),transparent 39%),
+    linear-gradient(137deg,rgba(255,255,255,.92),rgba(245,235,255,.79) 50%,rgba(222,240,255,.76));
+  box-shadow:0 14px 44px rgba(106,91,198,.105),inset 0 0 0 1px rgba(128,139,255,.07),
+    inset 0 18px 58px rgba(255,255,255,.34)}
+.brief-mast{background:rgba(255,255,255,.62);border-bottom:1px solid rgba(120,130,214,.14);
+  border-radius:46px 72px 0 0;padding:10px 30px}
+.brief-mast .mt{color:#253668}
+.brief-mast .mn{color:#55628a}
+/* 底紋層已在上方的 .brief-fx .pat 直接換成海香菇 hero 圖（位置、遮罩與視差
+   參數沿用第 9 輪），等於讓滑鼠視差直接推動海香菇，而非另疊一層裝飾。
+   此處只調不透明度。 */
+.brief-fx .pat{opacity:.62}
+.brief-fx .dots{background-image:radial-gradient(rgba(86,104,255,.22) 1px,transparent 1px)}
+.brief-fx .glow{background:radial-gradient(260px circle at var(--mx,-999px) var(--my,-999px),
+  rgba(123,97,255,.08),rgba(123,97,255,0) 70%)}
+.scen-en{color:#173da7;font-weight:900;letter-spacing:-.055em}
+.scen-zh{color:#29356f;font-weight:850}
+.verdict{color:#3e4a6b}
+/* Snapshot 面板 → decision-summary 的淺玻璃 */
+.snap{background-color:rgba(255,255,255,.84);
+  background-image:linear-gradient(180deg,rgba(255,255,255,.84),rgba(255,248,253,.71));
+  border-left:1px solid rgba(120,130,214,.12);color:#253668;border-radius:0 72px 46px 0}
+.snap h3{color:#253668;font-weight:850}
+.sr-row{border-top-color:rgba(112,120,185,.12)}
+.sr-k{color:#55628a}
+.sr-v{color:#253668}
+.sr-v .sm{color:#3e4a6b}
+.snap .note{border-top-color:rgba(112,120,185,.12);color:#55628a}
+/* 行動建議帶 → action-strip */
+.actband{border-radius:38px;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.9)}
+.actband-h{background:transparent;border-bottom:1px solid rgba(120,130,214,.12);
+  border-radius:38px 38px 0 0}
+.actband-h b{color:#354976;font-weight:850}
+.act{border-left-color:rgba(120,130,214,.12)}
+.actband-f{background:transparent;border-top-color:rgba(120,130,214,.12)}
+
+/* ── 響應式：對齊 V3.3 的 1180／880／540 三個斷點 ── */
+@media(max-width:1180px){
+  .product-frame{grid-template-columns:196px minmax(0,1fr)}
+}
+@media(max-width:1099px){
+  /* 舊模板在此寬度以下把 header 變回橫向黏性列；本層維持側欄直到 880px，
+     兩者衝突處在此一次覆蓋掉 */
+  header{position:sticky;top:12px;flex-direction:column}
+  .secnav a .ni{display:inline}
+}
+@media(max-width:880px){
+  .product-frame{display:block;width:min(100% - 12px,860px);margin:6px auto;padding:5px;
+    border-radius:29px}
+  header{position:static;max-height:none;display:block;padding:8px;border-radius:23px}
+  .hd{display:contents}
+  .brand{min-height:0;padding:0 5px 7px}
+  .brand-emblem{width:43px;height:47px}
+  .vtoggle{margin:0 0 8px;width:max-content}
+  .wnav{margin:0 0 8px}
+  #wsel{flex:1 1 auto;margin-bottom:0}
+  nav.secnav{border-top:0;margin-top:4px;padding-top:0}
+  .secnav .wrap{display:flex;gap:5px;overflow-x:auto;padding-bottom:2px}
+  .secnav a{flex:0 0 auto;min-height:34px;padding:6px 12px}
+  .secnav a:hover{transform:none}
+  .nh{display:none}
+  .stat{margin:8px 0 0;padding:8px 4px 2px}
+  .topbar{min-height:45px;padding-inline:4px}
+  .top-tools{display:none}
+  .corner-habitat{display:none}
+  .brief-mast,.snap{border-radius:0}
+  .brief{border-radius:33px}
+  .actband,.guide .wrap{border-radius:24px}
+}
+@media(max-width:540px){
+  .product-frame{border-radius:22px}
+  /* ⚠ 不可用 display:none：.tb 的可讀名稱只有 .tb-l（.tb-h 已全域隱藏，
+     編號圓圈是 ::before 的 CSS counter、不進無障礙樹），一藏就變成
+     五個沒有名稱的按鈕。改視覺隱藏，輔助科技仍讀得到「總覽／公司／…」。 */
+  .tb .tb-l{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);
+    white-space:nowrap}
+  .brief{border-radius:26px}
+  .guide .wrap{border-radius:18px;padding:9px 14px}
+}
+/* 舊模板 ≤600px 的 header 雙行規則已被本層的側欄／堆疊佈局取代 */
+@media(max-width:600px){
+  .hd{height:auto;padding:0}
+  .brand{flex:1 1 auto;min-width:0}
+  .wnav{flex:1 1 auto}
+}
+/* ── 決賽投影：1280×720 的首屏緊縮 ────────────────────────────────────
+   決賽現場投影為 720p。實測總覽分頁的「本週行動建議」帶底緣落在 727px
+   （W5/W8/W9/W10）與 750px（W6/W7，情境敘述較長使封面高 403px），
+   摺線 720 會把整條行動建議帶切掉——而那正是評審最該看到的一段。
+   最差需回收 30px；此處收 35px 留餘裕。
+   用 max-height 而非全域縮排：只在垂直空間真的不足時才緊縮，
+   一般螢幕的呼吸感完全不動。min-width 限定側欄版型，窄版本來就是捲的。 */
+@media (min-width:1100px) and (max-height:780px){
+  .product-frame{margin-top:8px}      /* −4 */
+  .topbar{min-height:42px}            /* −7 */
+  .guide{margin-bottom:6px}           /* −6 */
+  /* .hero 不可省：總覽區段是 <section class="hero" id="overview">，
+     而 .hero{padding-top:22px} 的特異性 (0,1,0) 壓過 section (0,0,1)，
+     與先後順序無關——只寫 section 那條完全不會生效（實測仍是 22px）。 */
+  section,.hero{padding-top:10px}     /* −12 */
+  .actband{margin-top:8px}            /* −6 */
+  .brief-main{padding-top:16px;padding-bottom:14px}   /* −14 */
+  .actband-h{padding-top:9px;padding-bottom:9px}      /* −6 */
+}
+@media print{
+  body{background:#fff!important;background-image:none!important}
+  body::before,.ambient-wash,.corner-habitat,.brief-fx{display:none!important}
+  .product-frame{display:block;width:auto;margin:0;padding:0;border:0;border-radius:0;
+    background:none;box-shadow:none;backdrop-filter:none}
+  header,.topbar,.guide{display:none!important}
+  .workspace{padding:0}
+  .card,.pb,.evc,details,.sa,.sc-card,.axc,.brief,.actband,.snap{
+    background:#fff!important;box-shadow:none!important;border-color:#bbb!important}
+}
 </style>
 </head>
 <body>
 <a class="skip" href="#main">跳到主要內容</a>
 <h1 class="sr">SCAI-Agent 半導體前瞻戰略情報儀表板</h1>
 
+<!-- 環境光暈與角落海香菇：純裝飾，z-index:-1／0，一律 aria-hidden，
+     且置於 .product-frame 之外或最底層，不影響任何可聚焦順序。 -->
+<div class="ambient-wash wash-a" aria-hidden="true"></div>
+<div class="ambient-wash wash-b" aria-hidden="true"></div>
+
+<div class="product-frame">
+<div class="frame-deco" aria-hidden="true">
+  <img class="corner-habitat corner-left" src="assets/corner-mushroom-habitat.webp"
+    width="1200" height="400" alt="">
+  <img class="corner-habitat corner-right" src="assets/corner-mushroom-habitat.webp"
+    width="1200" height="400" alt="">
+</div>
+
 <header>
   <div class="wrap hd">
     <div class="brand">
-      <img class="logo" src="assets/scai-logo-dark-bg.png" alt="SCAI-Agent 標誌">
+      <img class="brand-emblem" src="assets/brand-mushroom-emblem.webp"
+        width="180" height="180" alt="SCAI-Agent 標誌">
       <div><div class="bn">SCAI-Agent</div><div class="bs">半導體前瞻戰略情報</div></div>
     </div>
     <div class="hr">
@@ -798,13 +1140,20 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
       </div>
     </div>
   </div>
-  <nav class="tabnav" aria-label="分頁">
-    <div class="wrap" role="tablist" id="tabbar"></div>
-  </nav>
   <nav class="secnav" aria-label="區段導覽">
     <div class="wrap" id="secbar"></div>
   </nav>
 </header>
+
+<!-- 分頁列自 header 移到工作區頂端（＝V3.3 的 process-nav 位置）。
+     #tabbar 與 .tb 的 id/class 完全不動，JS 全以 $('#tabbar')／$$('#tabbar .tb')
+     綁定，無位置選擇器，故此搬移對行為零影響。 -->
+<div class="workspace">
+  <div class="topbar">
+    <nav class="tabnav" aria-label="分頁">
+      <div class="wrap" role="tablist" id="tabbar"></div>
+    </nav>
+  </div>
 
 <div class="guide"><div class="wrap">
   <b>第一次看？照這順序</b>
@@ -822,6 +1171,8 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
     方法論來源：元智大學管理學院 SCAI-Agent 競賽提案（指導教授 謝志宏、陳懷傑）｜團隊：海香菇
   </div>
 </footer>
+</div><!-- /.workspace -->
+</div><!-- /.product-frame -->
 
 <button id="top" aria-label="回到頂部">↑</button>
 
@@ -865,8 +1216,8 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const dimAvg=(w,d)=>d.members.reduce((s,i)=>s+w[i-1],0)/d.members.length;
-const DC=['#38547a','#357355','#b07a28','#6f5486','#9c5058'];
-const DIM_MUTE='#e3e2de';
+const DC=['#3f55ff','#007689','#aa5311','#834ad9','#c5277e'];
+const DIM_MUTE='#dcdff2';
 const dimIdx=id=>DATA.dims.findIndex(d=>d.members.includes(id));
 const fmt=n=>(n>0?'+':'')+n.toFixed(2);
 const xWord=v=>v<=-0.4?'明顯碎裂':v<=-0.15?'偏碎裂':v<0.15?'接近中性':v<0.4?'偏聚合':'明顯聚合';
@@ -1161,26 +1512,26 @@ function avgOf(set){
 function drawCmpXY(A,B,cv){
   const mkpts=set=>[...set].sort((a,b)=>a-b).map(k=>({x:DATA.weeks[k].xy.x,y:DATA.weeks[k].xy.y,l:'W'+DATA.weeks[k].week}));
   return new Chart(cv||$('#cmpxy'),{type:'scatter',data:{datasets:[
-    {label:'A 各週',data:mkpts(cmpA),pointRadius:4,pointBackgroundColor:'#38547a',pointBorderColor:'#fff',pointBorderWidth:1},
-    {label:'B 各週',data:mkpts(cmpB),pointRadius:4,pointBackgroundColor:'#a44a24',pointBorderColor:'#fff',pointBorderWidth:1},
-    {label:'A 平均',data:[{x:A.x,y:A.y,l:'A 平均'}],pointRadius:9,pointStyle:'rectRot',pointBackgroundColor:'#38547a'},
-    {label:'B 平均',data:[{x:B.x,y:B.y,l:'B 平均'}],pointRadius:9,pointStyle:'rectRot',pointBackgroundColor:'#a44a24'}]},
+    {label:'A 各週',data:mkpts(cmpA),pointRadius:4,pointBackgroundColor:'#3f55ff',pointBorderColor:'#fff',pointBorderWidth:1},
+    {label:'B 各週',data:mkpts(cmpB),pointRadius:4,pointBackgroundColor:'#4453d6',pointBorderColor:'#fff',pointBorderWidth:1},
+    {label:'A 平均',data:[{x:A.x,y:A.y,l:'A 平均'}],pointRadius:9,pointStyle:'rectRot',pointBackgroundColor:'#3f55ff'},
+    {label:'B 平均',data:[{x:B.x,y:B.y,l:'B 平均'}],pointRadius:9,pointStyle:'rectRot',pointBackgroundColor:'#4453d6'}]},
     options:{maintainAspectRatio:false,animation:{duration:300},
-      plugins:{legend:{position:'bottom',labels:{boxWidth:8,usePointStyle:true,font:{size:10.5},color:'#4a4741',padding:10}},
+      plugins:{legend:{position:'bottom',labels:{boxWidth:8,usePointStyle:true,font:{size:10.5},color:'#3e4a6b',padding:10}},
         tooltip:{callbacks:{label:c=>`${c.raw.l||c.dataset.label}（${c.raw.x.toFixed(2)}, ${c.raw.y.toFixed(2)}）`}}},
-      scales:{x:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}}},
-        y:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}}}}}});
+      scales:{x:{min:-1,max:1,grid:{color:'#e4e7f7'},ticks:{color:'#55628a',font:{size:10}}},
+        y:{min:-1,max:1,grid:{color:'#e4e7f7'},ticks:{color:'#55628a',font:{size:10}}}}}});
 }
 function drawCmpK(A,B,cv,full){
   const deltas=DATA.kdf.map((k,j)=>({id:k.id,name:k.name,d:B.w[j]-A.w[j]})).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d));
   const show=full?deltas:deltas.slice(0,10);
   return new Chart(cv||$('#cmpk'),{type:'bar',
     data:{labels:show.map(x=>x.id+'. '+x.name),datasets:[{data:show.map(x=>+x.d.toFixed(1)),
-      backgroundColor:show.map(x=>x.d>=0?'#2f7050':'#b03a30'),borderRadius:3,barPercentage:.72}]},
+      backgroundColor:show.map(x=>x.d>=0?'#0d6c86':'#b0106a'),borderRadius:3,barPercentage:.72}]},
     options:{indexAxis:'y',maintainAspectRatio:false,animation:{duration:300},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Δ ${c.raw>0?'+':''}${c.raw}`}}},
-      scales:{x:{grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}}},
-        y:{grid:{display:false},ticks:{color:'#4a4741',font:{size:10}}}}}});
+      scales:{x:{grid:{color:'#e4e7f7'},ticks:{color:'#55628a',font:{size:10}}},
+        y:{grid:{display:false},ticks:{color:'#3e4a6b',font:{size:10}}}}}});
 }
 /* 面板關閉後 #cmpui 會整個重建，原本被聚焦的元素隨之消失、焦點掉回文件開頭。
    關閉的四條路徑（Esc／✕／再點同一顆／選定結束週）一律把焦點交還該側按鈕。 */
@@ -1778,9 +2129,9 @@ function drawXY(idx,cv){
   const first=pts[0],last=pts[pts.length-1];
   $('#capx').innerHTML=`雙軸軌跡：X 由 ${fmt(first.x)} 移至 <b class="num">${fmt(last.x)}</b>，Y 由 ${fmt(first.y)} 移至 <b class="num">${fmt(last.y)}</b>。點上緣標示週次；點資料點可看該週講解，鍵盤則以左右鍵選擇、Enter 開啟。`;
   const inst=new Chart(cv||$('#cx'),{type:'scatter',
-    data:{datasets:[{data:pts,showLine:true,borderColor:'#cdc8bf',borderWidth:1.5,
+    data:{datasets:[{data:pts,showLine:true,borderColor:'#b9c0e8',borderWidth:1.5,
       pointRadius:pts.map((_,i)=>i===pts.length-1?7:4),
-      pointBackgroundColor:pts.map((_,i)=>i===pts.length-1?'#a44a24':'#d8d3ca'),
+      pointBackgroundColor:pts.map((_,i)=>i===pts.length-1?'#4453d6':'#b9c0e8'),
       pointBorderColor:'#fff',pointBorderWidth:1.5}]},
     options:{maintainAspectRatio:false,
       onClick:(e,els,ch)=>{const hit=ch.getElementsAtEventForMode(e,'nearest',{intersect:true},true)[0];
@@ -1788,26 +2139,26 @@ function drawXY(idx,cv){
       animation:matchMedia('(prefers-reduced-motion: reduce)').matches?false
         :{duration:480,delay:c=>c.type==='data'&&c.mode==='default'?c.dataIndex*160:0},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw.l}（${c.raw.x}, ${c.raw.y}）`}}},
-      scales:{x:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}},
-          title:{display:true,text:'碎裂 ← X 地緣與供應鏈 → 聚合',color:'#736e66',font:{size:11}}},
-        y:{min:-1,max:1,grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}},
-          title:{display:true,text:'匱乏 ← Y 資源與政策 → 充沛',color:'#736e66',font:{size:11}}}}},
+      scales:{x:{min:-1,max:1,grid:{color:'#e4e7f7'},ticks:{color:'#55628a',font:{size:10}},
+          title:{display:true,text:'碎裂 ← X 地緣與供應鏈 → 聚合',color:'#55628a',font:{size:11}}},
+        y:{min:-1,max:1,grid:{color:'#e4e7f7'},ticks:{color:'#55628a',font:{size:10}},
+          title:{display:true,text:'匱乏 ← Y 資源與政策 → 充沛',color:'#55628a',font:{size:11}}}}},
     plugins:[{id:'q',beforeDatasetsDraw(ch){const{ctx,chartArea:a,scales}=ch;
       const x0=scales.x.getPixelForValue(0),y0=scales.y.getPixelForValue(0);ctx.save();
       ctx.globalAlpha=.045;
-      ctx.fillStyle='#2f7050';ctx.fillRect(x0,a.top,a.right-x0,y0-a.top);
-      ctx.fillStyle='#a44a24';ctx.fillRect(a.left,a.top,x0-a.left,y0-a.top);
-      ctx.fillStyle='#38547a';ctx.fillRect(x0,y0,a.right-x0,a.bottom-y0);
-      ctx.fillStyle='#b03a30';ctx.fillRect(a.left,y0,x0-a.left,a.bottom-y0);
-      ctx.globalAlpha=1;ctx.fillStyle='#736e66';ctx.font='10px "Noto Sans TC",sans-serif';
+      ctx.fillStyle='#0d6c86';ctx.fillRect(x0,a.top,a.right-x0,y0-a.top);
+      ctx.fillStyle='#4453d6';ctx.fillRect(a.left,a.top,x0-a.left,y0-a.top);
+      ctx.fillStyle='#3f55ff';ctx.fillRect(x0,y0,a.right-x0,a.bottom-y0);
+      ctx.fillStyle='#b0106a';ctx.fillRect(a.left,y0,x0-a.left,a.bottom-y0);
+      ctx.globalAlpha=1;ctx.fillStyle='#55628a';ctx.font='10px "Noto Sans TC",sans-serif';
       ctx.textAlign='left';ctx.fillText('② Crossroads',a.left+7,a.top+15);
       ctx.textAlign='right';ctx.fillText('① Spring',a.right-7,a.top+15);
       ctx.fillText('③ Adaptation',a.right-7,a.bottom-7);
       ctx.textAlign='left';ctx.fillText('④ Inferno',a.left+7,a.bottom-7);
-      ctx.strokeStyle='#d6d0c6';ctx.beginPath();ctx.moveTo(x0,a.top);ctx.lineTo(x0,a.bottom);
+      ctx.strokeStyle='#c0c6ea';ctx.beginPath();ctx.moveTo(x0,a.top);ctx.lineTo(x0,a.bottom);
       ctx.moveTo(a.left,y0);ctx.lineTo(a.right,y0);ctx.stroke();ctx.restore();}},
      {id:'lb',afterDatasetsDraw(ch){const m=ch.getDatasetMeta(0),c=ch.ctx;c.save();
-      c.font='600 10px "Noto Sans TC",sans-serif';c.fillStyle='#4a4741';
+      c.font='600 10px "Noto Sans TC",sans-serif';c.fillStyle='#3e4a6b';
       m.data.forEach((pt,i)=>{c.fillText('W'+DATA.weeks[i].week,pt.x+9,pt.y-7)});c.restore();}}]
   });
   if(!cv)charts.push(inst);
@@ -1825,10 +2176,10 @@ function drawTrend(idx,cv){
       onClick:(e,els,ch)=>{const hit=ch.getElementsAtEventForMode(e,'nearest',{intersect:true},true)[0];
         if(hit)showWeekPop(hit.index);},
       plugins:{legend:{position:'bottom',labels:{boxWidth:8,boxHeight:8,usePointStyle:true,
-        pointStyle:'circle',font:{size:10.5},color:'#4a4741',padding:12}},
+        pointStyle:'circle',font:{size:10.5},color:'#3e4a6b',padding:12}},
         tooltip:{callbacks:{title:its=>{const wk=ws[its[0].dataIndex];return `W${wk.week}｜${deEnt(wk.scenarioEn||wk.scenario||'')}`}}}},
-      scales:{y:{min:40,max:85,grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}}},
-        x:{grid:{display:false},ticks:{color:'#736e66',font:{size:10.5}}}}}});
+      scales:{y:{min:40,max:85,grid:{color:'#e4e7f7'},ticks:{color:'#55628a',font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:'#55628a',font:{size:10.5}}}}}});
   if(!cv)charts.push(inst);
   return inst;
 }
@@ -1852,13 +2203,13 @@ function drawKDF(w,p){
             const out=[];if(p)out.push(`上週 ${p.w[c.dataIndex]} → 本週 ${c.raw}`);
             const def=DATA.kdfDefs[String(id)];if(def)out.push(...wrapText('定義：'+def,22));return out}
         }}},
-      scales:{x:{min:0,max:100,grid:{color:'#f0ece6'},ticks:{color:'#736e66',font:{size:10}}},
-        y:{grid:{display:false},ticks:{color:'#4a4741',font:{size:10.5}}}}},
+      scales:{x:{min:0,max:100,grid:{color:'#e4e7f7'},ticks:{color:'#55628a',font:{size:10}}},
+        y:{grid:{display:false},ticks:{color:'#3e4a6b',font:{size:10.5}}}}},
     plugins:[{id:'b',afterDatasetsDraw(ch){const x=ch.scales.x.getPixelForValue(50);
-      ch.ctx.save();ch.ctx.strokeStyle='#a5a099';ch.ctx.setLineDash([4,3]);ch.ctx.beginPath();
+      ch.ctx.save();ch.ctx.strokeStyle='#9aa3cf';ch.ctx.setLineDash([4,3]);ch.ctx.beginPath();
       ch.ctx.moveTo(x,ch.chartArea.top);ch.ctx.lineTo(x,ch.chartArea.bottom);ch.ctx.stroke();ch.ctx.restore();}},
      {id:'ghost',afterDatasetsDraw(ch){if(!p)return;const m=ch.getDatasetMeta(0);ch.ctx.save();
-      ch.ctx.strokeStyle='#736e66';ch.ctx.lineWidth=2;
+      ch.ctx.strokeStyle='#55628a';ch.ctx.lineWidth=2;
       m.data.forEach((bar,ix)=>{const gx=ch.scales.x.getPixelForValue(p.w[ix]);
         ch.ctx.beginPath();ch.ctx.moveTo(gx,bar.y-bar.height/2+1);ch.ctx.lineTo(gx,bar.y+bar.height/2-1);ch.ctx.stroke();});
       ch.ctx.restore();}}]});
@@ -2064,15 +2415,15 @@ async function aiAsk(){
 </script>
 <script>
 /* 滑鼠泡泡特效設定（2026-08-08 人類核定）
-   muted：取本站現行 token #736e66（交付文件寫的 #8b867d 為加深前的舊值）
+   muted：取本站現行 token #55628a（海香菇改版後值；交付文件的 #8b867d 為更早的舊值）
    trailInterval：22 → 27.5ms，軌跡生成頻率降為原本的 80%
    zIndex：2147483000 → 90，位於內容與 header(50) 之上、放大檢視(100) 與週次彈窗(110) 之下，
            避免泡泡飄在燈箱上方穿幫 */
 window.SCAI_POINTER_FX_CONFIG={
-  accent:'#a44a24',
-  ink:'#4a4741',
-  muted:'#736e66',
-  line:'#d6d0c6',
+  accent:'#4453d6',
+  ink:'#3e4a6b',
+  muted:'#55628a',
+  line:'#c0c6ea',
   trailInterval:27.5,
   maxParticles:96,
   respectReducedMotion:true,
@@ -2092,10 +2443,10 @@ window.SCAI_POINTER_FX_CONFIG={
   window.__SCAIPointerFXLoaded = true;
 
   const defaults = {
-    accent: '#a44a24',
-    ink: '#4a4741',
-    muted: '#8b867d',
-    line: '#d6d0c6',
+    accent: '#4453d6',
+    ink: '#3e4a6b',
+    muted: '#55628a',
+    line: '#c0c6ea',
     trailInterval: 22,
     maxParticles: 96,
     respectReducedMotion: true,
