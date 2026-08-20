@@ -1067,13 +1067,55 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
   .brand{flex:1 1 auto;min-width:0}
   .wnav{flex:1 1 auto}
 }
+/* ── Decision Trace 加總驗算 ── */
+.tsum{margin-top:14px;padding:14px 18px;border-radius:18px;
+  background:rgba(255,255,255,.72);border:1px solid rgba(120,130,214,.18);
+  border-left:3px solid var(--accent)}
+.tsum.bad{border-left-color:var(--err)}
+.tsum>b{font-size:12.5px;color:var(--ink)}
+.tsum-q{font-size:11.5px;color:var(--ink2);margin-left:10px}
+.tsum-t{width:auto;margin-top:9px;border-collapse:collapse;font-size:12px}
+.tsum-t td{padding:4px 18px 4px 0;border-bottom:1px solid rgba(120,130,214,.12);color:var(--ink2)}
+.tsum-t td.num{font-family:"IBM Plex Mono","Noto Sans TC",monospace;
+  font-variant-numeric:tabular-nums;text-align:right;padding-right:0;min-width:64px}
+.tsum-t tr.cur td{font-weight:700;color:var(--ink);border-bottom:none}
+.tsum-n{margin:9px 0 0;font-size:11px;color:var(--muted);line-height:1.7}
+.tsum.bad .tsum-n{color:var(--err);font-weight:600}
+@media(max-width:600px){.tsum-q{display:block;margin:4px 0 0}}
+
+/* ── 現場判定 ── */
+.jd{margin-top:14px}
+.jd-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:11px}
+.jd-h b{font-size:13.5px}
+.jd-q{font-size:12.5px;color:var(--ink2)}
+.jd-tag{margin-left:auto;font-size:9.5px;letter-spacing:.04em;padding:2px 9px;border-radius:999px;
+  background:rgba(176,16,106,.08);color:var(--err);border:1px solid rgba(176,16,106,.26);font-weight:700}
+.jd-in{display:grid;gap:8px;margin-bottom:11px}
+.jd-in select{max-width:none;width:100%}
+.jd-in textarea{width:100%;font-family:inherit;font-size:12px;line-height:1.7;color:var(--ink);
+  padding:10px 12px;border:1px solid var(--line2);border-radius:14px;background:rgba(255,255,255,.8);resize:vertical}
+.jd-in textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.jd-in button{justify-self:start}
+.jd-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.jd-col h4{margin:0 0 6px;font-size:11.5px;font-weight:800;color:var(--ink)}
+.jd-pre{margin:0;padding:11px 13px;border-radius:14px;white-space:pre-wrap;word-break:break-word;
+  font-family:inherit;font-size:11.5px;line-height:1.8;color:var(--ink2);
+  background:rgba(255,255,255,.72);border:1px solid rgba(120,130,214,.18)}
+.jd-meta{margin-top:6px;font-size:10.5px;color:var(--muted);line-height:1.65}
+.jd-wait{font-size:12px;color:var(--muted)}
+.jd-err{font-size:11.5px;color:var(--err);line-height:1.7}
+.jd-note{margin:11px 0 0;font-size:11px;color:var(--muted);line-height:1.75}
+.jd-note b{color:var(--ink2)}
+@media(max-width:820px){.jd-cols{grid-template-columns:1fr}.jd-tag{margin-left:0}}
+
 /* ── 規則模擬器 ── */
 .sim{margin-top:14px}
 .sim-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:11px}
 .sim-h b{font-size:13.5px}
 .sim-q{font-size:12.5px;color:var(--ink2)}
-.sim-chk{font-size:11px;color:var(--ok);margin-left:auto}
+.sim-chk{font-size:11px;color:var(--ok);margin-left:auto;max-width:60%;text-align:right;line-height:1.6}
 .sim-chk.bad{color:var(--err);font-weight:700}
+.sim-chk.note{color:var(--ink2)}
 .sim-ax{display:grid;grid-template-columns:auto 1fr;gap:7px 12px;align-items:center;margin-bottom:11px}
 .sim-ax label{font-size:11.5px;color:var(--ink2);white-space:nowrap}
 .sim-ax label b{font-family:"IBM Plex Mono","Noto Sans TC",monospace;color:var(--ink);margin-left:8px}
@@ -1744,6 +1786,106 @@ function go(i){
   },160);
 }
 
+/* ── Decision Trace 加總驗算（門檻④ 的可見化）─────────────────────────────
+   逐筆 ΔX／ΔY 站上一直印著，但從來沒有把它們加起來。門檻④（上週座標 ＋ Σ位移
+   ＝ 本週宣告座標）先前只存在於 data/week_schema.json 的文件裡——評審拿計算機
+   加一遍會得到什麼，我們自己沒有先擺出來。
+   這是 AI 判定唯一可被讀者當場驗算的地方，所以它該在畫面上，不該在文件裡。 */
+function traceSum(i){
+  const w=DATA.weeks[i], dt=w.decisionTrace||[];
+  if(!dt.length)return '';
+  const p=i>0?DATA.weeks[i-1]:null;
+  const sx=dt.reduce((s,t)=>s+(+t.xDelta||0),0), sy=dt.reduce((s,t)=>s+(+t.yDelta||0),0);
+  const r3=n=>Math.round(n*1000)/1000;
+  const row=(k,x,y,cls)=>`<tr class="${cls||''}"><td>${k}</td>`
+    +`<td class="num">${x===null?'—':fmt(x)}</td><td class="num">${y===null?'—':fmt(y)}</td></tr>`;
+  if(!p) return `<div class="tsum"><b>逐筆位移加總</b>
+    <table class="tsum-t"><tbody>
+      ${row('本期 Σ位移',r3(sx),r3(sy))}
+      ${row('宣告座標',w.xy.x,w.xy.y,'cur')}
+    </tbody></table>
+    <p class="tsum-n">W1 為基準週，無上一期座標可相加，故本期不做加總驗算。</p></div>`;
+  const ex=r3(p.xy.x+sx), ey=r3(p.xy.y+sy);
+  const ok=Math.abs(ex-w.xy.x)<1e-9&&Math.abs(ey-w.xy.y)<1e-9;
+  return `<div class="tsum${ok?'':' bad'}"><b>逐筆位移加總</b>
+    <span class="tsum-q">上面每一筆的 ΔX／ΔY 加起來，應該正好等於本週宣告座標</span>
+    <table class="tsum-t"><tbody>
+      ${row('上期宣告座標（W'+p.week+'）',p.xy.x,p.xy.y)}
+      ${row('＋ 本期 Σ位移（'+dt.length+' 筆）',r3(sx),r3(sy))}
+      ${row('＝ 推得',ex,ey)}
+      ${row('本期宣告座標',w.xy.x,w.xy.y,'cur')}
+    </tbody></table>
+    <p class="tsum-n">${ok
+      ?'✓ 相符。這條關係自 W2 起每一週都成立，但一直到 2026-08-18 才被寫成匯入門檻——W10 首版是開站以來第一次不吻合，因此被退回重修。'
+      :'✗ 不吻合。差 ΔX '+fmt(r3(ex-w.xy.x))+'、ΔY '+fmt(r3(ey-w.xy.y))+'——此為缺陷，不應出現。'}</p></div>`;
+}
+
+/* ── 現場判定（判定鏈第一段的示範）───────────────────────────────────────
+   ⚠ 這是全站唯一沒有對照組可自動比對的東西——模型現場講什麼就是什麼。
+   因此三件事必須做到：① 標示「現場生成、未經覆核、不屬於本週報告」
+   ② 選已收錄事件時，把當時的判定並排出來讓人自己比 ③ 明講 AI 只看得到這一則。
+   不做這三件，它就從「示範可稽核性」變成「一個無法驗證的 AI 演出」。 */
+/* 比對前先剝掉【…】——補記事件的 trace 標題帶著一長串揭露文字（「【補記事件：原始
+   日期…依 week_schema 補記事件處理規則…】」），那是揭露不是識別，留著會把重疊度
+   稀釋到對不上（實測 W10 事件 7 由 0.17 升到可對照）。 */
+const jdClean=s=>deEnt(String(s||'')).replace(/【[^】]*】/g,'').trim();
+function jdSim(a,b){            /* 2-gram 重疊度，用來把事件對回它的 decisionTrace */
+  const g=s=>{const o=new Set();const t=jdClean(s);for(let i=0;i<t.length-1;i++)o.add(t.slice(i,i+2));return o};
+  const A=g(a),B=g(b);if(!A.size||!B.size)return 0;
+  let n=0;A.forEach(x=>{if(B.has(x))n++});
+  return 2*n/(A.size+B.size);
+}
+function wireJudge(i){
+  const box=$('#jd'); if(!box)return;
+  const w=DATA.weeks[i], pick=$('#jdpick'), ta=$('#jdtext'), out=$('#jdout'), go=$('#jdgo');
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  pick.onchange=()=>{
+    out.innerHTML='';
+    if(pick.value===''){ta.value='';return}
+    const e=w.events[+pick.value];
+    ta.value=deEnt(e.title)+'。'+deEnt(e.summary||'');
+  };
+  go.onclick=async()=>{
+    const q=ta.value.trim(); if(!q){ta.focus();return}
+    const ep=(window.SCAI_AI_CONFIG||{}).endpoint||'';
+    if(!ep){out.innerHTML='<div class="jd-err">未設定 AI 端點，現場判定不可用。</div>';return}
+    go.disabled=true; out.innerHTML='<div class="jd-wait">AI 判定中…</div>';
+    let tm=null;
+    try{
+      const ctl=new AbortController(); tm=setTimeout(()=>ctl.abort(),20000);
+      const r=await fetch(ep,{method:'POST',headers:{'content-type':'application/json'},signal:ctl.signal,
+        body:JSON.stringify({mode:'judge',question:q})});
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const j=await r.json();
+      const u=j.usage||{};
+      let html='<div class="jd-cols"><div class="jd-col"><h4>AI 現場判定</h4>'
+        +'<pre class="jd-pre">'+esc(j.answer)+'</pre>'
+        +'<div class="jd-meta">模型 '+esc(j.model||'AI')+'｜in '+(u.input_tokens??'—')
+        +'／out '+(u.output_tokens??'—')+' tokens</div></div>';
+      /* 對照組：只有選了已收錄事件才有。自己貼的那段沒有正本可比，就不假裝有。 */
+      if(pick.value!==''){
+        const e=w.events[+pick.value];
+        const dt=(w.decisionTrace||[]);
+        let best=null,bs=0;
+        dt.forEach(t=>{const s=jdSim(deEnt(t.event),deEnt(e.title));if(s>bs){bs=s;best=t}});
+        html+='<div class="jd-col"><h4>當時的判定'+(bs<0.2?'（對不到，本則無決策軌跡）':'')+'</h4>';
+        if(best&&bs>=0.2){
+          html+='<pre class="jd-pre">X：'+fmt(+best.xDelta||0)+'\nY：'+fmt(+best.yDelta||0)
+            +'\nKDF：'+((best.kdfChanges||[]).map(k=>'#'+k.id+' '+deEnt(k.name)+' '+k.from+'→'+k.to).join('、')||'不調整')
+            +'</pre><div class="jd-meta">'+esc((best.kdfChanges||[]).map(k=>deEnt(k.reason||'')).join(' / ').slice(0,180))+'</div>';
+        }else{
+          html+='<div class="jd-meta">此事件未對應到任何 decisionTrace 條目——補記事件與純記錄性事件（如「本週無天災通報」）本來就不產生位移。</div>';
+        }
+        html+='</div>';
+      }
+      out.innerHTML=html+'</div>';
+    }catch(err){
+      out.innerHTML='<div class="jd-err">判定失敗：'+esc(err&&err.name==='AbortError'?'逾時（20 秒）':String(err&&err.message||err))
+        +'。免費額度用罄或斷線時會出現此訊息；本區失效不影響站上任何既有資料。</div>';
+    }finally{ if(tm)clearTimeout(tm); go.disabled=false; }
+  };
+}
+
 /* ── 規則模擬器：以 JS 重跑 plan_engine 的觸發判定 ──────────────────────────
    條件三型別（axis／kdf／keyword）與 AND/OR 完全比照 src/plan_engine.py 的
    check()／evaluate()。KDF 與關鍵字維持該週實際值——它們來自事件內容，不是
@@ -1751,12 +1893,28 @@ function go(i){
    ⚠ 一致性自檢：滑桿回到本週實際座標時，算出的觸發集合必須等於報告中的
    firedPlaybooks。不相等就在面板上明說「與引擎不一致」並列出兩邊——寧可自曝，
    也不讓一個會說謊的模擬器上台。 */
+/* 否定子句剔除：與 plan_engine.strip_negated() 逐字對齊。兩邊都改才算改完——
+   只改一邊會讓自檢在每一週都報不一致。 */
+const SIMNEG=['無','未','沒有'], SIMNEG_OK=['無晶圓廠','無塵室','無人','未來'];
+/* 已知且刻意保留的差異。新增一筆等於承認一次「當時算錯了但不回頭改」，
+   所以每一筆都要寫清楚是哪次修正、為什麼不重算。空的才是正常狀態。 */
+const SIM_KNOWN={
+  10:{drop:['PB-07'],
+      why:'引擎於 2026-08-20 修掉否定判讀（原本把「本週無天災、停電或缺水通報」讀成命中天災）。'
+        +'W10 紀錄早於該修正，依 append-only 未回頭改寫，僅對 W11 起生效。'}
+};
+function simStripNeg(t){
+  return t.split(/[。！？；\n，,]/).filter(cl=>{
+    let probe=cl; SIMNEG_OK.forEach(w=>{probe=probe.split(w).join('')});
+    return !SIMNEG.some(n=>probe.indexOf(n)>=0);
+  }).join(' ');
+}
 function simText(w){                       // 對齊 plan_engine.week_text()
   const p=[w.scenarioDesc||''];
   (w.events||[]).forEach(e=>p.push(e.title||'',e.summary||''));
   (w.decisionTrace||[]).forEach(t=>{p.push(t.event||'');(t.keywords||[]).forEach(k=>p.push(k))});
   (w.riskRadar||[]).forEach(r=>p.push(r.risk||'',r.signal||''));
-  return p.join(' ');
+  return simStripNeg(p.join(' '));
 }
 const SIMCMP={'<=':(a,b)=>a<=b,'>=':(a,b)=>a>=b,'<':(a,b)=>a<b,'>':(a,b)=>a>b,'==':(a,b)=>a===b};
 function simCheck(c,xy,w,text){
@@ -1776,9 +1934,13 @@ function simEval(xy,w,text){
       ok:(t.logic||'AND')==='AND'?rs.every(r=>r[0]):rs.some(r=>r[0])};
   });
 }
-function wireSim(){
+/* 參數要用 render(i) 的 i，不可讀全域 cur——cur 是 go() 設的，render() 不設。
+   直接呼叫 render(i) 逐週驗證時 cur 會停在上一次的值，面板整組拿錯週次的資料，
+   而自檢因為兩邊都拿到同一週而顯示「一致」——一個看起來全綠的假驗證。
+   （同一個坑在 go() 的 setTimeout 上踩過一次，見金庫「非同步包裝使逐項驗證失真」。） */
+function wireSim(i){
   const box=$('#sim'); if(!box||!DATA.triggers)return;
-  const w=DATA.weeks[cur], text=simText(w), real={x:w.xy.x,y:w.xy.y};
+  const w=DATA.weeks[i], text=simText(w), real={x:w.xy.x,y:w.xy.y};
   const sx=$('#simx'), sy=$('#simy');
   const draw=()=>{
     const xy={x:+sx.value,y:+sy.value};
@@ -1791,13 +1953,24 @@ function wireSim(){
     $('#simout').innerHTML=res.map(r=>`<div class="sim-r${r.ok?' on':''}">`
       +`<i>${r.ok?'✓':'✗'}</i><b>${r.id}</b><span>${r.title}</span>`
       +`<em>${r.conds.map(c=>(c[0]?'✓ ':'✗ ')+c[1]).join('　·　')}</em></div>`).join('');
-    const mine=res.filter(r=>r.ok).map(r=>r.id).sort().join('、');
-    const eng=(((w.companyPlan||{}).firedPlaybooks)||[]).map(f=>f.id).sort().join('、');
+    const mineA=res.filter(r=>r.ok).map(r=>r.id).sort(), mine=mineA.join('、');
+    const engA=(((w.companyPlan||{}).firedPlaybooks)||[]).map(f=>f.id).sort(), eng=engA.join('、');
     const atReal=Math.abs(xy.x-real.x)<1e-9&&Math.abs(xy.y-real.y)<1e-9;
     const chk=$('#simchk');
+    /* 兩種不一致要分開講，它們的意義完全相反：
+       ① 已知且刻意保留 —— 該週紀錄產生於某次引擎修正之前，依 append-only 不回頭
+          改寫已發佈週次。這是誠實的結果，該揭露不該警告。
+       ② 其他任何不一致 —— 那是模擬器抄錯了引擎，是真缺陷，維持警告。
+       不設這個區分的話，B 方案（不回頭重算）會讓面板在該週長期顯示紅字，
+       久了就沒有人再看它——一個永遠在響的警報等於沒有警報。 */
+    const kn=SIM_KNOWN[w.week];
+    const isKnown=kn&&engA.filter(x=>mineA.indexOf(x)<0).join('、')===kn.drop.join('、')
+                    &&mineA.filter(x=>engA.indexOf(x)<0).length===0;
     chk.textContent=!atReal?'':(mine===eng?'✓ 與本週報告的觸發結果一致'
+      :isKnown?'已知差異：報告多 '+kn.drop.join('、')+'——'+kn.why
       :'⚠ 與引擎不一致：模擬得 '+(mine||'無')+'，報告為 '+(eng||'無'));
-    chk.className='sim-chk'+(atReal&&mine!==eng?' bad':'');
+    chk.className='sim-chk'+(atReal&&mine!==eng&&!isKnown?' bad':'')
+      +(atReal&&isKnown?' note':'');
   };
   const reset=()=>{sx.value=real.x;sy.value=real.y;draw()};
   sx.oninput=draw; sy.oninput=draw; $('#simreset').onclick=reset;
@@ -2039,6 +2212,26 @@ function render(i){
           ${t.kdfChanges.map(k=>`<div class="kdfc">#${k.id} ${k.name}　<b>${k.from}→${k.to}</b>　<span style="color:var(--muted)">${k.reason}</span></div>`).join('')}
           ${safeUrl(ev.url)?`<div class="src">${ev.source||''} · ${ev.date||''} · <a href="${safeUrl(ev.url)}" target="_blank" rel="noopener">原文 <span class="arw">↗</span></a></div>`:''}
         </div></details>`}).join('')}
+    ${traceSum(i)}
+    ${IS_OFFLINE?'':`<div class="card jd" id="jd">
+      <div class="jd-h"><b>現場判定</b>
+        <span class="jd-q">丟一則事件給 AI，看它怎麼判成雙軸位移</span>
+        <span class="jd-tag" title="此區的輸出為現場即時生成，未經人工覆核，不構成本週報告的一部分">現場生成 · 未經覆核 · 不屬於本週報告</span></div>
+      <div class="jd-in">
+        <select id="jdpick" aria-label="選擇要判定的事件">
+          <option value="">自己貼一段…</option>
+          ${(w.events||[]).map((e,j)=>`<option value="${j}">本週事件 ${j+1}　${e.title.slice(0,24)}</option>`).join('')}
+        </select>
+        <textarea id="jdtext" rows="3" maxlength="1200"
+          placeholder="貼一則半導體產業事件，或從上方選一則本週已收錄的事件（選已收錄的才能跟當時的判定並排對照）"
+          aria-label="待判定的事件敘述"></textarea>
+        <button type="button" class="cmp-more" id="jdgo">交給 AI 判定</button>
+      </div>
+      <div class="jd-out" id="jdout" aria-live="polite"></div>
+      <p class="jd-note">AI 只看得到你貼的這一則，當時的判定則是在整週九則事件、前一週座標與風險雷達都在眼前的情況下做的——
+        兩邊不同不必然是誰錯，但差得多就值得追問。這一段是判定鏈裡<b>唯一由模型決定</b>的部分；
+        接下來「哪幾條劇本被觸發」是確定性規則，不經模型（可在 §02 的規則模擬器自行重算）。</p>
+    </div>`}
     <div class="audit">管線稽核：<a href="https://github.com/sakaban-Code/SCAI-test" target="_blank" rel="noopener">原始碼與資料 repo ↗</a> · <a href="https://github.com/sakaban-Code/SCAI-test/actions/workflows/weekly.yml" target="_blank" rel="noopener">每週自動執行紀錄 ↗</a>${w.tokenUsage?`　·　本週模型用量 <b class="num">${(w.tokenUsage.total||0).toLocaleString()}</b> tokens${w.tokenUsage.byStep?`<table><thead><tr><th>步驟</th><th>模型</th><th>in</th><th>out</th></tr></thead><tbody>${Object.entries(w.tokenUsage.byStep).map(([k,v])=>`<tr><td>${k}</td><td>${v.model||''}</td><td class="num">${(v.input_tokens||0).toLocaleString()}</td><td class="num">${(v.output_tokens||0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:''}`:'　·　自 W7 起由雲端管線自動產出，並於本區附逐模型 token 用量'}</div>
   </section>
 
@@ -2182,7 +2375,8 @@ function render(i){
     const nb=document.querySelector(`.co-b[data-co="${curCompany}"]`);
     if(nb)nb.focus({preventScroll:true});
   });
-  wireSim();
+  wireSim(i);
+  wireJudge(i);
   heroFx();
   /* setTab 內含 bindSpy 與圖表 resize；圖表先畫再切分頁，藏起來的那些會在
      使用者切到該頁時由 setTab 的 resize 補正尺寸。keepScroll＝重繪不捲頂。 */
