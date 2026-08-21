@@ -20,13 +20,12 @@ daily_watch.py — 每日輕巡邏（憲法 182–185 行的雲端實作；2026-
                                     使 72 小時去重在影子期即真實運作
 
 用法：
-  python src/daily_watch.py             巡邏一次（需 TAVILY_API_KEY）
-  python src/daily_watch.py --dry-run   抓取＋判級，不寫檔不寄信
+  python src/daily_watch.py             巡邏一次（需 TAVILY_API_KEY；不寄信＝shadow）
   python src/daily_watch.py --verify    上線驗收六項（離線，不需任何 key）
   python src/daily_watch.py --send-test 寄模擬 RED 給 GMAIL_USER 本人（僅 ALERT_MODE=test）
   python src/daily_watch.py --scan 路徑… 洩漏掃描（信箱／API key／家目錄路徑；命中 exit 1）
 """
-import argparse, csv, datetime, io, json, os, pathlib, re, sys
+import argparse, csv, datetime, json, os, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
@@ -270,7 +269,7 @@ def append_alerts_log(reds, sent):
 
 # ---- 主流程 ----------------------------------------------------------------
 
-def patrol(dry=False):
+def patrol():
     mode = os.environ.get("ALERT_MODE", "shadow")
     started = now_iso()
     scanned = n_red = n_yel = 0
@@ -299,24 +298,22 @@ def patrol(dry=False):
             else:
                 n_yel += 1
             day_items.append(rec)
-        sent, reason = (False, "dry-run 不寄") if dry else dispatch(reds_new, mode)
+        sent, reason = dispatch(reds_new, mode)
         for rec in reds_new:
             rec["alerted"] = sent
         print(f"[巡邏] mode={mode} 掃描 {scanned} 則 → RED {n_red}／YELLOW {n_yel}；寄信：{reason}")
         for rec in day_items:
             print(f"  {rec['tier']:6} {rec['ruleId']}  {rec['title'][:60]}")
-        if not dry:
-            if reds_new:
-                append_alerts_log(reds_new, sent)
-            if day_items:
-                write_day_file(day_items)
+        if reds_new:
+            append_alerts_log(reds_new, sent)
+        if day_items:
+            write_day_file(day_items)
         status = "success"
     except Exception as e:
         err = f"{type(e).__name__}: {e}"
         status = "failed"
-    if not dry:
-        p = write_receipt(status, mode, scanned, n_red, n_yel, started, err)
-        print(f"[收據] {p.name} status={status}")
+    p = write_receipt(status, mode, scanned, n_red, n_yel, started, err)
+    print(f"[收據] {p.name} status={status}")
     if status == "failed":
         sys.exit(f"[巡邏失敗] {err}")
 
@@ -494,7 +491,6 @@ def verify():
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="SCAI-Agent 每日輕巡邏")
     g = ap.add_mutually_exclusive_group()
-    g.add_argument("--dry-run", action="store_true", help="抓取＋判級，不寫檔不寄信")
     g.add_argument("--verify", action="store_true", help="上線驗收六項（離線）")
     g.add_argument("--send-test", action="store_true", help="寄模擬 RED 給 GMAIL_USER（僅 ALERT_MODE=test）")
     g.add_argument("--scan", nargs="+", metavar="PATH", help="洩漏掃描；命中即 exit 1")
@@ -512,4 +508,4 @@ if __name__ == "__main__":
             sys.exit(1)
         print("[洩漏掃描] 乾淨")
     else:
-        patrol(dry=a.dry_run)
+        patrol()

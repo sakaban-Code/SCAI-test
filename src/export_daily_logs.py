@@ -16,10 +16,9 @@ import argparse, csv, io, json, pathlib, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from daily_watch import scan_text
+from daily_watch import scan_text, CSV_COLS
 
 KEEP_ITEM = ("title", "source", "date", "url", "tier", "ruleId", "summary", "alerted")
-CSV_COLS = ["datetime", "tier", "ruleId", "title", "url", "emailSent"]
 
 
 def main():
