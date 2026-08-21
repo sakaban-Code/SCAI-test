@@ -185,6 +185,52 @@ def build_token_dev(root: pathlib.Path):
     }
 
 
+def build_alerts(root: pathlib.Path, weeks: list):
+    """即時警報紅條資料：每日監測的 RED，「出現～被週報涵蓋」為止。
+
+    - 只帶 emailSent=true——紅條與警報信同一道門檻（使用者 2026-08-22 裁定），
+      shadow 期的純關鍵字誤判不上公開首頁。
+    - 建置端條件①：警報日期尚未被任何已發佈週次的窗口涵蓋（W11 一匯入即熄）。
+    - 瀏覽器端條件②：現在 < 警報時間＋7 天（exp，毫秒）——就算沒人重建，8/28 也自動熄。
+    - 衍生顯示值，不寫回任何正本（與 coverage／risk_outcomes 同模式）。
+    """
+    import csv as _csv
+    p = root / "logs" / "alerts_log.csv"
+    if not p.exists():
+        return []
+    rules = load(root / "data" / "alert_rules.json")
+    rb = {r["id"]: r for rs in rules["ruleSets"].values() if isinstance(rs, list) for r in rs}
+    covered_end = max((w.get("end") or "" for w in weeks), default="")
+    tz_tw = datetime.timezone(datetime.timedelta(hours=8))
+    out = []
+    with p.open(encoding="utf-8", newline="") as f:
+        for row in _csv.DictReader(f):
+            if row.get("tier") != "RED" or row.get("emailSent") != "true":
+                continue
+            try:
+                # 警報時間記的是台北時間；CI 建置機是 UTC，必須顯式掛時區否則 exp 差 8 小時
+                ts = datetime.datetime.strptime(row["datetime"], "%Y-%m-%d %H:%M").replace(tzinfo=tz_tw)
+            except (ValueError, KeyError):
+                continue
+            day = ts.date().isoformat()
+            if covered_end and day <= covered_end:
+                continue  # 已被週報涵蓋 → 熄
+            r = rb.get(row.get("ruleId", ""), {})
+            rec = {"dt": row["datetime"], "title": row["title"], "url": row["url"],
+                   "ruleId": row.get("ruleId", ""), "why": r.get("why", ""),
+                   "action": r.get("action", ""), "playbook": r.get("playbook", "—"),
+                   "exp": int((ts + datetime.timedelta(days=7)).timestamp() * 1000)}
+            dw = root / "logs" / "daily_watch" / f"{day}.json"
+            if dw.exists():
+                for it in load(dw).get("items", []):
+                    if it.get("url") == row["url"] and it.get("summary"):
+                        rec["summary"] = it["summary"]
+                        break
+            out.append(rec)
+    out.sort(key=lambda a: a["dt"], reverse=True)
+    return out
+
+
 def build_payload(root: pathlib.Path) -> dict:
     weeks = copy.deepcopy(load(root / "data" / "weeks.json"))
     for w in weeks:
@@ -234,6 +280,8 @@ def build_payload(root: pathlib.Path) -> dict:
     token_dev = build_token_dev(root)
     return {
         # 模型名稱來自各工具的紀錄檔（非自家設定檔），與 weeks 同樣施用跳脫
+        # 即時警報同樣來自外部新聞文字，與 weeks 一體施用跳脫
+        "alerts": escape_html_deep(build_alerts(root, weeks)),
         "tokenDev": escape_html_deep(token_dev) if token_dev else None,
         "companies": escape_html_deep(companies) if companies else None,
         "weeks": escape_html_deep(weeks),

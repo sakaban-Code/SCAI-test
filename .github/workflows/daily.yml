@@ -68,16 +68,30 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python src/daily_watch.py --send-test
 
+      - name: Rebuild site if new confirmed RED（紅條上線；使用者 2026-08-22 授權此自動推 docs/ 例外）
+        id: red
+        if: steps.keys.outputs.ok == 'true'
+        run: |
+          # 本次巡邏是否新增了 emailSent=true 的 RED（shadow 期恆為 false，不會觸發重建）
+          if git diff -- logs/alerts_log.csv | grep -q '^+.*,true$'; then
+            python src/build_site.py
+            python src/build_offline.py --no-net
+            echo "rebuilt=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "rebuilt=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Leak scan（信箱／API key／家目錄路徑；命中即失敗、不 commit）
         if: steps.keys.outputs.ok == 'true'
         run: python src/daily_watch.py --scan logs data/alert_rules.json
 
-      - name: Commit logs（只加 logs/——收據與日誌留痕）
+      - name: Commit logs（收據與日誌留痕；有新 RED 時連同重建後的 docs/）
         if: steps.keys.outputs.ok == 'true'
         run: |
           git config user.name  "scai-agent-bot"
           git config user.email "bot@scai-agent"
           git add logs/
+          if [ "${{ steps.red.outputs.rebuilt }}" = "true" ]; then git add docs/; fi
           git diff --cached --quiet || git commit -m "chore(daily): $(date -u +%F) 每日巡邏"
           git pull --rebase origin main
           git push

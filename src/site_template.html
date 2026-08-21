@@ -1161,6 +1161,47 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
   .card,.pb,.evc,details,.sa,.sc-card,.axc,.brief,.actband,.snap{
     background:#fff!important;box-shadow:none!important;border-color:#bbb!important}
 }
+/* ── 即時警報紅條與置頂卡（出現～被週報涵蓋；瀏覽器端逾 7 天自動熄） ── */
+#alertbar{display:none;margin:10px 16px 0;border-radius:12px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#b0106a,#8f0d56);color:#fff;
+  box-shadow:0 0 0 1px rgba(176,16,106,.35),0 6px 22px rgba(176,16,106,.25)}
+#alertbar.on{display:flex;align-items:center;gap:12px;padding:10px 14px;
+  animation:abGlow 2.4s ease-in-out infinite}
+@keyframes abGlow{0%,100%{box-shadow:0 0 0 1px rgba(176,16,106,.35),0 6px 22px rgba(176,16,106,.25)}
+  50%{box-shadow:0 0 0 1px rgba(176,16,106,.65),0 6px 30px rgba(176,16,106,.55)}}
+.ab-chip{flex:0 0 auto;background:#fff;color:#8f0d56;font-weight:800;font-size:11px;
+  letter-spacing:.08em;padding:2px 8px;border-radius:999px}
+#alertbar .ab-t{flex:1 1 auto;min-width:0;font-weight:600;font-size:13.5px;line-height:1.45;
+  overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+#alertbar .ab-go{flex:0 0 auto;color:#fff;font-weight:700;font-size:12.5px;text-decoration:underline;
+  text-underline-offset:3px;border-radius:6px;padding:4px 6px}
+#alertbar .ab-x{flex:0 0 auto;border:none;background:rgba(255,255,255,.16);color:#fff;width:26px;height:26px;
+  border-radius:8px;cursor:pointer;font-size:13px;line-height:1}
+#alertbar .ab-x:hover{background:rgba(255,255,255,.3)}
+.tb{position:relative}
+.tb .tbdot{position:absolute;top:6px;right:8px;width:8px;height:8px;border-radius:50%;background:#b0106a;
+  animation:tbPulse 1.8s ease-out infinite}
+@keyframes tbPulse{0%{box-shadow:0 0 0 0 rgba(176,16,106,.5)}70%{box-shadow:0 0 0 7px rgba(176,16,106,0)}100%{box-shadow:0 0 0 0 rgba(176,16,106,0)}}
+.alertc{border:2px solid #b0106a;border-radius:14px;padding:14px 16px;margin:0 0 14px;
+  background:linear-gradient(180deg,rgba(176,16,106,.06),rgba(176,16,106,.015))}
+.alertc .ah{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;color:#8f0d56;font-size:12.5px}
+.alertc .am{color:var(--muted);font-size:11.5px}
+.alertc .at{font-weight:700;font-size:15px;line-height:1.5;color:var(--ink)}
+.alertc .as{margin-top:6px;font-size:13px;line-height:1.7;color:var(--ink2)}
+.alertc .af{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:12px;color:var(--ink2)}
+.alertc .af b{color:#8f0d56;margin-right:4px}
+.alertc .af a{color:var(--accent);font-weight:600}
+@media (prefers-reduced-motion:reduce){#alertbar.on,.tb .tbdot{animation:none}}
+@media (max-width:600px){#alertbar{margin:8px 10px 0}#alertbar.on{padding:9px 10px;gap:8px}}
+/* 720p 投影＋紅條活著：紅條縮成單行、收起導引列，把行動建議帶保回摺線之上。
+   ⚠ 這段必須放在上方 #alertbar 主樣式之後——同特異性靠順序取勝，搬到前面就會失效
+   （已實測：放在 1142 行的 720p 區塊裡時 line-clamp:1 被主樣式的 clamp:2 蓋掉）。 */
+@media (min-width:1100px) and (max-height:780px){
+  #alertbar{margin:6px 16px 0}
+  #alertbar.on{padding:6px 12px}
+  #alertbar .ab-t{-webkit-line-clamp:1}
+  html.alert-on .guide{display:none}
+}
 </style>
 </head>
 <body>
@@ -1214,6 +1255,9 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
      #tabbar 與 .tb 的 id/class 完全不動，JS 全以 $('#tabbar')／$$('#tabbar .tb')
      綁定，無位置選擇器，故此搬移對行為零影響。 -->
 <div class="workspace">
+  <!-- 即時警報紅條：預設隱藏，wireAlertBar() 只在有未過期警報時點亮。
+       顯示規則見 sitedata.build_alerts()——與警報信同門檻、被週報涵蓋即熄。 -->
+  <div id="alertbar" role="status"></div>
   <div class="topbar">
     <nav class="tabnav" aria-label="分頁">
       <div class="wrap" role="tablist" id="tabbar"></div>
@@ -1382,7 +1426,7 @@ function buildTabBar(){
      重建前記住焦點在列內，重建後交還給新的作用中分頁。 */
   const hadFocus=bar.contains(document.activeElement);
   bar.innerHTML=TABS.map(t=>`<button type="button" class="tb${t.k===curTab?' on':''}" role="tab"
-    data-tab="${t.k}" aria-selected="${t.k===curTab}"><span class="tb-l">${t.label}</span><span class="tb-h">${t.hint}</span></button>`).join('');
+    data-tab="${t.k}" aria-selected="${t.k===curTab}"><span class="tb-l">${t.label}</span><span class="tb-h">${t.hint}</span>${t.k==='intel'&&typeof ALERTS_LIVE!=='undefined'&&ALERTS_LIVE.length&&!window.ALERTS_X?'<span class="tbdot" aria-hidden="true"></span>':''}</button>`).join('');
   $$('#tabbar .tb').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
   if(hadFocus){const on=bar.querySelector('.tb.on');if(on)on.focus({preventScroll:true})}
 }
@@ -1978,6 +2022,44 @@ function wireSim(i){
 }
 
 /* ── render ── */
+/* ── 即時警報（每日監測 RED，與警報信同門檻）──
+   建置端只帶「未被任何已發佈週次涵蓋」且 emailSent=true 的 RED；
+   瀏覽器端再驗時效（警報時間＋7 天）：過期即整組不顯示，不需重建也會自動熄。
+   翻閱 W1–W10 歷史週時置頂卡不出現（只掛在最新一週），紅條屬站級提示、不隨週切換。 */
+const ALERTS_LIVE=(DATA.alerts||[]).filter(a=>Date.now()<a.exp);
+function alertCard(i){
+  if(!ALERTS_LIVE.length||i!==DATA.weeks.length-1)return '';
+  return ALERTS_LIVE.map(a=>`<div class="alertc" role="note">
+    <div class="ah"><span class="ab-chip">RED</span><b>即時警報</b>
+      <span class="am">${a.dt}｜規則 ${a.ruleId}｜來源：每日監測（未經週報四道門檻，分級屬【推斷】）</span></div>
+    <div class="at">${a.title}</div>
+    ${a.summary?`<div class="as">${a.summary.length>190?a.summary.slice(0,190)+'…':a.summary}</div>`:''}
+    <div class="af">
+      <span><b>為何重大</b>${a.why}</span>
+      <span><b>建議動作</b>${a.action}</span>
+      <span><b>對應劇本</b>${a.playbook}</span>
+      <a href="${safeUrl(a.url)}" target="_blank" rel="noopener">原文 <span class="arw">↗</span></a></div>
+  </div>`).join('');
+}
+function wireAlertBar(){
+  const bar=$('#alertbar');if(!bar||!ALERTS_LIVE.length)return;
+  const a=ALERTS_LIVE[0],more=ALERTS_LIVE.length>1?`（＋${ALERTS_LIVE.length-1} 則）`:'';
+  /* href="#events"：既有的跨分頁錨點攔截器會先切到情報分頁再捲到事件區，置頂卡就在那裡 */
+  bar.innerHTML=`<span class="ab-chip">RED</span>
+    <span class="ab-t">【SCAI 即時警報】${a.title}${more}</span>
+    <a class="ab-go" href="#events">詳情</a>
+    <button class="ab-x" type="button" aria-label="關閉警報列">✕</button>`;
+  bar.classList.add('on');
+  document.documentElement.classList.add('alert-on'); /* 720p 摺線緊縮的掛勾 */
+  /* 關閉只作用於本次瀏覽（無 localStorage 紅線）；重新整理會再出現，直到過期或被週報涵蓋。
+     ✕ 連分頁紅點一起收（使用者 2026-08-22：「我都按 ✕ 了就別再閃」）；置頂卡照留。
+     ALERTS_X 旗標讓之後每次 buildTabBar 重建都不再長出紅點。 */
+  bar.querySelector('.ab-x').onclick=()=>{bar.classList.remove('on');
+    document.documentElement.classList.remove('alert-on');
+    window.ALERTS_X=true;const d=$('#tabbar .tbdot');if(d)d.remove()};
+}
+wireAlertBar();
+
 function render(i){
   charts.forEach(c=>c.destroy());charts=[];kdfChart=null;
   const w=DATA.weeks[i], p=i>0?DATA.weeks[i-1]:null;
@@ -2188,6 +2270,7 @@ function render(i){
 
   <section id="events" data-tab="intel">
     <div class="sh"><span class="ix">§05</span><h2>本週事件</h2><span class="q">這些判斷根據哪些事實？</span><span class="sub">${S?'每則均可點回原文查證':'真實可追溯'} · ${(w.events||[]).length} 則 · ${[...new Set((w.events||[]).map(e=>e.source).filter(Boolean))].length} 個來源</span></div>
+    ${alertCard(i)}
     <div class="evgrid">
       ${(w.events||[]).map(e=>`<div class="evc">
         <div class="t">${e.title}</div>
