@@ -1,0 +1,81 @@
+{
+  "date": "2026-08-22",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "The Biggest Risk Facing the Roundhill Memory ETF (DRAM) Right Now",
+      "source": "247wallst.com",
+      "date": "Thu, 20 Au",
+      "url": "https://247wallst.com/investing/2026/08/20/the-biggest-risk-facing-the-roundhill-memory-etf-dram-right-now",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "HBM"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "京元電子(2449)股價：可以買嗎？1 個量化訊號觸發中｜FinLab",
+      "source": "finlab.finance",
+      "date": "Thu, 20 Au",
+      "url": "https://finlab.finance/stocks/2449",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "先進封裝",
+            "矽光子"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "營收",
+            "資本支出"
+          ],
+          "anyB": [
+            "京元電"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "「南茂」的搜尋結果 - 工商時報",
+      "source": "www.ctee.com.tw",
+      "date": "Wed, 19 Au",
+      "url": "https://www.ctee.com.tw/search/%E5%8D%97%E8%8C%82",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "矽光子"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "營收",
+            "資本支出"
+          ],
+          "anyB": [
+            "輝達",
+            "京元電",
+            "日月光"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 3
+}
