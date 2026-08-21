@@ -1,0 +1,49 @@
+{
+  "_comment": "SCAI-Agent 即時警報規則。核心原則：『重大』依企業類型而定——同一事件對不同類型公司的衝擊等級不同。每日監測用本檔分級；RED 即時通報、YELLOW 記入每日日誌並於週報彙整、GREEN 僅週報。",
+  "_integrity": "分級判斷屬【推斷】。警報寧可保守（漏報比誤報更危險的項目列 RED），但同一事件 72 小時內不重複通報（查 logs/alerts_log.csv 去重）。",
+  "_negation": "所有 match 比對一律先經 src/plan_engine.py 的 strip_negated() 剔除否定子句（2026-08-20 修正之同一份判定，不重寫第二份）：「園區無停電通報」不得觸發 RT-04。",
+  "version": "v1.1",
+  "updated": "2026-08-22",
+  "_changelog": "v1.1（2026-08-22，上雲）：收件地址改存 GitHub Secret ALERT_TO，檔內不留真實信箱；新增 _negation。依 12 天歷史回歸校準 YELLOW 關鍵字（人判為 YELLOW 但字面無對應詞之 4 則）：YT-01 增『出口許可』、YT-03 增『營收』『資本支出』、YT-05 增『半導體氣體』『特用氣體』——均為不寄信之 YELLOW 層，7 條 RED 規則與 v1.0（cowork 2026-08-01）逐字相同。",
+  "activeCompanyType": "OSAT-Test（專業測試廠｜欣銓）",
+  "tiers": {
+    "RED": "即時通報：直接衝擊測試廠營運／訂單／材料／據點安全，或情境可能單日跨象限。立即寄警報信。",
+    "YELLOW": "重要但非立即：記入每日日誌、週報彙整分析，不單獨寄信。",
+    "GREEN": "一般產業動態：不記每日日誌，由週報之搜尋涵蓋。"
+  },
+  "ruleSets": {
+    "OSAT-Test（專業測試廠｜欣銓）": [
+      { "id": "RT-01", "tier": "RED", "match": { "any": ["台海", "封鎖", "軍演升級", "飛彈", "開戰", "斷航"] }, "why": "測試廠據點高度集中台灣（新竹／龍潭），台海危機＝營運與交付直接中斷", "action": "啟動 BCP；通知客戶交付風險；對應 PB-05 據點評估急升級", "playbook": "PB-05" },
+      { "id": "RT-02", "tier": "RED", "match": { "any": ["稀土", "鎢", "鎵", "鍺", "CMP", "靶材"], "all": ["台灣"] }, "why": "關鍵測試耗材若列管『台灣』即為斷供倒數，測試廠無材料即停線", "action": "立即啟動 PB-01 六個月緩衝庫存；盤點在手庫存水位", "playbook": "PB-01" },
+      { "id": "RT-03", "tier": "RED", "match": { "any": ["測試服務", "封測", "OSAT"], "anyB": ["出口管制", "禁令", "實體清單", "制裁"] }, "why": "管制範圍首次延伸至測試／封測服務層＝商業模式直接受規範", "action": "法務合規盤點中系客戶訂單；啟動 PB-06", "playbook": "PB-06" },
+      { "id": "RT-04", "tier": "RED", "match": { "any": ["新竹", "龍潭", "桃園", "竹科"], "anyB": ["地震", "停電", "限電", "火災", "缺水"] }, "why": "廠區所在地天災／基礎設施事故＝立即營運衝擊", "action": "確認廠區狀態；啟動 PB-07 營運持續計畫", "playbook": "PB-07" },
+      { "id": "RT-05", "tier": "RED", "match": { "any": ["Nvidia", "輝達"], "anyB": ["財報遠遜", "暴跌", "砍單", "下修全年", "訂單腰斬"] }, "why": "AI 測試載量高度綁 AI 龍頭需求；龍頭崩跌＝測試訂單能見度急縮", "action": "啟動 PB-02 產能切換評估；48 小時內產能調度會議", "playbook": "PB-02" },
+      { "id": "RT-06", "tier": "RED", "match": { "any": ["TSMC", "台積電", "UMC", "聯電"], "anyB": ["停產", "重大事故", "駭客", "斷鏈", "爆炸"] }, "why": "上游代工重大事故直接中斷測試廠投片來源", "action": "評估受影響客戶產品線；啟動替代排程", "playbook": "PB-02" },
+      { "id": "RT-07", "tier": "RED", "match": { "any": ["欣銓", "Ardentec", "京元電", "矽格"], "anyB": ["併購", "收購", "重大", "火災", "罷工", "資安"] }, "why": "自身或直接同業重大事件＝競爭格局立即變動", "action": "即時通報並人工研判", "playbook": "—" },
+      { "id": "YT-01", "tier": "YELLOW", "match": { "any": ["出口管制", "出口許可", "關稅", "Section 232", "實體清單"] }, "why": "管制動態影響 X 軸與客戶結構，需納入週判定", "action": "記日誌；週報 KDF#19/#22 校準", "playbook": "PB-06" },
+      { "id": "YT-02", "tier": "YELLOW", "match": { "any": ["HBM", "CoWoS", "先進封裝", "SLT", "chiplet", "矽光子"] }, "why": "先進封裝測試轉軌是測試廠中期最大技術賭注", "action": "記日誌；追蹤 PB-04 進展", "playbook": "PB-04" },
+      { "id": "YT-03", "tier": "YELLOW", "match": { "any": ["法說", "財報", "營收", "資本支出"], "anyB": ["TSMC", "台積電", "Nvidia", "輝達", "SK海力士", "三星", "Samsung", "ASML", "京元電", "矽格", "日月光", "Amkor"] }, "why": "產業鏈上下游財報＝需求能見度領先指標（三連燈機制）", "action": "記日誌；更新 Y 軸研判依據", "playbook": "PB-03" },
+      { "id": "YT-04", "tier": "YELLOW", "match": { "any": ["在地化", "美國設廠", "亞利桑那", "回流", "境外測試"] }, "why": "客戶在地化外溢影響據點策略", "action": "記日誌；累積 PB-05 證據", "playbook": "PB-05" },
+      { "id": "YT-05", "tier": "YELLOW", "match": { "any": ["電價", "能源", "缺工", "人才", "補助", "CHIPS", "半導體氣體", "特用氣體"] }, "why": "資源與政策充沛度（Y 軸）變動因子", "action": "記日誌；週報 Y 軸校準", "playbook": "—" }
+    ],
+    "_對照組說明": "以下為其他企業類型之規則骨架，展示『同一事件、不同類型、不同等級』。非本系統啟用對象，僅供方法論證明與未來擴充。",
+    "Foundry（晶圓代工）": [
+      { "id": "RF-01", "tier": "RED", "match": { "any": ["EUV", "ASML"], "anyB": ["禁運", "斷供", "故障潮"] }, "why": "先進製程命脈在曝光機；對測試廠僅 YELLOW，對代工廠是 RED" },
+      { "id": "RF-02", "tier": "YELLOW", "match": { "any": ["稀土", "鎢"], "all": ["台灣"] }, "why": "同一稀土事件：代工廠材料替代彈性較高，列 YELLOW；測試廠靶材依賴深，列 RED" }
+    ],
+    "Memory（記憶體）": [
+      { "id": "RM-01", "tier": "RED", "match": { "any": ["DRAM", "NAND", "HBM"], "anyB": ["合約價暴跌", "砍單", "庫存暴增"] }, "why": "記憶體是價格週期生意，報價崩跌即 RED；對測試廠僅為 YELLOW 需求訊號" }
+    ],
+    "Fabless（IC 設計）": [
+      { "id": "RD-01", "tier": "RED", "match": { "any": ["先進製程產能", "CoWoS"], "anyB": ["排擠", "配額砍", "交期延"] }, "why": "設計公司命脈在拿得到產能；對測試廠反而是轉單機會（GREEN/YELLOW）" }
+    ]
+  },
+  "dedup": { "windowHours": 72, "log": "logs/alerts_log.csv", "rule": "同一事件（標題近似或同 URL）於時窗內已通報者不重發，改記日誌追蹤欄" },
+  "alertEmail": {
+    "toEnv": "ALERT_TO",
+    "modeEnv": "ALERT_MODE",
+    "_note": "收件地址只存 GitHub Secret ALERT_TO；寄信閘門 ALERT_MODE（shadow→test→live，預設 shadow）。任何檔案不留真實信箱。",
+    "subjectFormat": "【SCAI 即時警報】{tier}｜{事件標題}",
+    "bodyOutline": "事件摘要（來源＋日期＋URL）→ 為何對欣銓重大（依企業類型規則 {rule.id}）→ 建議立即動作 → 對應劇本 {playbook} → 聲明【推斷】"
+  }
+}

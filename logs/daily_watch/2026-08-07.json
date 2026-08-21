@@ -1,0 +1,53 @@
+{
+  "date": "2026-08-07",
+  "checked": [
+    "semiconductor news today August 7 2026 TSMC Nvidia Taiwan",
+    "台灣 半導體 出口管制 稀土 鎢 關稅 2026年8月",
+    "欣銓 京元電 矽格 Nvidia 財報 半導體測試 新聞"
+  ],
+  "items": [
+    {
+      "title": "美國公布多晶矽 Section 232 關稅 15%（12/4 生效），台灣半導體適用 MOU 優惠待遇",
+      "source": "鉅亨網／自由財經",
+      "date": "2026-08-07",
+      "url": "https://news.cnyes.com/news/id/6565333",
+      "tier": "YELLOW",
+      "ruleId": "YT-01",
+      "summary": "川普 8/6（美東）簽署公告，自 2026/12/4 起對進口多晶矽及衍生品課 15% 關稅並設最低進口價格；行政院表示台灣半導體因台美投資合作 MOU 可適用免稅配額與豁免清單。非直接衝擊測試服務，但屬 Section 232 管制動態，影響 X 軸與週報 KDF#19/#22 校準【推斷】。",
+      "alerted": false
+    },
+    {
+      "title": "中國鎢材（碳化鎢、高純鎢粉、六氟化鎢）對日出口近乎歸零",
+      "source": "經濟日報",
+      "date": "2026-08-07",
+      "url": "https://money.udn.com/money/story/5603/9544267",
+      "tier": "YELLOW",
+      "ruleId": "YT-01",
+      "summary": "中國自 2026/1 兩用物項新規後，核心鎢材對日出口近乎歸零；中國掌控全球逾 8 成鎢製品產能。管制對象為日本、非台灣，故不觸發 RT-02（該規則需「列管台灣」）；列 YELLOW 追蹤耗材斷供外溢風險【推斷】。報導確切日期【建議查證】。",
+      "alerted": false
+    },
+    {
+      "title": "京元電 Q2 獲利估寫同期高、Q3 營運續看升（AI 測試需求強勁）",
+      "source": "Yahoo 股市（時報）",
+      "date": "2026-08-07",
+      "url": "https://tw.stock.yahoo.com/news/%E4%BA%AC%E5%85%83%E9%9B%BBq2%E7%8D%B2%E5%88%A9%E4%BC%B0%E5%AF%AB%E5%90%8C%E6%9C%9F%E9%AB%98-q3%E7%87%9F%E9%81%8B%E7%BA%8C%E7%9C%8B%E5%8D%87-013400649.html",
+      "tier": "YELLOW",
+      "ruleId": "YT-03",
+      "summary": "直接同業京元電 Q2 營收 111.4 億元創單季新高、AI 占比估逾 7 成；欣銓 Q2 亦優於預期、Q3 ASIC 訂單挹注。屬財報／需求能見度領先指標（三連燈），供週報 Y 軸校準【推斷】。",
+      "alerted": false
+    },
+    {
+      "title": "TSMC 上調全年資本支出至 600–640 億美元，3nm 產能受 Nvidia/AMD/Broadcom 強單提前達標",
+      "source": "24/7 Wall St.（2026-08-06）",
+      "date": "2026-08-06",
+      "url": "https://247wallst.com/investing/2026/08/06/tsmcs-64-billion-investment-signals-mega-growth-why-pivoting-away-from-the-titan-makes-little-sense/",
+      "tier": "YELLOW",
+      "ruleId": "YT-03",
+      "summary": "上游代工龍頭擴產與 AI 強需求＝測試投片來源充沛之正向訊號（Y 軸↑）；無事故或砍單跡象，不觸發 RT-05/RT-06。列 YELLOW 供週報需求能見度研判【推斷】。",
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 4,
+  "_sanitized": "公開淨化版：note 欄（含收件資訊）整欄移除；原始檔留在本機"
+}

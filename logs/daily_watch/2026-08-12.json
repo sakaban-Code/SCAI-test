@@ -1,0 +1,23 @@
+{
+  "date": "2026-08-12",
+  "checked": [
+    "semiconductor news today August 12 2026 TSMC Nvidia Taiwan",
+    "台灣 半導體 出口管制 稀土 鎢 關稅 2026年8月",
+    "Nvidia 輝達 台積電 欣銓 京元電 矽格 重大 新聞 財報"
+  ],
+  "items": [
+    {
+      "title": "台積電與 Sony 簽約成立熊本影像感測器合資公司（Sony 60%／TSMC 40%，投資約 1 兆日圓，2029 年量產車用與機器人 CIS）",
+      "source": "BigGo Finance（彙整報導）",
+      "date": "2026-08-12",
+      "url": "https://finance.biggo.com/news/8bc240d4-f1e1-4850-8126-9e47bf8df8fe",
+      "tier": "YELLOW",
+      "ruleId": "YT-04",
+      "summary": "台積電先進封裝＋Sony 感測器設計結合，於日本熊本在地化擴產，抗衡三星。未命中 YT-04 明列關鍵字（美國設廠／回流），但屬客戶與供應鏈境外在地化布局、影響據點策略之同類訊號，寧取保守列 YELLOW【推斷】。週報應納入 KDF#15（相關產業發展）、#17（全球供應鏈重組）研判；車用/機器人 CIS 測試需求為測試廠中期潛在載量。",
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 1,
+  "_sanitized": "公開淨化版：note 欄（含收件資訊）整欄移除；原始檔留在本機"
+}

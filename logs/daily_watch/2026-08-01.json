@@ -1,0 +1,52 @@
+{
+  "date": "2026-08-01",
+  "checked": [
+    "semiconductor news today TSMC Nvidia export control",
+    "台灣 半導體 稀土 管制 地震 限電"
+  ],
+  "items": [
+    {
+      "title": "Nvidia 因出口管制中國銷售停滯，TSMC 產能自 H200 轉向 Vera Rubin",
+      "source": "Reuters／Investing.com（引 FT）",
+      "date": "2026-07-31",
+      "url": "https://www.investing.com/news/stock-market-news/nvidia-refocuses-tsmc-capacity-as-export-controls-stall-china-sales-ft-reports-4542820",
+      "tier": "YELLOW",
+      "ruleId": "YT-01",
+      "summary": "H200 對中出貨遇 25% 關稅與需求觀望而停滯，Nvidia 將 TSMC 產能改配 Vera Rubin。需求結構改變而非總量崩跌，對測試載量屬中性偏正【推斷】；納入週報 Y 軸研判。",
+      "alerted": false
+    },
+    {
+      "title": "TSMC 南京廠獲美國年度出口許可（VEU 到期後新制）",
+      "source": "Cryptopolitan",
+      "date": "2026-07-31",
+      "url": "https://www.cryptopolitan.com/tsmc-wins-annual-us-export-license-for-chips/",
+      "tier": "YELLOW",
+      "ruleId": "YT-01",
+      "summary": "VEU 豁免 2025 年底到期後，TSMC 南京廠獲一年期出口許可、設備供應不中斷。管制常態化但可控訊號；週報 KDF#19 校準依據。",
+      "alerted": false
+    },
+    {
+      "title": "中國研議對日本再祭材料管制（稀土之後之『殺手鐧』，日媒示警全線停產風險）",
+      "source": "經濟日報（udn money）",
+      "date": "2026-07-31",
+      "url": "https://money.udn.com/money/story/5603/9544267",
+      "tier": "YELLOW",
+      "ruleId": "YT-01",
+      "summary": "管制對象為日本、未及台灣，未觸發 RT-02（需含『台灣』）；惟日系材料（光阻、特化）斷供將間接衝擊台灣供應鏈，列 YELLOW 密切追蹤。若列管範圍出現『台灣』字樣即升 RED。",
+      "alerted": false
+    },
+    {
+      "title": "熊本 7/28 震度 7 地震：TSMC 熊本廠人員疏散、新廠建設中斷（追蹤項）",
+      "source": "日經 xTECH",
+      "date": "2026-07-28",
+      "url": "https://xtech.nikkei.com/atcl/nxt/column/18/03703/072900002/",
+      "tier": "YELLOW",
+      "ruleId": "RT-06（降級記錄）",
+      "summary": "符合 RT-06（TSMC＋重大事故）字面，但事發已逾 72 小時且為上週事件——本日誌為首跑，依去重原則不補發過期警報，改列追蹤：關注 Sony/Renesas 供應鏈與 TSMC 熊本復工進度，屬 W7 週報事件池。",
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 4,
+  "_sanitized": "公開淨化版：note 欄（含收件資訊）整欄移除；原始檔留在本機"
+}

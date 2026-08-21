@@ -1,0 +1,23 @@
+{
+  "date": "2026-08-06",
+  "checked": [
+    "semiconductor news today August 6 2026",
+    "台灣 半導體 出口管制 稀土 關稅",
+    "Nvidia TSMC 台積電 京元電 欣銓 重大 新聞"
+  ],
+  "items": [
+    {
+      "title": "TSMC Boosts 2026 Expansion Budget, Adds $100B to U.S. Investment（SIA 新聞頁標題）",
+      "source": "Semiconductor Industry Association（新聞彙整頁）",
+      "date": null,
+      "url": "https://www.semiconductors.org/news-events/latest-news/",
+      "tier": "YELLOW",
+      "ruleId": "YT-04",
+      "summary": "台積電擴大 2026 擴張預算並加碼美國投資 1,000 億美元之標題出現於 SIA 新聞頁，命中 YT-04（美國設廠／在地化，客戶在地化外溢影響據點策略）【推斷】。原文日期與細節未能於本次輕巡邏確認，可能為既有訊息之更新報導，週報 Step 1 請以原始來源查證後再納入分析【建議查證】。",
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 1,
+  "_sanitized": "公開淨化版：note 欄（含收件資訊）整欄移除；原始檔留在本機"
+}

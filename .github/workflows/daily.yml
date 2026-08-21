@@ -1,0 +1,83 @@
+name: SCAI-Agent Daily Watch
+
+on:
+  schedule:
+    # 每日 13:00 UTC＝台北 21:00（貼近人工巡邏時段；GitHub cron 可能延遲數分鐘）
+    - cron: "0 13 * * *"
+  workflow_dispatch:
+    inputs:
+      send_test:
+        description: "寄模擬 RED 到 GMAIL_USER 本人（僅 ALERT_MODE=test 生效）"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # 三段式閘門：Settings → Secrets and variables → Actions → Variables 設 ALERT_MODE。
+      # 未設＝shadow（判級落檔、不寄信）；把它改回 shadow 就是緊急停止開關。
+      ALERT_MODE: ${{ vars.ALERT_MODE || 'shadow' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check secrets（缺 TAVILY 則本次優雅跳過，設定後自動恢復）
+        id: keys
+        env:
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+        run: |
+          if [ -z "$TAVILY_API_KEY" ]; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::TAVILY_API_KEY 未設定，本次巡邏跳過"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Python
+        if: steps.keys.outputs.ok == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies（每日巡邏零模型呼叫，只需搜尋端）
+        if: steps.keys.outputs.ok == 'true'
+        run: pip install tavily-python
+
+      - name: Daily patrol
+        if: steps.keys.outputs.ok == 'true'
+        env:
+          TAVILY_API_KEY:     ${{ secrets.TAVILY_API_KEY }}
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_TO:           ${{ secrets.ALERT_TO }}
+        run: python src/daily_watch.py
+
+      - name: Send test mail（手動觸發＋ALERT_MODE=test 才會走到）
+        if: steps.keys.outputs.ok == 'true' && github.event_name == 'workflow_dispatch' && inputs.send_test
+        env:
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python src/daily_watch.py --send-test
+
+      - name: Leak scan（信箱／API key／家目錄路徑；命中即失敗、不 commit）
+        if: steps.keys.outputs.ok == 'true'
+        run: python src/daily_watch.py --scan logs data/alert_rules.json
+
+      - name: Commit logs（只加 logs/——收據與日誌留痕）
+        if: steps.keys.outputs.ok == 'true'
+        run: |
+          git config user.name  "scai-agent-bot"
+          git config user.email "bot@scai-agent"
+          git add logs/
+          git diff --cached --quiet || git commit -m "chore(daily): $(date -u +%F) 每日巡邏"
+          git pull --rebase origin main
+          git push

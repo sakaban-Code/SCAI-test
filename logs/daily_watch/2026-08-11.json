@@ -1,0 +1,33 @@
+{
+  "date": "2026-08-11",
+  "checked": [
+    "semiconductor news today August 11 2026",
+    "台灣 半導體 出口管制 稀土 鎢 2026年8月",
+    "Nvidia TSMC 台積電 重大 新聞 2026年8月11日"
+  ],
+  "items": [
+    {
+      "title": "台積電發布 2026 年 7 月營收報告",
+      "source": "TSMC 官網（最新消息）",
+      "date": "2026-08-10",
+      "url": "https://pr.tsmc.com/english/latest-news",
+      "tier": "YELLOW",
+      "ruleId": "YT-03",
+      "summary": "台積電於 8/10 發布 7 月營收報告；上游代工營收為測試需求能見度領先指標（三連燈機制），供週報 Y 軸研判。具體數字未於本次輕巡邏擷取【建議查證】。",
+      "alerted": false
+    },
+    {
+      "title": "中國鎢／稀土出口管制持續：對日兩用物項管制致碳化鎢、六氟化鎢出口近乎歸零；台灣經濟部稱持續監控供應鏈",
+      "source": "經濟日報（money.udn.com）／經濟部新聞稿",
+      "date": "2026-08（刊出日未確定）【建議查證】",
+      "url": "https://money.udn.com/money/story/5603/9544267",
+      "tier": "YELLOW",
+      "ruleId": "YT-01",
+      "summary": "管制對象為日本、未列管「台灣」，經濟部評估台灣稀土需求以歐美日供應為主、直接影響低，故不構成 RT-02 RED【推斷】。惟鎢屬測試耗材上游，需納入週報 KDF#19/#22 校準並持續盯「台灣列管」訊號。",
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 2,
+  "_sanitized": "公開淨化版：note 欄（含收件資訊）整欄移除；原始檔留在本機"
+}

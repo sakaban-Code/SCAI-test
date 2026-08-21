@@ -1,0 +1,33 @@
+{
+  "date": "2026-08-08",
+  "checked": [
+    "semiconductor news today August 8 2026 TSMC Nvidia Taiwan",
+    "台灣 半導體 出口管制 稀土 鎢 8月 新聞",
+    "欣銓 京元電 矽格 輝達 台積電 重大 新聞 2026年8月7日"
+  ],
+  "items": [
+    {
+      "title": "京元電 7 月營收 29.18 億元年月雙增（輝達 AI 測試訂單挹注），8/7 董事會通過 Q2 合併財報",
+      "source": "理財周刊（LINE TODAY）",
+      "date": "2026-08-07",
+      "url": "https://today.line.me/tw/v3/article/j7g7yOa",
+      "tier": "YELLOW",
+      "ruleId": "YT-03",
+      "summary": "直接同業京元電 7 月營收 29.18 億元、年月雙增，媒體歸因輝達 AI 測試需求；8/7 並召開董事會通過 Q2 合併財報。屬同業財報／需求能見度領先指標，供週報 Y 軸校準。為 8/7 日誌「京元電 Q2 獲利估同期高」同一主軸之延續（72 小時內近似事件，僅日誌追蹤）【推斷】。",
+      "alerted": false
+    },
+    {
+      "title": "韓媒：關鍵半導體氣體價格暴漲 90%，助漲記憶體漲勢",
+      "source": "自由財經",
+      "date": "2026-08-08",
+      "url": "https://ec.ltn.com.tw/article/breakingnews/5225783",
+      "tier": "YELLOW",
+      "ruleId": "YT-05",
+      "summary": "韓媒報導關鍵製程氣體價格暴漲約 90%，推升記憶體價格走勢。屬營運資源（Y 軸）供給趨緊訊號，關聯測試耗材與上游成本；未涉台灣列管，不觸發 RT-02。報導確切刊出日期未確認【建議查證】；分級依 YT-05（資源與政策充沛度變動因子）之精神判定【推斷】。",
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 2,
+  "_sanitized": "公開淨化版：note 欄（含收件資訊）整欄移除；原始檔留在本機"
+}
