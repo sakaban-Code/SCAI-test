@@ -1191,7 +1191,13 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 .alertc .af{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:12px;color:var(--ink2)}
 .alertc .af b{color:#8f0d56;margin-right:4px}
 .alertc .af a{color:var(--accent);font-weight:600}
-@media (prefers-reduced-motion:reduce){#alertbar.on,.tb .tbdot{animation:none}}
+/* ── 彩蛋：左上角水母 ── */
+.brand-emblem{transform-origin:50% 50%}
+.brand-emblem.jelly{animation:jelly .45s ease}
+@keyframes jelly{0%{transform:scale(1)}30%{transform:scale(1.18,.84)}60%{transform:scale(.9,1.1)}100%{transform:scale(1)}}
+.brand-emblem.rick{animation:rick .65s ease-in forwards}
+@keyframes rick{to{transform:rotate(720deg) scale(.15);opacity:0}}
+@media (prefers-reduced-motion:reduce){#alertbar.on,.tb .tbdot,.brand-emblem.jelly,.brand-emblem.rick{animation:none}}
 @media (max-width:600px){#alertbar{margin:8px 10px 0}#alertbar.on{padding:9px 10px;gap:8px}}
 /* 720p 投影＋紅條活著：紅條縮成單行、收起導引列，把行動建議帶保回摺線之上。
    ⚠ 這段必須放在上方 #alertbar 主樣式之後——同特異性靠順序取勝，搬到前面就會失效
@@ -2059,6 +2065,24 @@ function wireAlertBar(){
     window.ALERTS_X=true;const d=$('#tabbar .tbdot');if(d)d.remove()};
 }
 wireAlertBar();
+
+/* ── 彩蛋（2026-08-22 深夜，團隊指定）：5 秒內連點左上角水母 8 下 → 經典影片。
+   為什麼是 8：一週只有 7 天，這是意外的第八天。
+   純前端計時、無任何儲存；水母是非互動元件、不進 Tab 序，無障礙與既有功能零影響。 */
+(()=>{
+  const em=document.querySelector('.brand-emblem');if(!em)return;
+  let hits=[];
+  em.addEventListener('click',()=>{
+    const now=Date.now();hits=hits.filter(t=>now-t<5000);hits.push(now);
+    em.classList.remove('jelly');void em.offsetWidth;em.classList.add('jelly');   /* 每點一下彈一下，讓人知道它在數 */
+    if(hits.length<8)return;
+    hits=[];em.classList.add('rick');
+    setTimeout(()=>{
+      window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ','_blank','noopener,noreferrer');
+      em.classList.remove('rick');
+    },650);
+  });
+})();
 
 function render(i){
   charts.forEach(c=>c.destroy());charts=[];kdfChart=null;
