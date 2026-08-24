@@ -1241,6 +1241,19 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 @keyframes rick{to{transform:rotate(720deg) scale(.15);opacity:0}}
 @media (prefers-reduced-motion:reduce){#alertbar.on,.tb .tbdot,.brand-emblem.jelly,.brand-emblem.rick{animation:none}}
 @media (max-width:600px){#alertbar{margin:8px 10px 0}#alertbar.on{padding:9px 10px;gap:8px}}
+/* ── 資料匯出列 ── */
+.expbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px;
+  padding:9px 12px;border-radius:11px;border:1px dashed var(--line);
+  background:rgba(68,83,214,.035)}
+.expbar .el{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;
+  font-weight:700;color:var(--ink)}
+.expbar .el .ic{width:15px;height:15px;flex:0 0 auto}
+.expb{font-family:inherit;font-size:11.5px;font-weight:600;color:var(--accent);
+  background:var(--card);border:1px solid rgba(68,83,214,.32);border-radius:8px;
+  padding:5px 10px;cursor:pointer;white-space:nowrap}
+.expb:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.expbar .eh{font-size:11px;color:var(--muted);margin-left:auto}
+@media (max-width:600px){.expbar .eh{margin-left:0;flex:1 1 100%}}
 /* ── §02 產業定位（基礎盤）── */
 /* 卡片小標。既有卡片是用行內樣式各寫各的，本區段用到五次，故收成一個類別。 */
 .ch{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12px;
@@ -2202,6 +2215,66 @@ wireAlertBar();
   });
 })();
 
+/* ── 資料匯出（CSV）──
+   2026-08-24 依指導教授意見新增：情報要能「丟進他們自己的內部策略分析」，
+   看得到不等於用得到。刻意用 CSV 而非 .xlsx——站上不引入任何函式庫或打包工具，
+   CSV 由瀏覽器原生 Blob 產生，Excel 雙擊即開、Google 試算表可直接匯入。
+   兩個必踩的坑：
+   (1) 開頭必須加 UTF-8 BOM，否則 Excel 以系統編碼開啟，繁中全部亂碼。
+   (2) DATA.weeks 的字串在建置時已 HTML 跳脫，須以 deEnt() 還原，否則匯出檔會
+       出現 &amp;、&lt;——與 canvas 用 fillText 前要 deEnt 是同一個原因。 */
+const csvCell=v=>{const s=deEnt(v==null?'':String(v));
+  return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+const csvOf=rows=>'﻿'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
+function dlFile(name,text){
+  const b=new Blob([text],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(b);
+  const a=document.createElement('a');a.href=u;a.download=name;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+const EXPORTS={
+  trend:{label:'趨勢總表',hint:'全週次 × 雙軸座標 × 25 項 KDF 權重',rows:()=>{
+    const r=[['週次','區間','產生日','情境','情境(EN)','X 地緣聚合','Y 資源充沛',
+      '觸發劇本','事件數',...DATA.kdf.map(k=>`#${k.id} ${k.name}`)]];
+    DATA.weeks.forEach(w=>r.push(['W'+w.week,w.range,w.gen,w.scenario,w.scenarioEn,
+      w.xy.x,w.xy.y,(((w.companyPlan||{}).firedPlaybooks)||[]).map(f=>f.id).join('｜'),
+      (w.events||[]).length,...w.w]));
+    return r}},
+  events:{label:'事件總表',hint:'全週次事件、影響方向與可查證連結',rows:()=>{
+    const r=[['週次','日期','標題','來源','X 影響','Y 影響','摘要','連結']];
+    DATA.weeks.forEach(w=>(w.events||[]).forEach(e=>r.push(['W'+w.week,e.date,e.title,
+      e.source,e.xImpact||'→',e.yImpact||'→',e.summary,e.url])));
+    return r}},
+  risk:{label:'風險雷達',hint:'全週次風險、規避動作與事後結果回測',rows:()=>{
+    const r=[['週次','風險','領先訊號','KDF','規避動作','事後結果','後續']];
+    DATA.weeks.forEach(w=>(w.riskRadar||[]).forEach(x=>r.push(['W'+w.week,x.risk,x.signal,
+      'KDF#'+x.kdf,x.mitigation,x.status||'追蹤中',x.followUp||''])));
+    return r}},
+  trace:{label:'決策軌跡',hint:'每筆事件的軸位移與 KDF 調整依據',rows:()=>{
+    const r=[['週次','事件','關鍵字','ΔX','ΔY','KDF 編號','項目','調整前','調整後','理由']];
+    DATA.weeks.forEach(w=>(w.decisionTrace||[]).forEach(t=>{
+      const kc=t.kdfChanges||[];
+      if(!kc.length){r.push(['W'+w.week,t.event,(t.keywords||[]).join('｜'),
+        t.xDelta,t.yDelta,'','','','','']);return}
+      kc.forEach((k,i)=>r.push(['W'+w.week,i?'':t.event,i?'':(t.keywords||[]).join('｜'),
+        i?'':t.xDelta,i?'':t.yDelta,'#'+k.id,k.name,k.from,k.to,k.reason]));
+    }));
+    return r}}
+};
+function doExport(k){
+  const e=EXPORTS[k];if(!e)return;
+  const last=DATA.weeks[DATA.weeks.length-1];
+  dlFile(`SCAI-Agent_${e.label}_W1-W${last.week}.csv`,csvOf(e.rows()));
+}
+function exportBar(){
+  return `<div class="expbar">
+    <span class="el"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2.2v8.1"/><path d="M4.9 7.4 8 10.5l3.1-3.1"/><path d="M2.6 12.6h10.8"/></svg>匯出給內部分析</span>
+    ${Object.keys(EXPORTS).map(k=>`<button type="button" class="expb" data-exp="${k}"
+      title="${EXPORTS[k].hint}">${EXPORTS[k].label} CSV</button>`).join('')}
+    <span class="eh">UTF-8 CSV，Excel 與 Google 試算表可直接開啟</span>
+  </div>`;
+}
+
 /* ── §02 產業定位（基礎盤）──
    內容不隨週次變動，來源 data/industry_position.json（人工撰寫、版本控管）。
    2026-08-24 依指導教授意見新增：先確立「欣銓在哪裡、對手是誰、子彈夠不夠」，
@@ -2497,6 +2570,7 @@ function render(i){
 
   <section id="trend" data-tab="analysis">
     <div class="sh"><span class="ix">§05</span><h2>情境軌跡與權重</h2><span class="q">局勢往哪個方向走？</span><span class="sub">${S?`W1–W${w.week} 累積｜資料只追加不覆寫`:`W1–W${w.week} 累積 · 只追加不覆寫`}</span></div>
+    ${exportBar()}
     ${p?`<div class="trendsum">累積觀察（W${w0.week}→W${w.week}）：X 軸由 <b class="num">${fmt(w0.xy.x)}</b> 移至 <b class="num">${fmt(w.xy.x)}</b>（${w.xy.x<w0.xy.x?'碎裂加深':'聚合改善'} ${Math.abs(w.xy.x-w0.xy.x).toFixed(2)}）；Y 軸由 <b class="num">${fmt(w0.xy.y)}</b> 至 <b class="num">${fmt(w.xy.y)}</b>。期間情境${scenSpan.length===1?`維持 ${scenSpan[0]}`:`歷經 ${scenSpan.join(' → ')}`}；五維中累積變動最大＝${dimTop.n}（<b class="num">${dimTop.a.toFixed(1)}→${dimTop.b.toFixed(1)}</b>）。</div>`:''}
     <div class="g2">
       <div class="card"><button class="zoombtn" data-zoom="xy" aria-label="放大雙軸軌跡圖">⤢ 放大</button>
@@ -2713,6 +2787,8 @@ function render(i){
   });
   wireSim(i);
   wireJudge(i);
+  /* 匯出鈕隨 render 重建，故在此重綁；資料一律取當下的 DATA，不吃閉包裡的 i */
+  $$('.expb').forEach(b=>b.onclick=()=>doExport(b.dataset.exp));
   heroFx();
   /* setTab 內含 bindSpy 與圖表 resize；圖表先畫再切分頁，藏起來的那些會在
      使用者切到該頁時由 setTab 的 resize 補正尺寸。keepScroll＝重繪不捲頂。 */
