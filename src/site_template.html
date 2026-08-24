@@ -294,7 +294,14 @@ tbody td{transition:background .12s}
 .trendsum b{color:var(--ink)}
 
 /* ── hero ── */
-.hero{display:block;padding-top:22px}
+/* ⚠ 不可加回 display——<section> 本來就是 block，這裡宣告它沒有作用，
+   卻會壓過瀏覽器預設樣式表的 [hidden]{display:none}（UA 樣式一律輸給任何作者規則，
+   與特異性無關），使總覽區段在切到其他分頁時關不掉、疊在別頁內容上方。
+   2026-08-24 修，成因存在數週未被發現：先前只驗 s.hidden 屬性為 true，沒驗計算後的 display。 */
+.hero{padding-top:22px}
+/* 把「隱藏的區段不得顯示」寫成明確規則，而不是依賴 UA 樣式：
+   (1,1,1) 壓得過任何 .class 規則，日後誰在 section 上加 display 都不會再破掉分頁互斥。 */
+#main section[hidden]{display:none}
 .eyebrow{font-size:11.5px;color:var(--muted);letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .scen{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 .scen-en{font-family:"Space Grotesk","Noto Sans TC",sans-serif;font-size:clamp(30px,4.2vw,40px);font-weight:700;letter-spacing:-.5px;color:var(--accent);line-height:1.06}
@@ -690,7 +697,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
      副標統一 #55628a，逐底色驗過最差 5.24:1 */
   .nh{display:block;font-size:9.5px;line-height:1.45;color:#55628a;margin-top:2px}
 }
-/* §09 Agent 治理 */
+/* §10 Agent 治理 */
 .govgrid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gut)}
 .card.gov{grid-column:span 6;min-width:0}
 .gov-t{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
@@ -746,7 +753,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 }
 @media (prefers-reduced-motion:no-preference){#aipanel{animation:aiin .18s ease-out}}
 @keyframes aiin{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
-/* 企業畫像切換（§02/§08）：欣銓官方＋兩家虛構示範企業 */
+/* 企業畫像切換（§08/§09）：欣銓官方＋兩家虛構示範企業 */
 .cosel{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:14px}
 .cosel-l{font-size:10px;letter-spacing:.08em;color:var(--muted);
   font-family:"IBM Plex Mono","Noto Sans TC",monospace;text-transform:uppercase}
@@ -1199,6 +1206,67 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 @keyframes rick{to{transform:rotate(720deg) scale(.15);opacity:0}}
 @media (prefers-reduced-motion:reduce){#alertbar.on,.tb .tbdot,.brand-emblem.jelly,.brand-emblem.rick{animation:none}}
 @media (max-width:600px){#alertbar{margin:8px 10px 0}#alertbar.on{padding:9px 10px;gap:8px}}
+/* ── §02 產業定位（基礎盤）── */
+/* 卡片小標。既有卡片是用行內樣式各寫各的，本區段用到五次，故收成一個類別。 */
+.ch{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12px;
+  color:var(--muted);margin-bottom:9px}
+.ch b{color:var(--ink);font-weight:700;font-size:13.5px}
+.pos-role{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:baseline;
+  padding:13px 16px;border-radius:12px;margin-bottom:14px;
+  background:linear-gradient(135deg,rgba(68,83,214,.07),rgba(68,83,214,.02));
+  border:1px solid rgba(68,83,214,.16)}
+.pos-role .rt{font-weight:700;font-size:15px;color:var(--ink)}
+.pos-role .rn{font-size:12.5px;color:var(--ink2);line-height:1.65;flex:1 1 260px;min-width:0}
+.pos-facts{display:flex;flex-wrap:wrap;gap:6px 10px;margin-bottom:16px}
+.pos-facts .f{font-size:11.5px;color:var(--ink2);background:rgba(68,83,214,.05);
+  border:1px solid rgba(68,83,214,.13);border-radius:8px;padding:4px 9px}
+.pos-facts .f b{color:var(--ink);font-weight:600}
+.src{font-size:10px;letter-spacing:.03em;padding:1px 6px;border-radius:999px;
+  border:1px solid currentColor;white-space:nowrap;font-weight:600}
+/* 10px 小字一律以 4.5 為門檻（非大字例外）；#aa5311 在卡片底上只有 4.37，故加深。
+   .tierchip 的 #aa5311 是白字在其上、方向相反且已達標，不可一併改。 */
+.src.ok{color:#0d6c86}.src.inf{color:#8a420b}.src.wait{color:#b0106a}
+.pos-grid{display:grid;gap:14px;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+@media (max-width:900px){.pos-grid{grid-template-columns:1fr}}
+.pos-map svg{width:100%;height:auto;display:block}
+.pos-read{font-size:12.5px;line-height:1.75;color:var(--ink2);margin-top:10px}
+.pos-read b{color:var(--ink)}
+.f5{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));margin-top:6px}
+.f5 .fc{border:1px solid var(--line);border-radius:12px;padding:12px 13px;background:var(--card)}
+.f5 .fc.key{border-color:rgba(176,16,106,.32)}
+.f5 .fh{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:3px}
+.f5 .fh .nm{font-weight:700;font-size:13.5px;color:var(--ink)}
+.tierchip{font-size:10px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:999px;color:#fff}
+.tierchip.t1{background:#b0106a}.tierchip.t2{background:#aa5311}.tierchip.t3{background:#55628a}
+.f5 .fq{font-size:11.5px;color:var(--muted);margin-bottom:8px;font-style:italic}
+.f5 .fi{font-size:12px;line-height:1.6;color:var(--ink2);margin-bottom:5px;padding-left:11px;position:relative}
+.f5 .fi::before{content:"";position:absolute;left:0;top:8px;width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:.55}
+.f5 .fi b{color:var(--ink);font-weight:600}
+.f5 .fl{margin-top:9px;padding-top:8px;border-top:1px dashed var(--line);font-size:11.5px;line-height:1.65;color:var(--ink2)}
+.f5 .fl .tag{display:inline-block;font-family:var(--mono);font-size:10.5px;color:var(--accent);
+  background:rgba(68,83,214,.08);border-radius:5px;padding:1px 5px;margin-right:4px}
+.appbar{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.appbar .r{display:grid;grid-template-columns:88px 1fr 34px;align-items:center;gap:9px;font-size:12px}
+.appbar .r .n{color:var(--ink2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.appbar .r .t{height:15px;border-radius:5px;background:rgba(68,83,214,.09);overflow:hidden}
+.appbar .r .t i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent),#6b78e8)}
+.appbar .r .v{font-family:var(--mono);color:var(--ink);font-weight:600;text-align:right}
+.sitelist{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.sitelist .s{font-size:11.5px;border-radius:9px;padding:6px 10px;border:1px solid var(--line);background:var(--card);line-height:1.5}
+.sitelist .s b{display:block;color:var(--ink);font-weight:700;font-size:12px}
+.sitelist .s span{color:var(--muted)}
+.sitelist .s.k-主力{border-color:rgba(68,83,214,.4)}
+.sitelist .s.k-成長{border-color:rgba(13,108,134,.45)}
+.gapbox{border:1px solid rgba(176,16,106,.3);border-radius:12px;padding:13px 15px;margin-top:14px;
+  background:linear-gradient(180deg,rgba(176,16,106,.05),rgba(176,16,106,.012))}
+.gapbox h4{margin:0 0 4px;font-size:13.5px;color:#8f0d56}
+.gapbox .gn{font-size:11.5px;color:var(--ink2);line-height:1.65;margin-bottom:9px}
+.gapbox ul{margin:0 0 10px;padding-left:18px}
+.gapbox li{font-size:12px;line-height:1.75;color:var(--ink2)}
+.gapbox .im{font-size:12.5px;line-height:1.75;color:var(--ink);border-top:1px dashed rgba(176,16,106,.3);padding-top:9px}
+.tiertab{width:100%;border-collapse:collapse;margin-top:4px;font-size:12px}
+.tiertab th{text-align:left;font-size:11px;color:var(--muted);font-weight:600;padding:0 8px 6px 0;border-bottom:1px solid var(--line)}
+.tiertab td{padding:8px 8px 8px 0;border-bottom:1px solid var(--line);color:var(--ink2);line-height:1.6;vertical-align:top}
 /* 720p 投影＋紅條活著：紅條縮成單行、收起導引列，把行動建議帶保回摺線之上。
    ⚠ 這段必須放在上方 #alertbar 主樣式之後——同特異性靠順序取勝，搬到前面就會失效
    （已實測：放在 1142 行的 720p 區塊裡時 line-clamp:1 被主樣式的 clamp:2 蓋掉）。 */
@@ -1398,31 +1466,46 @@ const CMP_PRESETS=[
 ];
 
 /* ── 分頁（依功能分類）──
-   決賽只有 10 分鐘簡報，單頁 10 個區段太長；改為五個分頁：總覽／公司／情報／分析／治理。
+   決賽只有 10 分鐘簡報，單頁 11 個區段太長；改為六個分頁：總覽／定位／情報／分析／公司／治理。
    「治理」頁對齊競賽評分表的六項 Harness 面向，內容**全部取自既有機制**而非新功能。
-   每個區段附白話副標，降低「決策軌跡」「風險雷達」這類內部術語的理解成本。 */
+   每個區段附白話副標，降低「決策軌跡」「風險雷達」這類內部術語的理解成本。
+
+   ⚠ 分頁順序＝閱讀順序，2026-08-24 依指導教授意見重排：
+   情報在前、建議在後。原順序把「公司該做什麼」放在第二頁，等於還沒說清楚
+   外部情勢與欣銓的位置，就先給結論；而我們並不掌握欣銓內部（產銷人發財、
+   品管、資訊）的現況，那層建議本就只能是外部推導。新順序＝
+   先「他在哪裡」（定位）→ 再「這週發生什麼」（情報）→ 再「怎麼推導」（分析）
+   → 最後才「所以可以考慮什麼」（公司），治理獨立於內容層、殿後。 */
 /* 每列＝[區段 id, 全站 § 編號, 標題, 白話副標]。編號沿用區段標頭的 §NN 而非
-   分頁內流水號，否則導覽寫 01 而標頭寫 §07 會對不起來。 */
+   分頁內流水號，否則導覽寫 01 而標頭寫 §07 會對不起來。
+   § 編號已於 2026-08-24 隨分頁重排一併重編為閱讀順序；改動編號時**必須同步**
+   區段標頭的 <span class="ix">、本註解下方的 secs 陣列、以及內文與 AI 問答裡的
+   交叉引用（見 §NN）——三者任一沒改，導覽與標頭就會對不起來。 */
 const TABS=[
   {k:'overview',label:'總覽',hint:'本週判定',secs:[
     ['overview','01','本週戰略簡報','這週的判定、信心與該做的事']]},
-  {k:'company',label:'公司',hint:'欣銓相關',secs:[
-    ['plan','02','公司規畫','哪些劇本被觸發、該做與不該做什麼'],
-    ['profile','08','企業畫像','欣銓是什麼樣的公司——判斷的前提']]},
+  /* 定位＝基礎盤：不隨週次變動的結構情報。先知道欣銓在產業裡的位置、
+     對手是誰、子彈（供應商）夠不夠，才知道每週該蒐什麼、蒐到的東西重不重要。 */
+  {k:'position',label:'定位',hint:'基礎盤',secs:[
+    ['position','02','產業定位','欣銓在哪裡：對手、客戶、供應商與競爭位置']]},
   /* 各分頁內的順序**必須與 DOM 順序一致**，否則導覽的先後與畫面的先後對不上。
      此處沿用全站既有的「結論先行」排法：風險雷達與本週最大變動是結論，
      本週事件與趨勢圖表是支撐它們的證據。 */
   {k:'intel',label:'情報',hint:'外部動態',secs:[
     ['risk','03','風險雷達','未來六個月要盯哪些訊號'],
-    ['events','05','本週事件','外部發生了什麼，每則附可查證來源']]},
+    ['events','04','本週事件','外部發生了什麼，每則附可查證來源']]},
   {k:'analysis',label:'分析',hint:'走勢與依據',secs:[
     ['movers','','本週最大變動','哪些因素這週變重要了，為什麼'],
-    ['trend','04','趨勢圖表','八週走勢、25 項因素權重與週次對比'],
+    /* 副標不寫死週數——曾寫「八週走勢」而站上已累積十一週，資料長大它不會跟著改 */
+    ['trend','05','趨勢圖表','歷週走勢、25 項因素權重與週次對比'],
     ['trace','06','決策軌跡','每一次權重調整的依據與來源'],
     ['selfaudit','07','自我稽核','這些判斷如果錯了會怎樣']]},
+  {k:'company',label:'公司',hint:'欣銓相關',secs:[
+    ['plan','08','公司規畫','哪些劇本被觸發、該做與不該做什麼'],
+    ['profile','09','企業畫像','欣銓是什麼樣的公司——判斷的前提']]},
   {k:'gov',label:'治理',hint:'怎麼控管',secs:[
-    ['gov','09','Agent 治理','任務分派、記憶、工具、護欄、可觀測性、評估'],
-    ['method','10','方法論','雙軸情境與 25 項關鍵決策因素怎麼運作']]},
+    ['gov','10','Agent 治理','任務分派、記憶、工具、護欄、可觀測性、評估'],
+    ['method','11','方法論','雙軸情境與 25 項關鍵決策因素怎麼運作']]},
 ];
 const SEC_TAB={};TABS.forEach(t=>t.secs.forEach(s=>SEC_TAB[s[0]]=t.k));
 let curTab='overview';
@@ -2084,6 +2167,115 @@ wireAlertBar();
   });
 })();
 
+/* ── §02 產業定位（基礎盤）──
+   內容不隨週次變動，來源 data/industry_position.json（人工撰寫、版本控管）。
+   2026-08-24 依指導教授意見新增：先確立「欣銓在哪裡、對手是誰、子彈夠不夠」，
+   才能說明每週為什麼蒐這些、為什麼這則重要。定位圖刻意用內嵌 SVG 而非 Chart.js——
+   靜態內容不必等圖表庫，離線版與列印皆可用。 */
+const SRCCLS={'查證':'ok','推斷':'inf','待公司確認':'wait'};
+const srcTag=s=>s?`<span class="src ${SRCCLS[s]||'inf'}">${s}</span>`:'';
+function posMap(P){
+  const A=P.axes,PL=P.players;
+  const X=v=>90+v/100*860, Y=v=>520-v/100*480;
+  const grid=[25,50,75].map(g=>
+    `<line x1="${X(g)}" y1="40" x2="${X(g)}" y2="520" stroke="var(--line)" stroke-width="1"/>
+     <line x1="90" y1="${Y(g)}" x2="950" y2="${Y(g)}" stroke="var(--line)" stroke-width="1"/>`).join('');
+  const dots=PL.map(p=>{
+    /* 標籤讓開圓點：欣銓另有 r=21 的高亮外環，用一般的 18 位移會壓在環線上 */
+    const cx=X(p.x),cy=Y(p.y),end=p.x>55,off=p.self?30:18;
+    return `<g>
+      <circle cx="${cx}" cy="${cy}" r="${p.self?13:8}"
+        fill="${p.self?'var(--accent)':'var(--muted)'}" ${p.self?'':'fill-opacity=".62"'}/>
+      ${p.self?`<circle cx="${cx}" cy="${cy}" r="21" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-opacity=".45"/>`:''}
+      <text x="${end?cx-off:cx+off}" y="${cy+6}" text-anchor="${end?'end':'start'}"
+        font-size="19" font-weight="${p.self?'700':'500'}"
+        fill="${p.self?'var(--accent)':'var(--ink2)'}">${p.n}</text></g>`;
+  }).join('');
+  return `<svg viewBox="0 0 1000 620" role="img"
+      aria-label="競爭定位圖：橫軸${A.x.name}（左${A.x.lo}、右${A.x.hi}），縱軸${A.y.name}（下${A.y.lo}、上${A.y.hi}）。${PL.map(p=>p.n+'位於'+p.x+'／'+p.y).join('；')}。座標為推斷值。">
+    ${grid}
+    <line x1="90" y1="520" x2="950" y2="520" stroke="var(--ink2)" stroke-width="2"/>
+    <line x1="90" y1="40" x2="90" y2="520" stroke="var(--ink2)" stroke-width="2"/>
+    ${dots}
+    <text x="90" y="556" font-size="17" fill="var(--muted)">← ${A.x.lo}</text>
+    <text x="950" y="556" font-size="17" fill="var(--muted)" text-anchor="end">${A.x.hi} →</text>
+    <text x="520" y="590" font-size="18" font-weight="600" fill="var(--ink2)" text-anchor="middle">${A.x.name}</text>
+    <!-- Y 軸端點標籤放在軸線**內側**並靠左對齊：原本用 text-anchor="end" 貼在 x=72
+         往左延伸，長字串（AI ASIC・SLT・矽光子）會伸出 viewBox 左緣 118 單位被切掉。
+         SVG 沒有溢出捲軸也不報錯，只是安靜地少一截字。 -->
+    <text x="100" y="64" font-size="17" fill="var(--muted)">↑ ${A.y.hi}</text>
+    <text x="100" y="506" font-size="17" fill="var(--muted)">↓ ${A.y.lo}</text>
+    <text x="30" y="280" font-size="18" font-weight="600" fill="var(--ink2)" text-anchor="middle"
+      transform="rotate(-90 30 280)">${A.y.name}</text>
+  </svg>`;
+}
+function positionHTML(S){
+  const P=DATA.position; if(!P)return '';
+  const C=P.company,AP=P.applications,FP=P.footprint,PS=P.positioning,IT=P.intelTiers,G=P.gaps;
+  const T={'關鍵':'t1','主要':'t2','次要':'t3'};
+  return `
+  <section id="position" data-tab="position">
+    <div class="sh"><span class="ix">§02</span><h2>產業定位</h2><span class="q">欣銓在哪裡？對手、客戶與供應商是誰？</span><span class="sub">${S?'不隨週次變動的基礎盤——它決定每週該蒐什麼、蒐到的東西重不重要':'結構情報基礎盤 · 五力 × 競爭定位 × 情報分級'}</span><span class="chip" title="競爭定位座標為依公開業務描述之分析判斷，非官方數據">推斷</span></div>
+
+    <div class="pos-role">
+      <span class="rt">${C.role}</span>
+      <span class="rn">${C.roleNote}</span>
+    </div>
+    <div class="pos-facts">${C.facts.map(f=>`<span class="f"><b>${f.k}</b> ${f.v} ${srcTag(f.src)}</span>`).join('')}</div>
+
+    <div class="pos-grid">
+      <div class="card">
+        <div class="ch"><b>${PS.title}</b> ${srcTag(PS.src)}</div>
+        <div class="pos-map">${posMap(PS)}</div>
+        <div class="pos-read">${PS.read}</div>
+        <div class="pos-read" style="font-size:11.5px;color:var(--muted);margin-top:8px">${PS.disclaimer}</div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="ch"><b>應用結構</b>（${AP.year}） ${srcTag('查證')}</div>
+          <div class="appbar">${AP.mix.map(m=>`<div class="r"><span class="n">${m.n}</span>
+            <span class="t"><i style="width:${m.v/26*100}%"></i></span>
+            <span class="v">${m.v}%</span></div>`).join('')}</div>
+          <div class="pos-read" style="margin-top:9px">${AP.note}</div>
+        </div>
+        <div class="card">
+          <div class="ch"><b>廠區布局</b> ${srcTag(FP.src)}</div>
+          <div class="sitelist">${FP.sites.map(s=>`<span class="s k-${s.kind}"><b>${s.region}</b><span>${s.detail}</span></span>`).join('')}</div>
+          <div class="pos-read" style="margin-top:9px">${FP.riskNote}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sh" style="margin-top:20px"><h3 style="margin:0;font-size:16px">五力：子彈夠不夠</h3><span class="q">${P.fiveForces._note.split('。')[0]}。</span></div>
+    <div class="f5">${P.fiveForces.forces.map(f=>`
+      <div class="fc${f.tier==='關鍵'?' key':''}">
+        <div class="fh"><span class="nm">${f.name}</span><span class="tierchip ${T[f.tier]}">${f.tier}</span></div>
+        <div class="fq">${f.q}</div>
+        ${f.items.map(it=>`<div class="fi"><b>${it.n}</b>　${it.d} ${srcTag(it.src)}</div>`).join('')}
+        <div class="fl">${(f.rules||[]).map(r=>`<span class="tag">${r}</span>`).join('')}${(f.kdf||[]).length?`<span class="tag">KDF#${f.kdf.join('・#')}</span>`:''}<br>${f.live}</div>
+      </div>`).join('')}
+    </div>
+
+    <div class="pos-grid" style="margin-top:16px">
+      <div class="card">
+        <div class="ch"><b>情報分級</b>：關鍵／主要／次要</div>
+        <div class="pos-read" style="margin-bottom:8px">${IT._note.split('。').slice(1).join('。')}</div>
+        <table class="tiertab"><thead><tr><th>級別</th><th>判準</th><th>處置</th></tr></thead><tbody>
+        ${IT.tiers.map(t=>`<tr>
+          <td><span class="tierchip ${T[t.t]}">${t.t}</span> <span style="font-family:var(--mono);font-size:10.5px;color:var(--muted)">${t.code}</span></td>
+          <td>${t.d}</td><td>${t.act}</td></tr>`).join('')}
+        </tbody></table>
+      </div>
+      <div class="gapbox">
+        <h4>已知缺口：我們拿不到的東西</h4>
+        <div class="gn">${G._note.split('：')[1]||G._note}</div>
+        <ul>${G.items.map(x=>`<li>${x}</li>`).join('')}</ul>
+        <div class="im">${G.impact}</div>
+      </div>
+    </div>
+  </section>`;
+}
+
 function render(i){
   charts.forEach(c=>c.destroy());charts=[];kdfChart=null;
   const w=DATA.weeks[i], p=i>0?DATA.weeks[i-1]:null;
@@ -2092,7 +2284,7 @@ function render(i){
   $('#wprev').disabled=(i===0);$('#wnext').disabled=(i===DATA.weeks.length-1);
   const dx=p?w.xy.x-p.xy.x:0, dy=p?w.xy.y-p.xy.y:0;
   const plan=w.companyPlan, fired=plan?plan.firedPlaybooks:[];
-  /* 企業畫像切換：§01 總覽維持欣銓官方週報；§02／§08 依 curCompany 切換。
+  /* 企業畫像切換：§01 總覽維持欣銓官方週報；§08／§09 依 curCompany 切換。
      欣銓（real）取 weeks.json 正本；示範企業取建置時以引擎重算的 plans。 */
   const CO=DATA.companies||[];
   const co=CO.find(c=>c.id===curCompany)||CO[0]||null;
@@ -2161,7 +2353,7 @@ function render(i){
         <span class="ix">§01</span>
         <span class="mt">本週戰略簡報</span>
         <span class="mn">W${String(w.week).padStart(2,'0')}　${w.range}</span>
-        ${w.days&&w.days!==7?`<span class="chip" title="本期涵蓋 ${w.days} 個日曆天，非標準 7 天週期；成因見 §10 方法論">${w.days} 天窗口</span>`:''}
+        ${w.days&&w.days!==7?`<span class="chip" title="本期涵蓋 ${w.days} 個日曆天，非標準 7 天週期；成因見 §11 方法論">${w.days} 天窗口</span>`:''}
         <span class="sp"></span>
         <span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>
         ${w.crossCheck?`<span class="chip cc${w.confidence==='低'?' lo':''}">雙模型${w.crossCheck.agreement?'一致 ✓':'不一致 ✕'}｜信心 ${w.confidence||'—'}</span>`:''}
@@ -2207,6 +2399,8 @@ function render(i){
     </div>
   </section>
 
+  ${positionHTML(S)}
+
   ${moversHTML}
 
   <section id="plan" data-tab="company">
@@ -2214,7 +2408,7 @@ function render(i){
       <span class="cosel-l">企業畫像</span>
       ${CO.map(c=>`<button type="button" class="co-b${c.id===co.id?' on':''}" data-co="${c.id}" aria-pressed="${c.id===co.id}">${c.short}${c.real?'':'<span class="co-tag">示範</span>'}</button>`).join('')}
     </div>`:''}
-    <div class="sh"><span class="ix">§02</span><h2>對${co?co.short:'欣銓'}的公司規畫</h2><span class="q">${co?co.short:'欣銓'}現在該做什麼？</span><span class="sub">${S?`共 ${coFired.length} 條觸發｜含成功指標與停損訊號`:'企業畫像 × 情境 → 觸發式劇本'}</span>${co&&!co.real?'<span class="chip demo" title="虛構企業：畫像與劇本為示範資料；觸發依據引用的週次資料為真實紀錄">示範資料</span>':'<span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>'}</div>
+    <div class="sh"><span class="ix">§08</span><h2>對${co?co.short:'欣銓'}的公司規畫</h2><span class="q">${co?co.short:'欣銓'}現在該做什麼？</span><span class="sub">${S?`共 ${coFired.length} 條觸發｜含成功指標與停損訊號`:'企業畫像 × 情境 → 觸發式劇本'}</span>${co&&!co.real?'<span class="chip demo" title="虛構企業：畫像與劇本為示範資料；觸發依據引用的週次資料為真實紀錄">示範資料</span>':'<span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>'}</div>
     ${co&&!co.real?`<div class="demobox"><b>${co.name}</b>為虛構示範企業——同一套週次情境判定，換上不同企業畫像與劇本組，觸發結果隨之改變（可與欣銓對照本週差異）。觸發依據引用的座標、KDF 與關鍵字均為真實週次資料；虛構的只有企業本身。非投資建議。</div>`:''}
     ${coPlan?`<div style="font-size:12.5px;color:var(--ink2);margin-bottom:14px">情境姿態：${coPlan.scenarioStance}</div>`:''}
     <div class="plan">${coFired.map(f=>`
@@ -2267,7 +2461,7 @@ function render(i){
   </section>
 
   <section id="trend" data-tab="analysis">
-    <div class="sh"><span class="ix">§04</span><h2>情境軌跡與權重</h2><span class="q">局勢往哪個方向走？</span><span class="sub">${S?`W1–W${w.week} 累積｜資料只追加不覆寫`:`W1–W${w.week} 累積 · 只追加不覆寫`}</span></div>
+    <div class="sh"><span class="ix">§05</span><h2>情境軌跡與權重</h2><span class="q">局勢往哪個方向走？</span><span class="sub">${S?`W1–W${w.week} 累積｜資料只追加不覆寫`:`W1–W${w.week} 累積 · 只追加不覆寫`}</span></div>
     ${p?`<div class="trendsum">累積觀察（W${w0.week}→W${w.week}）：X 軸由 <b class="num">${fmt(w0.xy.x)}</b> 移至 <b class="num">${fmt(w.xy.x)}</b>（${w.xy.x<w0.xy.x?'碎裂加深':'聚合改善'} ${Math.abs(w.xy.x-w0.xy.x).toFixed(2)}）；Y 軸由 <b class="num">${fmt(w0.xy.y)}</b> 至 <b class="num">${fmt(w.xy.y)}</b>。期間情境${scenSpan.length===1?`維持 ${scenSpan[0]}`:`歷經 ${scenSpan.join(' → ')}`}；五維中累積變動最大＝${dimTop.n}（<b class="num">${dimTop.a.toFixed(1)}→${dimTop.b.toFixed(1)}</b>）。</div>`:''}
     <div class="g2">
       <div class="card"><button class="zoombtn" data-zoom="xy" aria-label="放大雙軸軌跡圖">⤢ 放大</button>
@@ -2293,7 +2487,7 @@ function render(i){
   </section>
 
   <section id="events" data-tab="intel">
-    <div class="sh"><span class="ix">§05</span><h2>本週事件</h2><span class="q">這些判斷根據哪些事實？</span><span class="sub">${S?'每則均可點回原文查證':'真實可追溯'} · ${(w.events||[]).length} 則 · ${[...new Set((w.events||[]).map(e=>e.source).filter(Boolean))].length} 個來源</span></div>
+    <div class="sh"><span class="ix">§04</span><h2>本週事件</h2><span class="q">這些判斷根據哪些事實？</span><span class="sub">${S?'每則均可點回原文查證':'真實可追溯'} · ${(w.events||[]).length} 則 · ${[...new Set((w.events||[]).map(e=>e.source).filter(Boolean))].length} 個來源</span></div>
     ${alertCard(i)}
     <div class="evgrid">
       ${(w.events||[]).map(e=>`<div class="evc">
@@ -2337,7 +2531,7 @@ function render(i){
       <div class="jd-out" id="jdout" aria-live="polite"></div>
       <p class="jd-note">AI 只看得到你貼的這一則，當時的判定則是在整週九則事件、前一週座標與風險雷達都在眼前的情況下做的——
         兩邊不同不必然是誰錯，但差得多就值得追問。這一段是判定鏈裡<b>唯一由模型決定</b>的部分；
-        接下來「哪幾條劇本被觸發」是確定性規則，不經模型（可在 §02 的規則模擬器自行重算）。</p>
+        接下來「哪幾條劇本被觸發」是確定性規則，不經模型（可在 §08 的規則模擬器自行重算）。</p>
     </div>`}
     <div class="audit">管線稽核：<a href="https://github.com/sakaban-Code/SCAI-test" target="_blank" rel="noopener">原始碼與資料 repo ↗</a> · <a href="https://github.com/sakaban-Code/SCAI-test/actions/workflows/weekly.yml" target="_blank" rel="noopener">每週自動執行紀錄 ↗</a>${w.tokenUsage?`　·　本週模型用量 <b class="num">${(w.tokenUsage.total||0).toLocaleString()}</b> tokens${w.tokenUsage.byStep?`<table><thead><tr><th>步驟</th><th>模型</th><th>in</th><th>out</th></tr></thead><tbody>${Object.entries(w.tokenUsage.byStep).map(([k,v])=>`<tr><td>${k}</td><td>${v.model||''}</td><td class="num">${(v.input_tokens||0).toLocaleString()}</td><td class="num">${(v.output_tokens||0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:''}`:'　·　自 W7 起由雲端管線自動產出，並於本區附逐模型 token 用量'}</div>
   </section>
@@ -2345,7 +2539,7 @@ function render(i){
   ${saHTML}
 
   <section id="profile" data-tab="company">
-    <div class="sh"><span class="ix">§08</span><h2>企業畫像</h2><span class="q">這些建議是對誰而言？</span><span class="sub">${co?`${co.name}｜${co.tickerLabel}`:'欣銓科技 3264.TWO · 公開資料'}</span>${co&&!co.real?'<span class="chip demo" title="虛構企業：畫像數字為示範資料">示範資料</span>':''}</div>
+    <div class="sh"><span class="ix">§09</span><h2>企業畫像</h2><span class="q">這些建議是對誰而言？</span><span class="sub">${co?`${co.name}｜${co.tickerLabel}`:'欣銓科技 3264.TWO · 公開資料'}</span>${co&&!co.real?'<span class="chip demo" title="虛構企業：畫像數字為示範資料">示範資料</span>':''}</div>
     ${co&&co.industry?`<div style="font-size:12px;color:var(--ink2);margin-bottom:12px">${co.industry}${co.positioning?`——${co.positioning}`:''}</div>`:''}
     <div class="pf">
       ${(co?co.stats:[]).map(s2=>`<div class="it"><div class="k">${s2.k}</div><div class="v">${s2.v}</div><div class="n">${s2.n}${s2.tbc?' <span class="tbc">待確認</span>':''}${co.real?'':' <span class="tbc">示範</span>'}</div></div>`).join('')}
@@ -2359,7 +2553,7 @@ function render(i){
   </section>
 
   <section id="gov" data-tab="gov">
-    <div class="sh"><span class="ix">§09</span><h2>Agent 治理</h2><span class="q">怎麼讓它可預測、有邊界、可稽核？</span><span class="sub">六個面向，每項均可回到本站或 repo 查證</span></div>
+    <div class="sh"><span class="ix">§10</span><h2>Agent 治理</h2><span class="q">怎麼讓它可預測、有邊界、可稽核？</span><span class="sub">六個面向，每項均可回到本站或 repo 查證</span></div>
     <div class="govgrid">
       <div class="card gov"><div class="gov-t"><span class="gov-k">Task Router</span>任務分派</div>
         <div class="gov-b">四層單向管線，各層可獨立重跑：<b>抓取</b>（純搜尋 API，不用模型）→ <b>判定</b>（雙模型交叉驗證）→ <b>規畫</b>（純規則引擎，零 API 呼叫）→ <b>呈現</b>（靜態產物）。規畫層不依賴模型，因此任何一週的公司規畫都能離線重算並比對。</div></div>
@@ -2410,7 +2604,7 @@ function render(i){
   </section>
 
   <section id="method" data-tab="gov">
-    <div class="sh"><span class="ix">§10</span><h2>方法論</h2><span class="q">這套判定怎麼運作？</span><span class="sub">${S?'雙軸情境 × 25 項關鍵決策因素（KDF）':'雙軸情境分析 × 25 KDF 動態校準（SCAI-Agent）'}</span></div>
+    <div class="sh"><span class="ix">§11</span><h2>方法論</h2><span class="q">這套判定怎麼運作？</span><span class="sub">${S?'雙軸情境 × 25 項關鍵決策因素（KDF）':'雙軸情境分析 × 25 KDF 動態校準（SCAI-Agent）'}</span></div>
     <div class="axbox">
       <div class="axc"><div class="t">X 軸｜地緣與供應鏈聚合程度（−1 碎裂 ↔ +1 聚合）</div>
         <div class="d">碎裂訊號：保護主義、出口管制、關稅、技術封鎖、斷鏈、供應鏈區域化。聚合訊號：自由貿易、國際合作、供應鏈穩定、跨國協作。</div></div>
@@ -2760,13 +2954,13 @@ function aiAnswer(q){
   }
   /* 用詞邊界比對：原本的 /(x|y|…)/ 會把英文 why 裡的 y 當成軸向查詢 */
   if(/(\bx\s*軸|\by\s*軸|\bx\b|\by\b|軸|座標|象限|方法論|kdf)/i.test(t)){
-    return `方法論：<b>X 軸＝地緣與供應鏈聚合</b>（−1 碎裂 ↔ +1 聚合）、<b>Y 軸＝資源與政策充沛</b>（−1 匱乏 ↔ +1 充沛），定位四情境後校準 25 項 KDF 權重（中性 50），每次調整附 Decision Trace。詳見「治理」分頁 §10。${SRC}`;
+    return `方法論：<b>X 軸＝地緣與供應鏈聚合</b>（−1 碎裂 ↔ +1 聚合）、<b>Y 軸＝資源與政策充沛</b>（−1 匱乏 ↔ +1 充沛），定位四情境後校準 25 項 KDF 權重（中性 50），每次調整附 Decision Trace。詳見「治理」分頁 §11。${SRC}`;
   }
   if(/(治理|token|護欄|控管|harness)/i.test(t)){
-    return `治理六面向見「治理」分頁 §09：任務分派（四層單向管線）、記憶（append-only）、工具（時間窗檢索）、護欄（缺漏防呆＋三道匯入門檻）、可觀測（Decision Trace＋自我稽核）、評估（確定性重算＋外部對抗審查）。Token 用量目前誠實留白——管線尚未首跑，不以估算值充數。${SRC}`;
+    return `治理六面向見「治理」分頁 §10：任務分派（四層單向管線）、記憶（append-only）、工具（時間窗檢索）、護欄（缺漏防呆＋三道匯入門檻）、可觀測（Decision Trace＋自我稽核）、評估（確定性重算＋外部對抗審查）。Token 用量目前誠實留白——管線尚未首跑，不以估算值充數。${SRC}`;
   }
   if(/(可信|來源|真的|查證|假的)/.test(q)){
-    return `本站每則事件附可查證來源連結；每次權重調整附 Decision Trace；§07 自我稽核公開「判斷錯了會怎樣」；§10 揭露期間重疊與缺口等不利事實。X／Y 與建議屬分析判斷【推斷】，非官方數據、非投資建議。${SRC}`;
+    return `本站每則事件附可查證來源連結；每次權重調整附 Decision Trace；§07 自我稽核公開「判斷錯了會怎樣」；§11 揭露期間重疊與缺口等不利事實。X／Y 與建議屬分析判斷【推斷】，非官方數據、非投資建議。${SRC}`;
   }
   return `展示模式能回答：<br>・「本週判定是什麼」<br>・任一劇本編號（如「為什麼觸發 PB-07」）<br>・「三家企業差在哪」<br>・「風險雷達」「方法論」「治理」「資料可信嗎」<br>其餘問題待後端連接真 AI 後支援。${SRC}`;
 }

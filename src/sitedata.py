@@ -271,6 +271,10 @@ def build_payload(root: pathlib.Path) -> dict:
 
     cfg = load(root / "data" / "kdf_config.json")
     prof = load(root / "data" / "company_profile.json")
+    # 產業定位基礎盤（§02）。與 kdf_config／playbook 同屬版本控管之自家設定檔，
+    # 內容由人工撰寫而非檢索結果，故與它們一致：不施用 escape_html_deep。
+    pos_path = root / "data" / "industry_position.json"
+    position = load(pos_path) if pos_path.exists() else None
     pb = load(root / "data" / "playbook.json")
     ex_path = root / "data" / "kdf_definitions.json"
     extras = load(ex_path) if ex_path.exists() else {"kdfDefs": {}, "scenarioMeta": []}
@@ -294,6 +298,7 @@ def build_payload(root: pathlib.Path) -> dict:
         "triggers": {p["id"]: {"title": p["title"], **p["trigger"]} for p in pb["playbooks"]},
         "levers": {l["id"]: l for l in prof["decision_levers"]},
         "profile": prof,
+        "position": position,
         "kdfDefs": extras.get("kdfDefs", {}),
         "scenarioMeta": extras.get("scenarioMeta", []),
         "coverage": coverage,
