@@ -7,7 +7,7 @@
 本模組**不讀寫 data/ 以外的東西、也不修改 weeks.json**：`days`／`start`／`end`
 與 `coverage` 全部是由既有的 `range` 字串與 `gen` 欄位**推導**出來的顯示用衍生值。
 """
-import copy, datetime, json, pathlib
+import copy, datetime, json, pathlib, sys
 
 import weekcal
 
@@ -231,6 +231,48 @@ def build_alerts(root: pathlib.Path, weeks: list):
     return out
 
 
+def build_alert_layer(root: pathlib.Path, weeks: list):
+    """『一則新聞的完整旅程』面板所需：警報規則 ＋ 自證基準。
+
+    面板要在瀏覽器端即時重跑語氣剔除與警報分級，等於同一份邏輯出現第三份實作
+    （plan_engine.py／daily_watch.py／JS）。金庫〈重寫的判定必須自證與正本一致〉
+    的教訓是：重寫的判定若沒有自證，遲早與正本分岔而沒人發現。
+
+    故此處以 **Python 正本** 對全部歷史事件跑一次分級，把結果一併送進頁面；
+    JS 載入時用同一批事件重跑並逐則比對，不一致即在畫面上示警。
+    ⚠ 比對前 JS 必須先 deEnt()——DATA.weeks 的字串在建置時已 HTML 跳脫，
+    而這裡的基準是用未跳脫的原文算的。
+    """
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import daily_watch as DW
+
+    rules = load(root / "data" / "alert_rules.json")
+    active = rules["ruleSets"][rules["activeCompanyType"]]
+
+    expect = []
+    for w in weeks:
+        for i, e in enumerate(w.get("events") or []):
+            text = f'{e.get("title", "")} {e.get("summary", "")}'
+            m = DW.classify(text)
+            # week 在 build_payload 內已正規化為整數，但本函式也可能被單獨呼叫測試；
+            # 兩種格式都吃，避免出現 "WW1-0" 這種鍵
+            expect.append({"k": f'W{str(w["week"]).lstrip("Ww")}-{i}',
+                           "tier": DW.tier_of(m),
+                           "ids": sorted(r["id"] for r, _ in m)})
+    return {
+        "companyType": rules["activeCompanyType"],
+        "tiers": rules["tiers"],
+        "rules": [{"id": r["id"], "tier": r["tier"], "match": r["match"],
+                   "why": r.get("why", ""), "action": r.get("action", ""),
+                   "playbook": r.get("playbook", "—")} for r in active],
+        # 語氣剔除詞表：JS 鏡像必須用同一份，不可各自維護
+        "neg": list(DW.NEG), "negOk": list(DW.NEG_OK),
+        "hypo": list(DW.HYPO), "hypoOk": list(DW.HYPO_OK),
+        "clause": DW._CLAUSE.pattern,
+        "selfCheck": expect,
+    }
+
+
 def build_playbook_coverage(weeks: list, pb: dict):
     """劇本覆蓋率：每條在已發佈週次中觸發過幾次，未觸發者列出卡在哪個條件。
 
@@ -354,6 +396,8 @@ def build_payload(root: pathlib.Path) -> dict:
         "position": position,
         # 劇本覆蓋率：以未跳脫的原值計算（同 coverage／companies）
         "pbCoverage": build_playbook_coverage(weeks, pb),
+        # 警報層與自證基準（同上，須用未跳脫原值）；規則檔為自家版控檔，不施跳脫
+        "alertLayer": build_alert_layer(root, weeks),
         "kdfDefs": extras.get("kdfDefs", {}),
         "scenarioMeta": extras.get("scenarioMeta", []),
         "coverage": coverage,

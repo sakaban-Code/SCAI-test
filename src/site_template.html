@@ -1206,6 +1206,51 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 @keyframes rick{to{transform:rotate(720deg) scale(.15);opacity:0}}
 @media (prefers-reduced-motion:reduce){#alertbar.on,.tb .tbdot,.brand-emblem.jelly,.brand-emblem.rick{animation:none}}
 @media (max-width:600px){#alertbar{margin:8px 10px 0}#alertbar.on{padding:9px 10px;gap:8px}}
+/* ── 一則新聞的完整旅程 ── */
+.jn-in{padding:13px 15px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.jn-in label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+#jntext{width:100%;box-sizing:border-box;font-family:inherit;font-size:13px;line-height:1.7;
+  color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;
+  padding:9px 11px;resize:vertical}
+.jn-btns{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px;align-items:center}
+.jn-go{font-family:inherit;font-size:13px;font-weight:700;color:#fff;background:var(--accent);
+  border:none;border-radius:9px;padding:8px 18px;cursor:pointer}
+.jn-go:hover{filter:brightness(1.08)}
+.jn-go.sm{font-size:12px;padding:6px 13px;margin-top:8px}
+.jn-empty{padding:14px;font-size:12.5px;color:var(--muted)}
+.jn-l{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+.jn-h{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:9px 13px;
+  background:rgba(68,83,214,.05);border-bottom:1px solid var(--line)}
+.jn-n{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;
+  font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.jn-h b{font-size:13.5px;color:var(--ink)}
+.jn-src{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.jn-tok{margin-left:auto;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;
+  color:#0d6c86;border:1px solid #0d6c86;white-space:nowrap}
+.jn-tok.model{color:#fff;background:#8a420b;border-color:#8a420b}
+.jn-b{padding:11px 13px}
+.jn-drop{font-size:12px;line-height:1.7;margin-bottom:5px}
+.jn-drop s{color:var(--muted)}
+.jn-drop span{color:#8f0d56;margin-left:7px;font-size:11.5px}
+.jn-keep{font-size:12.5px;line-height:1.75;color:var(--ink2);margin-top:7px;
+  padding-top:7px;border-top:1px dashed var(--line)}
+.jn-keep b{color:var(--ink)}
+.jn-tier{font-size:12.5px;color:var(--ink2);margin-bottom:8px}
+.jn-tier b{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;
+  padding:2px 9px;border-radius:999px;color:#fff;margin-right:7px}
+.jn-tier.t-RED b{background:#b0106a}.jn-tier.t-YELLOW b{background:#aa5311}
+.jn-tier.t-GREEN b{background:#55628a}
+.jn-rule{font-size:12.5px;line-height:1.7;color:var(--ink);margin-bottom:7px}
+.jn-rule .tag{display:inline-block;font-family:var(--mono);font-size:10.5px;color:var(--accent);
+  background:rgba(68,83,214,.08);border-radius:5px;padding:1px 6px;margin-right:6px}
+.jn-rule em{font-style:normal;color:var(--muted);font-size:11.5px;margin-right:4px}
+.jn-why{font-size:11.5px;line-height:1.7;color:var(--ink2);margin-top:3px}
+.jn-why b{color:var(--ink)}
+.jn-sim{font-size:12px;line-height:1.7;color:var(--ink2);margin-bottom:4px}
+.jn-sim b{font-family:var(--mono);color:var(--accent);margin-right:7px}
+.jn-note{margin-top:9px;padding:8px 11px;border-radius:9px;font-size:11.5px;line-height:1.7;
+  color:var(--ink2);background:rgba(170,83,17,.06);border:1px solid rgba(170,83,17,.22)}
+.jn-note code{font-family:var(--mono);font-size:11px}
 /* ── 劇本覆蓋率（§08 末） ── */
 .pbc{margin-top:18px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
 .pbc-note{font-size:12px;line-height:1.7;color:var(--muted);margin-bottom:11px}
@@ -1556,7 +1601,10 @@ const TABS=[
      本週事件與趨勢圖表是支撐它們的證據。 */
   {k:'intel',label:'情報',hint:'外部動態',secs:[
     ['risk','03','風險雷達','未來六個月要盯哪些訊號'],
-    ['events','04','本週事件','外部發生了什麼，每則附可查證來源']]},
+    ['events','04','本週事件','外部發生了什麼，每則附可查證來源'],
+    /* 不給 § 編號：它是可操作的示範而非週報內容，且新增編號會牽動其後全部區段
+       與六處交叉引用。先例＝本週最大變動（movers）亦無編號。 */
+    ['journey','','試一則新聞','貼一則新聞，看它穿過系統每一層']]},
   {k:'analysis',label:'分析',hint:'走勢與依據',secs:[
     ['movers','','本週最大變動','哪些因素這週變重要了，為什麼'],
     /* 副標不寫死週數——曾寫「八週走勢」而站上已累積十一週，資料長大它不會跟著改 */
@@ -2230,6 +2278,85 @@ wireAlertBar();
   });
 })();
 
+/* ── 一則新聞的完整旅程 ─────────────────────────────────────────────
+   評審自己貼一則新聞，看它穿過每一層。設計要點有三：
+
+   (1) 每一層自陳「依據哪個檔」與「用不用模型」。六層裡五層是確定性規則、零呼叫，
+       只有雙軸判定那層需要模型——這個對比是 Token 紀律最有力的呈現，
+       它從一句宣稱變成畫面上數得出來的東西。
+   (2) 警報層與週報判定層**剔除規則不同**：警報層剔否定＋假設語氣（daily_watch），
+       週報判定層只剔否定（plan_engine，已凍結）。面板如實分開顯示，不假裝一致。
+   (3) 本面板等於同一份邏輯的第三份實作（Python×2 ＋ JS）。故載入時以建置時
+       Python 正本算出的 62 則基準自我比對，不一致即示警——見金庫
+       〈重寫的判定必須自證與正本一致〉。基準用未跳脫原文算，比對前須 deEnt()。 */
+const AL=DATA.alertLayer||null;
+const jnEsc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+/* 警報層的語氣剔除：否定與假設一趟做完。必須單趟——分兩次切句時，第一次 join 後
+   標點已失，第二次切不出邊界，一個「若」會清空整篇（2026-08-22 實際踩過）。 */
+function jnStrip(text){
+  if(!AL)return {kept:text,dropped:[]};
+  const re=new RegExp(AL.clause), kept=[], dropped=[];
+  String(text).split(re).forEach(cl=>{
+    if(!cl.trim())return;
+    let probe=cl;
+    AL.negOk.concat(AL.hypoOk).forEach(w=>{probe=probe.split(w).join('')});
+    const n=AL.neg.find(x=>probe.indexOf(x)>=0), h=AL.hypo.find(x=>probe.indexOf(x)>=0);
+    if(n)dropped.push({cl,why:`含否定詞「${n}」——說的是沒發生`});
+    else if(h)dropped.push({cl,why:`含假設語氣「${h}」——說的是還沒發生`});
+    else kept.push(cl);
+  });
+  return {kept:kept.join(' '),dropped};
+}
+/* 警報分級：組內 any/anyB 為 OR、組間 AND、all 須全數在場（對齊 daily_watch.classify） */
+function jnClassify(text){
+  if(!AL)return [];
+  const t=jnStrip(text).kept, out=[];
+  AL.rules.forEach(r=>{
+    const m=r.match, hits={}; let ok=true;
+    ['any','anyB'].forEach(g=>{
+      if(!m[g])return;
+      const h=m[g].filter(k=>t.indexOf(k)>=0);
+      if(h.length)hits[g]=h; else ok=false;
+    });
+    if(ok&&m.all){
+      if(m.all.every(k=>t.indexOf(k)>=0))hits.all=m.all.slice(); else ok=false;
+    }
+    if(ok)out.push({r,hits});
+  });
+  return out;
+}
+const jnTier=ms=>ms.some(x=>x.r.tier==='RED')?'RED':(ms.length?'YELLOW':'GREEN');
+/* 自證：用同一批歷史事件重跑，與建置時的 Python 結果逐則比對 */
+function jnSelfCheck(){
+  if(!AL)return null;
+  const exp={}; AL.selfCheck.forEach(x=>exp[x.k]=x);
+  let n=0, bad=[];
+  DATA.weeks.forEach(w=>(w.events||[]).forEach((e,i)=>{
+    const k='W'+w.week+'-'+i, x=exp[k]; if(!x)return;
+    n++;
+    /* 基準以未跳脫原文計算，這裡的字串已 HTML 跳脫，必須先還原再比 */
+    const ms=jnClassify(deEnt(e.title||'')+' '+deEnt(e.summary||''));
+    const ids=ms.map(m=>m.r.id).sort().join(','), tier=jnTier(ms);
+    if(tier!==x.tier||ids!==x.ids.join(','))
+      bad.push(`${k} Python=${x.tier}/${x.ids.join(',')||'無'} JS=${tier}/${ids||'無'}`);
+  }));
+  return {n,bad};
+}
+/* 相似事件：與歷史事件比對（字元 bigram），對應 daily_watch 的 72 小時去重 */
+function jnSimilar(title){
+  const bg=s=>{s=String(s).replace(/\s+/g,'');const o=new Set();
+    for(let i=0;i<s.length-1;i++)o.add(s.slice(i,i+2));return o};
+  const A=bg(title); if(!A.size)return [];
+  const out=[];
+  DATA.weeks.forEach(w=>(w.events||[]).forEach(e=>{
+    const B=bg(deEnt(e.title||'')); if(!B.size)return;
+    let n=0; A.forEach(x=>{if(B.has(x))n++});
+    const s=n/(A.size+B.size-n);
+    if(s>=0.35)out.push({w:'W'+w.week,t:deEnt(e.title||''),s});
+  }));
+  return out.sort((a,b)=>b.s-a.s).slice(0,3);
+}
+
 /* ── 劇本覆蓋率（§08 末）──
    評審一定會問：八條劇本，Demo 上只看到四五條，其餘呢？
    「從未觸發」有兩種，性質天差地遠，分開呈現才誠實：
@@ -2270,6 +2397,113 @@ function pbCovHTML(S){
         :'區分「條件未發生之正確休眠」與「門檻自相矛盾之設計缺陷」；後者由本系統自行發現並公開揭露。'}</div>
       ${C.rows.map(row).join('')}
     </div>`;
+}
+
+function journeyHTML(S){
+  if(!AL)return '';
+  return `
+  <section id="journey" data-tab="intel">
+    <div class="sh"><h2>試一則新聞</h2><span class="q">情報進來之後，實際發生什麼事？</span>
+      <span class="sub">${S?'貼任何一則新聞，看它穿過系統每一層——每層都會說明依據哪個檔、以及有沒有呼叫模型'
+        :'完整判定鏈路 · 逐層可稽核 · 六層中五層為確定性規則'}</span>
+      <span class="chip" id="jnsc" title="以建置時 Python 正本的結果自我比對">自證中…</span></div>
+    <div class="jn">
+      <div class="jn-in">
+        <label for="jntext">新聞內容（標題＋內文，或只貼標題）</label>
+        <textarea id="jntext" rows="3" placeholder="例：中國延遲、限制鍺與石英對台灣出口，衝擊半導體供應鏈"></textarea>
+        <div class="jn-btns">
+          <button type="button" class="jn-go" id="jngo">走一遍</button>
+          <button type="button" class="cmp-more" id="jneg1">試：真事件</button>
+          <button type="button" class="cmp-more" id="jneg2">試：報平安</button>
+          <button type="button" class="cmp-more" id="jneg3">試：假設語氣</button>
+        </div>
+      </div>
+      <div id="jnout"></div>
+    </div>
+  </section>`;
+}
+const JN_SAMPLES={
+  jneg1:'中國延遲並限制鍺、石英與永磁對台灣出口，衝擊半導體與光學供應鏈。石英製品為測試廠基礎耗材。',
+  jneg2:'本週台灣新竹、龍潭、桃園園區無天災、停電或缺水通報，產線運作正常。',
+  jneg3:'外資報告：若新竹缺水或桃園停電，測試產能將受衝擊，建議留意後續。'
+};
+function wireJourney(i){
+  const out=$('#jnout'), ta=$('#jntext'), go=$('#jngo');
+  if(!out||!ta||!go||!AL)return;
+  const sc=$('#jnsc'), r=jnSelfCheck();
+  if(sc&&r){
+    const ok=r.bad.length===0;
+    sc.textContent=ok?`自證 ${r.n}/${r.n} 與正本一致`:`自證不一致 ${r.bad.length}/${r.n}`;
+    sc.className='chip'+(ok?'':' lo');
+    sc.title=ok?`以建置時 Python 正本對 ${r.n} 則歷史事件的分級結果比對，逐則相同`
+      :'JS 鏡像與 Python 正本分岔：\n'+r.bad.slice(0,5).join('\n');
+  }
+  const L=(n,name,src,tok,body)=>`<div class="jn-l">
+    <div class="jn-h"><span class="jn-n">${n}</span><b>${name}</b>
+      <span class="jn-src">依據 ${src}</span>
+      <span class="jn-tok${tok?' model':''}">${tok?'呼叫模型':'0 tokens'}</span></div>
+    <div class="jn-b">${body}</div></div>`;
+  const run=()=>{
+    const text=(ta.value||'').trim();
+    if(!text){out.innerHTML='<div class="jn-empty">先貼一段文字，或按上面三個範例其中一個。</div>';return}
+    const w=DATA.weeks[i];
+    /* ① 語氣剔除（警報層口徑：否定＋假設） */
+    const st=jnStrip(text);
+    const l1=st.dropped.length
+      ? st.dropped.map(d=>`<div class="jn-drop"><s>${jnEsc(d.cl)}</s><span>${d.why}</span></div>`).join('')
+        +`<div class="jn-keep"><b>送進比對的文字：</b>${jnEsc(st.kept)||'<i>（整段都被剔除）</i>'}</div>`
+      : '<div class="jn-keep">全段保留——沒有否定或假設語氣的子句。</div>';
+    /* ② 警報分級 */
+    const ms=jnClassify(text), tier=jnTier(ms);
+    const tierName={RED:'關鍵',YELLOW:'主要',GREEN:'次要'}[tier];
+    const l2=`<div class="jn-tier t-${tier}"><b>${tier}</b>${tierName}　${AL.tiers[tier]}</div>`
+      +(ms.length?ms.map(m=>`<div class="jn-rule"><span class="tag">${m.r.id}</span>
+        ${Object.keys(m.hits).map(g=>`<em>${g==='all'?'必要條件':'關鍵字'}</em>${m.hits[g].join('、')}`).join('　')}
+        <div class="jn-why">${m.r.why}${m.r.playbook&&m.r.playbook!=='—'?`　→ 對應劇本 ${m.r.playbook}`:''}</div></div>`).join('')
+        :'<div class="jn-why">未命中任何規則，屬一般產業動態；每日監測不落檔，由週報搜尋涵蓋。</div>');
+    /* ③ 相似事件（去重） */
+    const sim=jnSimilar(text.split(/[。\n]/)[0]);
+    const l3=sim.length
+      ? sim.map(s=>`<div class="jn-sim"><b>${(s.s*100).toFixed(0)}%</b> ${s.w}　${jnEsc(s.t)}</div>`).join('')
+        +`<div class="jn-why">相似度 ≥50% 且在 72 小時內者視為同源續報，不重複發警報——只記日誌保留時間線。</div>`
+      : '<div class="jn-why">與過去十一週的事件皆不相似，屬新事件。</div>';
+    /* ④ 劇本觸發（週報判定層口徑：只剔否定，plan_engine 已凍結） */
+    const pText=simStripNeg(text);
+    const ev=simEval({x:w.xy.x,y:w.xy.y},w,pText).filter(p=>p.ok);
+    const l4=(ev.length?ev.map(p=>`<div class="jn-rule"><span class="tag">${p.id}</span>${p.title}
+        <div class="jn-why">${p.conds.map(c=>(c[0]?'✓ ':'✗ ')+c[1]).join('　')}</div></div>`).join('')
+      :'<div class="jn-why">以本週座標與權重計算，這則不足以點燃任何劇本。</div>')
+      +`<div class="jn-note">此層沿用週報判定的口徑：<b>只剔除否定、不剔假設語氣</b>——
+        <code>plan_engine.py</code> 已隨十一週紀錄凍結，修改它會改動已發佈的判定。
+        警報層（第②層）較嚴，兩層本來就不同，這裡如實分開。</div>`
+      /* 兩層結論不一致時主動說破——評審一定看得出來，與其被問不如自己講 */
+      +((tier==='GREEN'&&ev.length)?`<div class="jn-note" style="border-color:rgba(176,16,106,.3);background:rgba(176,16,106,.05)">
+        <b>兩層結論不同，這是預期的。</b>第②層判 GREEN（不發警報），第④層卻點燃了
+        ${ev.map(p=>p.id).join('、')}。原因就是上一段：警報層剔掉了假設語氣的子句，
+        劇本層沒有。<b>警報問的是「要不要現在叫醒人」，劇本問的是「這週規畫要不要納入這個面向」</b>
+        ——後者寧可寬一點。兩個門檻服務不同目的，不是同一個判斷的兩種答案。</div>`:'');
+    /* ⑤ 雙軸判定：唯一需要模型的一層 */
+    const l5=`<div class="jn-why">前四層全部是確定性規則，同樣的輸入永遠得到同樣的輸出，
+        各位可以自己重算。<b>只有雙軸位移需要語意理解</b>，那是唯一呼叫模型的地方。</div>
+      <button type="button" class="jn-go sm" id="jnai">把這段交給 AI 判定 X／Y →</button>`;
+    out.innerHTML=L(1,'語氣剔除','daily_watch.strip_untriggerable',0,l1)
+      +L(2,'警報分級','data/alert_rules.json',0,l2)
+      +L(3,'同源去重','logs/alerts_log.csv 之 72 小時規則',0,l3)
+      +L(4,'劇本觸發','data/playbook.json ＋ plan_engine',0,l4)
+      +L(5,'雙軸位移判定','Cloudflare Worker',1,l5);
+    const ai=$('#jnai');
+    if(ai)ai.onclick=()=>{
+      const t=$('#jdtext'); if(!t){alert('AI 判定面板未載入');return}
+      t.value=text;
+      const sec=t.closest('section');
+      if(sec&&sec.dataset.tab&&sec.dataset.tab!==curTab)setTab(sec.dataset.tab);
+      t.scrollIntoView({behavior:'smooth',block:'center'});
+      const g=$('#jdgo'); if(g)setTimeout(()=>g.click(),400);
+    };
+  };
+  go.onclick=run;
+  Object.keys(JN_SAMPLES).forEach(k=>{const b=$('#'+k);
+    if(b)b.onclick=()=>{ta.value=JN_SAMPLES[k];run()}});
 }
 
 /* ── 資料匯出（CSV）──
@@ -2688,6 +2922,8 @@ function render(i){
     </div>
   </section>
 
+  ${journeyHTML(S)}
+
   <section id="trace" data-tab="analysis">
     <div class="sh"><span class="ix">§06</span><h2>Decision Trace${S?' 決策軌跡':''}</h2><span class="q">每一步判斷怎麼來的？</span><span class="sub">${S?'事件 → 關鍵字 → 軸位移 → 權重調整，逐筆可查證':'可稽核決策軌跡 · 事件 → 關鍵字 → 軸位移 → KDF 調整'}</span></div>
     ${(w.decisionTrace||[]).map(t=>{
@@ -2864,6 +3100,7 @@ function render(i){
   });
   wireSim(i);
   wireJudge(i);
+  wireJourney(i);
   /* 匯出鈕隨 render 重建，故在此重綁；資料一律取當下的 DATA，不吃閉包裡的 i */
   $$('.expb').forEach(b=>b.onclick=()=>doExport(b.dataset.exp));
   heroFx();
