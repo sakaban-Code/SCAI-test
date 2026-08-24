@@ -1170,6 +1170,249 @@
       "from": "",
       "to": "",
       "confirmed": true
+    },
+    "claude-code:6fcd4d04-7034-44b3-b082-9bb5f18cfaab": {
+      "scope": "related",
+      "mentions": 265,
+      "density": 11.3,
+      "from": "2026-08-09",
+      "to": "2026-08-21",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "claude-code:adf3d033-e82d-4600-bc34-3ef7edf56cd7": {
+      "scope": "related",
+      "mentions": 143,
+      "density": 5.8,
+      "from": "2026-08-11",
+      "to": "2026-08-23",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:9ef6a744-03a2-474a-b081-fdb0f8564353": {
+      "scope": "core",
+      "mentions": 184,
+      "density": 54.2,
+      "from": "2026-08-10",
+      "to": "2026-08-10",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:83ac2025-5cec-4543-9f5e-64630cc3fc46": {
+      "scope": "core",
+      "mentions": 141,
+      "density": 61.9,
+      "from": "2026-08-17",
+      "to": "2026-08-17",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:d5387a8f-0a82-4c1e-b61b-f95725bab275": {
+      "scope": "core",
+      "mentions": 103,
+      "density": 93.9,
+      "from": "2026-08-24",
+      "to": "2026-08-24",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:0bf44106-f727-4735-9756-64733dca2f34": {
+      "scope": "core",
+      "mentions": 57,
+      "density": 159.8,
+      "from": "2026-08-21",
+      "to": "2026-08-21",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:6a8334e1-f8f3-4b9c-97df-ff552ba2765d": {
+      "scope": "core",
+      "mentions": 186,
+      "density": 593.7,
+      "from": "2026-08-17",
+      "to": "2026-08-17",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:46eb9ab7-1f8d-4b3e-8469-898a20b0b6fb": {
+      "scope": "core",
+      "mentions": 154,
+      "density": 564.4,
+      "from": "2026-08-23",
+      "to": "2026-08-23",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:d64cc80a-a0a6-4d11-b809-67a865c1fe68": {
+      "scope": "core",
+      "mentions": 148,
+      "density": 419.1,
+      "from": "2026-08-10",
+      "to": "2026-08-10",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:3032dcd9-d40e-47ba-b75f-ed27b6c3c2ad": {
+      "scope": "core",
+      "mentions": 86,
+      "density": 374.9,
+      "from": "2026-08-21",
+      "to": "2026-08-21",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:9aa3f479-2daa-41d9-bb5e-4ab48ac8afa5": {
+      "scope": "core",
+      "mentions": 132,
+      "density": 474.6,
+      "from": "2026-08-11",
+      "to": "2026-08-11",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:e592939d-cb7f-4684-960b-61ed6c9ecf31": {
+      "scope": "core",
+      "mentions": 106,
+      "density": 495.1,
+      "from": "2026-08-20",
+      "to": "2026-08-20",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:49fadb37-180b-42e4-a20f-4f19db16904b": {
+      "scope": "core",
+      "mentions": 13,
+      "density": 88.4,
+      "from": "2026-08-12",
+      "to": "2026-08-12",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:16678462-63c8-4dcc-83e1-863582d6ba0a": {
+      "scope": "core",
+      "mentions": 80,
+      "density": 468.2,
+      "from": "2026-08-14",
+      "to": "2026-08-14",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:65ad73c3-499a-4844-9230-3eeed59ae693": {
+      "scope": "core",
+      "mentions": 97,
+      "density": 471.0,
+      "from": "2026-08-12",
+      "to": "2026-08-12",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:ac40532b-c694-4d25-ad89-5812dd070c25": {
+      "scope": "core",
+      "mentions": 13,
+      "density": 103.6,
+      "from": "2026-08-20",
+      "to": "2026-08-20",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:03d7811b-bb53-4cda-9dba-4bc59f983cae": {
+      "scope": "core",
+      "mentions": 92,
+      "density": 508.9,
+      "from": "2026-08-21",
+      "to": "2026-08-21",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:32e8638a-1695-4d33-bf87-c48826e35ccb": {
+      "scope": "core",
+      "mentions": 13,
+      "density": 112.0,
+      "from": "2026-08-11",
+      "to": "2026-08-11",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:9f590f54-3b02-4fac-ba3e-cbaf6ae201a5": {
+      "scope": "core",
+      "mentions": 49,
+      "density": 466.3,
+      "from": "2026-08-18",
+      "to": "2026-08-18",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:a0321ff6-5407-4fcb-8522-cac178c4b0c0": {
+      "scope": "core",
+      "mentions": 45,
+      "density": 390.0,
+      "from": "2026-08-14",
+      "to": "2026-08-14",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:ac57f188-b642-4e7a-9459-aa8e6d0d810e": {
+      "scope": "core",
+      "mentions": 49,
+      "density": 461.1,
+      "from": "2026-08-24",
+      "to": "2026-08-24",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:594c9878-095e-4ced-a8e9-664fd693282d": {
+      "scope": "core",
+      "mentions": 80,
+      "density": 558.4,
+      "from": "2026-08-14",
+      "to": "2026-08-14",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:82a6db9d-cd71-4667-aded-ade1f15581d5": {
+      "scope": "core",
+      "mentions": 47,
+      "density": 485.2,
+      "from": "2026-08-23",
+      "to": "2026-08-23",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:999e6274-7b52-4dd0-822a-5ba3873225aa": {
+      "scope": "core",
+      "mentions": 45,
+      "density": 446.6,
+      "from": "2026-08-17",
+      "to": "2026-08-17",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:a8acf5fc-7696-4e58-9ca3-5fe78a10458a": {
+      "scope": "core",
+      "mentions": 86,
+      "density": 604.8,
+      "from": "2026-08-23",
+      "to": "2026-08-23",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:ae978ea6-86f7-44bf-811c-3783af0635a0": {
+      "scope": "core",
+      "mentions": 98,
+      "density": 568.6,
+      "from": "2026-08-09",
+      "to": "2026-08-09",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
+    },
+    "cowork:139e1c29-3bb5-438e-a85f-96852d4a02bf": {
+      "scope": "core",
+      "mentions": 5,
+      "density": 209.6,
+      "from": "",
+      "to": "",
+      "confirmed": false,
+      "why": "（2026-08-24 依密度自動歸類補入，未經人工覆核）"
     }
   },
   "_覆核": "2026-08-09 人工決定：專案期間內一律計入 core。理由是逐一區分 SCAI 與非 SCAI 的成本高於其帶來的精度，且寧可高估自己的用量也不低估。唯一排除的是期間早於專案起點者（2026-06-11），那類無論如何都不可能屬於本專案。"
