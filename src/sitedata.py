@@ -403,6 +403,10 @@ def build_payload(root: pathlib.Path) -> dict:
         "alertLayer": build_alert_layer(root, weeks),
         # 風險回測的評判截止日：晚於此日產出的週次尚未評判，回測面板據此說明而非留白
         "riskJudged": risk_judged,
+        # 事前預測與否證條件。人工撰寫之版控檔，同 playbook／kdf_config 不施跳脫。
+        # 檔案缺席時面板整區不顯示——寧可不講，不講半套。
+        "predictions": (load(root / "data" / "predictions.json")
+                        if (root / "data" / "predictions.json").exists() else None),
         "kdfDefs": extras.get("kdfDefs", {}),
         "scenarioMeta": extras.get("scenarioMeta", []),
         "coverage": coverage,

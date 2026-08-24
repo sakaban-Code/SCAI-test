@@ -1206,6 +1206,41 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 @keyframes rick{to{transform:rotate(720deg) scale(.15);opacity:0}}
 @media (prefers-reduced-motion:reduce){#alertbar.on,.tb .tbdot,.brand-emblem.jelly,.brand-emblem.rick{animation:none}}
 @media (max-width:600px){#alertbar{margin:8px 10px 0}#alertbar.on{padding:9px 10px;gap:8px}}
+/* ── 事前預測與否證條件 ── */
+.pd-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:11px 14px;
+  border:1px solid var(--line);border-radius:12px;background:var(--card);margin-bottom:12px}
+.pd-k{font-size:12px;color:var(--ink2);white-space:nowrap}
+.pd-k b{font-family:var(--mono);font-size:16px;color:var(--accent);margin-right:5px}
+.pd-note{flex:1 1 300px;min-width:0;font-size:11.5px;line-height:1.75;color:var(--ink2)}
+.pd-note b{color:var(--ink)}
+.pd-note code{font-family:var(--mono);font-size:11px}
+.pd{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--card)}
+.pd-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.pd-id{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--accent)}
+.pd-t{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;color:#fff}
+.p-ext{background:#b0106a}.p-sys{background:#0d6c86}.p-self{background:#55628a}
+.pd-st{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid currentColor}
+.o-wait{color:#8a420b}.o-hit{color:#0d6c86}.o-miss{color:#b0106a}
+.pd-d{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap}
+.pd-claim{font-size:13.5px;line-height:1.75;color:var(--ink);font-weight:600}
+.pd-fal{margin-top:8px;padding:9px 11px;border-radius:9px;font-size:12px;line-height:1.75;
+  color:var(--ink2);background:rgba(176,16,106,.05);border:1px solid rgba(176,16,106,.24)}
+.pd-fal b{display:block;color:#8f0d56;font-size:11.5px;margin-bottom:2px}
+.pd-more{margin-top:8px}
+.pd-more summary{font-size:12px;color:var(--accent);cursor:pointer;font-weight:600;padding:3px 0}
+.pd-sec{font-size:12px;line-height:1.75;color:var(--ink2);margin-top:6px}
+.pd-sec b{color:var(--ink);margin-right:5px}
+.pd-sec ul{margin:4px 0 0;padding-left:18px}
+.pd-sec li{margin-bottom:3px}
+.pd-cav{margin-top:7px;padding:8px 11px;border-radius:9px;font-size:11.5px;line-height:1.7;
+  color:var(--ink2);background:rgba(85,98,138,.08);border:1px solid rgba(85,98,138,.25)}
+.pd-out{margin-top:8px;padding:9px 11px;border-radius:9px;font-size:12px;line-height:1.75;
+  color:var(--ink2);background:rgba(13,108,134,.06);border:1px solid rgba(13,108,134,.25)}
+.pd-out b{display:block;color:#0d6c86;font-size:11.5px;margin-bottom:2px}
+.pd-foot{font-size:11.5px;line-height:1.8;color:var(--muted);padding:10px 13px;
+  border-left:3px solid var(--line);margin-top:4px}
+.pd-foot b{color:var(--ink2)}
+@media (max-width:600px){.pd-d{margin-left:0;flex:1 1 100%}}
 /* ── 回測時光機 ── */
 .bt-sum{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:11px 14px;
   border:1px solid var(--line);border-radius:12px;background:var(--card);margin-bottom:12px}
@@ -1649,6 +1684,7 @@ const TABS=[
     ['trend','05','趨勢圖表','歷週走勢、25 項因素權重與週次對比'],
     /* 同 journey：不給 § 編號，避免牽動其後全部編號與交叉引用 */
     ['backtest','','回測時光機','當時說了什麼、後來怎麼了'],
+    ['predict','','事前預測','敢不敢先說，錯了算誰的'],
     ['trace','06','決策軌跡','每一次權重調整的依據與來源'],
     ['selfaudit','07','自我稽核','這些判斷如果錯了會怎樣']]},
   {k:'company',label:'公司',hint:'欣銓相關',secs:[
@@ -2439,6 +2475,62 @@ function pbCovHTML(S){
     </div>`;
 }
 
+/* ── 事前預測與否證條件 ─────────────────────────────────────────────
+   憲法 LAYER 10 決策四問的第四問（「若判斷錯誤，最早可從哪個領先訊號察覺」）落地。
+   只列風險不算預測；**敢寫下自己怎麼算輸才算**。
+
+   面板的核心不是預測本身，是讓「事前」這件事可被查證：
+     · 每則標明寫入日與驗證日，且驗證日一律在寫入日之後
+     · 檔案進 git，commit 時間即時間戳——事後無法偽造
+     · 結果只追加（outcome 事後填），claim 與 falsify 一字不改
+   三種預測的知識論地位不同（外部事實／系統行為／自身判定），刻意分開標示：
+   預測自己的座標帶有循環性，不可當成預測能力的證據，面板明寫這件事。 */
+const PRED=DATA.predictions||null;
+const PT_CLS={'外部事實':'p-ext','系統行為':'p-sys','自身判定':'p-self'};
+function predHTML(S){
+  if(!PRED||!(PRED.predictions||[]).length)return '';
+  const ps=PRED.predictions;
+  const open=ps.filter(p=>!p.outcome).length, done=ps.length-open;
+  return `
+  <section id="predict" data-tab="analysis">
+    <div class="sh"><h2>事前預測與否證條件</h2><span class="q">敢不敢先說，錯了算誰的？</span>
+      <span class="sub">${S?'每則預測都附「什麼訊號出現代表我們錯了」——沒有否證條件的預測只是換句話說的描述'
+        :'憲法 LAYER 10 第四問落地 · 寫入日早於驗證日 · 結果只追加不覆寫'}</span></div>
+    <div class="pd-bar">
+      <span class="pd-k"><b>${ps.length}</b>則預測</span>
+      <span class="pd-k"><b>${open}</b>待驗證</span>
+      ${done?`<span class="pd-k"><b>${done}</b>已結果</span>`:''}
+      <span class="pd-note"><b>為什麼可信「這是事前寫的」</b>：本檔（<code>data/predictions.json</code>）
+        於寫入當日提交進 git，**commit 時間即時間戳**，事後無法偽造；且結果欄只追加，
+        預測內容與否證條件一字不改。錯了就記錄錯了。</span>
+    </div>
+    ${ps.map(p=>{
+      const st=p.outcome?(p.outcome.correct?['命中','o-hit']:['未命中','o-miss']):['待驗證','o-wait'];
+      return `<div class="pd">
+        <div class="pd-h">
+          <span class="pd-id">${p.id}</span>
+          <span class="pd-t ${PT_CLS[p.type]||''}">${p.type}</span>
+          <span class="pd-st ${st[1]}">${st[0]}</span>
+          <span class="pd-d">寫於 ${p.made}（${p.madeAtWeek}）→ 驗於 ${p.verifyOn}</span>
+        </div>
+        <div class="pd-claim">${p.claim}</div>
+        <div class="pd-fal"><b>否證條件</b>${p.falsify}</div>
+        <details class="pd-more"><summary>依據、以及萬一錯了代表什麼</summary>
+          <div class="pd-sec"><b>依據</b><ul>${(p.basis||[]).map(b=>`<li>${b}</li>`).join('')}</ul></div>
+          <div class="pd-sec"><b>若錯了</b>${p.ifWrong||''}</div>
+          <div class="pd-sec"><b>驗證方式</b>${p.verifyBy||''}　信心 ${p.confidence||'—'}</div>
+          ${p.caveat?`<div class="pd-cav">${p.caveat}</div>`:''}
+        </details>
+        ${p.outcome?`<div class="pd-out"><b>事後結果（${p.outcome.on}）</b>${p.outcome.note}</div>`:''}
+      </div>`}).join('')}
+    <div class="pd-foot">${PRED._type_note.split('：')[0]}——
+      <b>外部事實</b>對世界的預測，最可能錯也最有價值；
+      <b>系統行為</b>對本系統警報層的預測，可判定但半循環；
+      <b>自身判定</b>對本系統下週座標的預測，<b>座標是我方判斷，預測自己等於陳述意圖，
+      不可當成預測能力的證據</b>——仍列出，是為了錯的時候強制自我檢討。</div>
+  </section>`;
+}
+
 /* ── 回測時光機 ─────────────────────────────────────────────────────
    拉時間軸回到任一週，看「當時說了什麼」與「後來怎麼了」並排。
    全部是既有資料的重新呈現，不新增任何判定：
@@ -3044,6 +3136,8 @@ function render(i){
   </section>
 
   ${backtestHTML(S)}
+
+  ${predHTML(S)}
 
   <section id="events" data-tab="intel">
     <div class="sh"><span class="ix">§04</span><h2>本週事件</h2><span class="q">這些判斷根據哪些事實？</span><span class="sub">${S?'每則均可點回原文查證':'真實可追溯'} · ${(w.events||[]).length} 則 · ${[...new Set((w.events||[]).map(e=>e.source).filter(Boolean))].length} 個來源</span></div>
