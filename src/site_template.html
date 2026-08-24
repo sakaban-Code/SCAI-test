@@ -1239,6 +1239,7 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 /* 10px 小字一律以 4.5 為門檻（非大字例外）；#aa5311 在卡片底上只有 4.37，故加深。
    .tierchip 的 #aa5311 是白字在其上、方向相反且已達標，不可一併改。 */
 .src.ok{color:#0d6c86}.src.inf{color:#8a420b}.src.wait{color:#b0106a}
+.src.rep{color:#fff;background:#0d6c86;border-color:#0d6c86}
 .pos-grid{display:grid;gap:14px;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
 @media (max-width:900px){.pos-grid{grid-template-columns:1fr}}
 .pos-map svg{width:100%;height:auto;display:block}
@@ -1264,6 +1265,25 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 .appbar .r .t{height:15px;border-radius:5px;background:rgba(68,83,214,.09);overflow:hidden}
 .appbar .r .t i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent),#6b78e8)}
 .appbar .r .v{font-family:var(--mono);color:var(--ink);font-weight:600;text-align:right}
+/* 客戶集中度：兩年度堆疊條，一眼看出 ≥10% 客戶由 1 家變 3 家 */
+.cust{margin-top:4px}
+.cust .yr{margin-bottom:12px}
+.cust .yl{display:flex;align-items:baseline;gap:8px;font-size:12px;color:var(--ink2);margin-bottom:5px}
+.cust .yl b{color:var(--ink);font-size:13px}
+.cust .yl .net{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.cust .stack{display:flex;height:26px;border-radius:7px;overflow:hidden;border:1px solid var(--line)}
+.cust .seg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+  color:#fff;min-width:0;overflow:hidden;white-space:nowrap}
+.cust .seg.s0{background:#3f55ff}.cust .seg.s1{background:#007689}.cust .seg.s2{background:#834ad9}
+.cust .seg.rest{background:rgba(85,98,138,.22);color:var(--ink2)}
+.cust .leg{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:7px;font-size:11.5px;color:var(--ink2)}
+.cust .leg i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:middle}
+.cust .cr{font-size:12.5px;line-height:1.75;color:var(--ink2);margin-top:10px}
+.cust .cr b{color:var(--ink)}
+.cust .cw{margin-top:9px;padding:8px 11px;border-radius:9px;font-size:12px;line-height:1.7;
+  color:var(--ink2);background:rgba(176,16,106,.05);border:1px solid rgba(176,16,106,.2)}
+.f5 .fc .cav{margin-top:8px;padding:8px 10px;border-radius:8px;font-size:11.5px;line-height:1.65;
+  color:var(--ink2);background:rgba(170,83,17,.06);border:1px solid rgba(170,83,17,.22)}
 .sitelist{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
 .sitelist .s{font-size:11.5px;border-radius:9px;padding:6px 10px;border:1px solid var(--line);background:var(--card);line-height:1.5}
 .sitelist .s b{display:block;color:var(--ink);font-weight:700;font-size:12px}
@@ -2245,7 +2265,8 @@ function exportBar(){
    2026-08-24 依指導教授意見新增：先確立「欣銓在哪裡、對手是誰、子彈夠不夠」，
    才能說明每週為什麼蒐這些、為什麼這則重要。定位圖刻意用內嵌 SVG 而非 Chart.js——
    靜態內容不必等圖表庫，離線版與列印皆可用。 */
-const SRCCLS={'查證':'ok','推斷':'inf','待公司確認':'wait'};
+/* 四級來源標記。「年報」為法定公開揭露之原始數字，可信度最高，給實心底以資區別 */
+const SRCCLS={'年報':'rep','查證':'ok','推斷':'inf','待公司確認':'wait'};
 const srcTag=s=>s?`<span class="src ${SRCCLS[s]||'inf'}">${s}</span>`:'';
 function posMap(P){
   const A=P.axes,PL=P.players;
@@ -2319,6 +2340,23 @@ function positionHTML(S){
       </div>
     </div>
 
+    ${P.customers?`<div class="card" style="margin-top:14px">
+      <div class="ch"><b>${P.customers.title}</b> ${srcTag(P.customers.src)}
+        <span style="font-size:11px;color:var(--muted)">${P.customers.srcNote}</span></div>
+      <div class="cust">
+        ${P.customers.years.map(y=>`<div class="yr">
+          <div class="yl"><b>${y.y}</b><span class="net">銷貨淨額 ${(y.net/100000).toFixed(2)} 億元</span></div>
+          <div class="stack">${y.rows.map((r,j)=>`<div class="seg ${r.n==='其他'?'rest':'s'+j}"
+            style="width:${r.pct}%" title="${r.n} ${r.pct}%">${r.pct>=9?r.n+' '+r.pct+'%':''}</div>`).join('')}</div>
+          <div class="leg">${y.rows.filter(r=>r.desc&&r.desc!=='同上').map((r,j)=>
+            `<span><i style="background:${['#3f55ff','#007689','#834ad9'][j]||'#55628a'}"></i>${r.n}：${r.desc}</span>`).join('')}</div>
+        </div>`).join('')}
+        <div class="cr">${P.customers.read}</div>
+        <div class="cr">${P.customers.meaning}</div>
+        <div class="cw">📌 ${P.customers.watch}</div>
+      </div>
+    </div>`:''}
+
     <div class="sh" style="margin-top:20px"><h3 style="margin:0;font-size:16px">五力：子彈夠不夠</h3><span class="q">${P.fiveForces._note.split('。')[0]}。</span></div>
     <div class="f5">${P.fiveForces.forces.map(f=>`
       <div class="fc${f.tier==='關鍵'?' key':''}">
@@ -2326,6 +2364,7 @@ function positionHTML(S){
         <div class="fq">${f.q}</div>
         ${f.items.map(it=>`<div class="fi"><b>${it.n}</b>　${it.d} ${srcTag(it.src)}</div>`).join('')}
         <div class="fl">${(f.rules||[]).map(r=>`<span class="tag">${r}</span>`).join('')}${(f.kdf||[]).length?`<span class="tag">KDF#${f.kdf.join('・#')}</span>`:''}<br>${f.live}</div>
+        ${f.caveat?`<div class="cav">${f.caveat}</div>`:''}
       </div>`).join('')}
     </div>
 
