@@ -1206,6 +1206,46 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 @keyframes rick{to{transform:rotate(720deg) scale(.15);opacity:0}}
 @media (prefers-reduced-motion:reduce){#alertbar.on,.tb .tbdot,.brand-emblem.jelly,.brand-emblem.rick{animation:none}}
 @media (max-width:600px){#alertbar{margin:8px 10px 0}#alertbar.on{padding:9px 10px;gap:8px}}
+/* ── 每日巡邏 ── */
+.dl-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:11px 14px;
+  border:1px solid var(--line);border-radius:12px;background:var(--card);margin-bottom:10px}
+.dl-k{font-size:12px;color:var(--ink2);white-space:nowrap}
+.dl-k b{font-family:var(--mono);font-size:16px;color:var(--accent);margin-right:5px}
+.dl-k.mut b{color:var(--muted)}
+.dl-note{flex:1 1 300px;min-width:0;font-size:11.5px;line-height:1.75;color:var(--ink2)}
+.dl-note b{color:var(--ink)}
+.dl-lg{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:9px;font-size:11px;color:var(--muted)}
+.dl-lg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.s-hit{background:#b0106a}.s-yel{background:#aa5311}.s-zero{background:#0d6c86}
+/* 「人工巡邏期」原用 #7c86ad，白字在其上只有 3.58；加深至 #5b678f 才過 4.5。
+   圖例色塊與格子共用同一組色，改一處兩邊同步。 */
+.s-man{background:#5b678f}.s-gap{background:rgba(85,98,138,.2)}
+.dl-strip{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
+.dl-strip button{width:30px;height:30px;border-radius:7px;border:1px solid transparent;
+  font-family:var(--mono);font-size:11px;color:#fff;cursor:pointer;padding:0}
+/* 沒跑的格子是淺底深字：--muted 在其上僅 3.81，改用 --ink2 才達標 */
+.dl-strip button.s-gap{color:var(--ink2);border-color:var(--line)}
+.dl-strip button.on{outline:2px solid var(--accent);outline-offset:2px}
+.dl-day{border:1px solid var(--line);border-radius:12px;padding:13px 15px;background:var(--card)}
+.dl-dh{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:9px}
+.dl-dh b{font-family:var(--mono);font-size:14px;color:var(--ink)}
+.dl-tag{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;color:#fff}
+.dl-tag.s-gap{color:var(--ink2)}
+.dl-meta{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.dl-i{display:flex;gap:9px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line)}
+.dl-t{flex:0 0 auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;color:#fff;margin-top:2px}
+.t-RED{background:#b0106a}.t-YELLOW{background:#aa5311}.t-GREEN{background:#55628a}
+.dl-it{font-size:12.5px;line-height:1.7;color:var(--ink)}
+.dl-is{font-size:11px;line-height:1.7;color:var(--muted);margin-top:2px}
+.dl-is .tag{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--accent);
+  background:rgba(68,83,214,.08);border-radius:5px;padding:1px 5px;margin-right:5px}
+.dl-is b{color:#8f0d56}
+/* 11px 的「原文 ↗」在 --muted 底色脈絡下只有 4.37；連結一律用 --accent（6.2） */
+.dl-is a,.dl-is a .arw{color:var(--accent)}
+.dl-iy{font-size:11.5px;line-height:1.75;color:var(--ink2);margin-top:4px;
+  padding-left:9px;border-left:2px solid rgba(68,83,214,.25)}
+.dl-none{font-size:12px;line-height:1.8;color:var(--ink2);padding-top:8px;border-top:1px solid var(--line)}
+.dl-none b{color:var(--ink)}
 /* ── 事前預測與否證條件 ── */
 .pd-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:11px 14px;
   border:1px solid var(--line);border-radius:12px;background:var(--card);margin-bottom:12px}
@@ -1675,6 +1715,7 @@ const TABS=[
   {k:'intel',label:'情報',hint:'外部動態',secs:[
     ['risk','03','風險雷達','未來六個月要盯哪些訊號'],
     ['events','04','本週事件','外部發生了什麼，每則附可查證來源'],
+    ['daily','','每日巡邏','每天有沒有真的跑、發現了什麼'],
     /* 不給 § 編號：它是可操作的示範而非週報內容，且新增編號會牽動其後全部區段
        與六處交叉引用。先例＝本週最大變動（movers）亦無編號。 */
     ['journey','','試一則新聞','貼一則新聞，看它穿過系統每一層']]},
@@ -2475,6 +2516,95 @@ function pbCovHTML(S){
     </div>`;
 }
 
+/* ── 每日巡邏 ───────────────────────────────────────────────────────
+   把「有沒有跑」與「有沒有警報」分成兩種視覺，這是整個區段的重點。
+   四種日子各有各的樣子，尤其第二種——**跑了但零警報**——在沒有收據制的年代，
+   它跟「根本沒跑」在檔案系統上長得一模一樣（金庫〈零掃描的假全綠〉）。
+
+   ⚠ 每日層與每週層節奏不同、可信度不同，**不可混講**：每日巡邏未經週報四道門檻，
+   是即時偵測而非正式紀錄。區段標頭與說明都要寫明這件事。 */
+const DL=DATA.dailyLayer||null;
+function dailyHTML(S){
+  if(!DL||!DL.days.length)return '';
+  const g=DL.gaps.length;
+  return `
+  <section id="daily" data-tab="intel">
+    <div class="sh"><h2>每日巡邏</h2><span class="q">每天有沒有真的跑？發現了什麼？</span>
+      <span class="sub">${S?'即時偵測層——每天掃新聞、依規則分級，發現 RED 就寄警報。與每週正式紀錄是兩套節奏'
+        :'即時偵測 · 每日執行收據 · 與週報四道門檻分屬兩層'}</span>
+      <span class="chip lo" title="每日層為即時偵測，未經週報之四道匯入門檻">未經週報門檻</span></div>
+    <div class="dl-bar">
+      <span class="dl-k"><b>${DL.autoDays}</b>天自動執行</span>
+      <span class="dl-k"><b>${DL.days.length}</b>天有紀錄</span>
+      <span class="dl-k mut"><b>${g}</b>天沒跑</span>
+      <span class="dl-note"><b>為什麼要分「跑了」和「有警報」</b>：零警報的日子不落日誌
+        （避免噪音），所以在收據制上線前，<b>「跑了而且沒事」跟「根本沒跑」長得一模一樣</b>。
+        ${DL.receiptFrom?`${DL.receiptFrom} 起每次執行都寫收據，兩者從此可分。`:''}
+        ${DL.silentButRan?`目前已有 <b>${DL.silentButRan}</b> 天屬於「跑了但零警報」——沒有收據的話，這些日子會被誤讀成沒跑。`:''}</span>
+    </div>
+    <div class="dl-lg">
+      <span><i class="s-hit"></i>有 RED</span><span><i class="s-yel"></i>有 YELLOW</span>
+      <span><i class="s-zero"></i>跑了零警報</span><span><i class="s-man"></i>人工巡邏期</span>
+      <span><i class="s-gap"></i>沒跑</span>
+    </div>
+    <div class="dl-strip" id="dlstrip"></div>
+    <div id="dlout"></div>
+  </section>`;
+}
+function wireDaily(){
+  const st=$('#dlstrip'), out=$('#dlout'); if(!st||!DL)return;
+  const byd={}; DL.days.forEach(x=>byd[x.d]=x);
+  const gaps=new Set(DL.gaps);
+  const [a,b]=DL.span, days=[];
+  /* ⚠ 全程走 UTC。`new Date('2026-08-01T00:00:00')` 以**本地時間**解析，
+     再用 toISOString() 取字串會轉回 UTC——在 UTC+8 整串倒退一天，
+     結果是首日被吃掉、末日畫不出來（實測 08/24 整格消失）。
+     加 'Z' 解析、用 setUTCDate 遞增、toISOString 取字串，三者口徑一致才不會漂。 */
+  for(let t=new Date(a+'T00:00:00Z');t<=new Date(b+'T00:00:00Z');t.setUTCDate(t.getUTCDate()+1)){
+    const s=t.toISOString().slice(0,10);
+    days.push({s,x:byd[s]||null,gap:gaps.has(s)});
+  }
+  const cls=o=>{
+    if(o.gap||!o.x)return 's-gap';
+    if(o.x.red>0)return 's-hit';
+    if(o.x.yellow>0)return 's-yel';
+    return o.x.how==='auto'?'s-zero':'s-man';
+  };
+  const draw=d=>{
+    $$('#dlstrip button').forEach(b=>b.classList.toggle('on',b.dataset.d===d));
+    const x=byd[d];
+    if(!x){out.innerHTML=`<div class="dl-day"><div class="dl-dh"><b>${d}</b>
+      <span class="dl-tag s-gap">沒跑</span></div>
+      <div class="dl-none">這一天沒有執行紀錄，也沒有日誌。<b>不是零警報，是沒跑。</b>
+      每日巡邏於 ${DL.receiptFrom} 起才由 GitHub Actions 自動執行，先前為人工不定期巡邏。</div></div>`;return}
+    const tag=x.red>0?['有 RED','s-hit']:x.yellow>0?['有 YELLOW','s-yel']
+      :x.how==='auto'?['跑了，零警報','s-zero']:['人工巡邏，零警報','s-man'];
+    out.innerHTML=`<div class="dl-day">
+      <div class="dl-dh"><b>${d}</b><span class="dl-tag ${tag[1]}">${tag[0]}</span>
+        <span class="dl-meta">${x.how==='auto'
+          ? `Actions 自動執行 ${x.at}　掃描 ${x.scanned} 則　收據 status=${x.status}　mode=${x.mode}`
+          : '人工巡邏（收據制上線前，無執行收據）'}</span></div>
+      ${x.items.length?x.items.map(it=>`<div class="dl-i">
+          <span class="dl-t t-${it.tier}">${it.tier}</span>
+          <div><div class="dl-it">${it.title}</div>
+            <div class="dl-is">${it.ruleId?`<span class="tag">${it.ruleId}</span>`:''}${it.source||''}${it.date?'　'+it.date:''}
+              ${it.url?` · <a href="${safeUrl(it.url)}" target="_blank" rel="noopener">原文 <span class="arw">↗</span></a>`:''}
+              ${it.alerted?' · <b>已寄警報信</b>':''}</div>
+            ${it.summary?`<div class="dl-iy">${it.summary}</div>`:''}</div></div>`).join('')
+        :`<div class="dl-none">${x.how==='auto'
+            ? `掃描了 ${x.scanned} 則，沒有任何一則達到 YELLOW 以上——<b>GREEN 不落日誌</b>，
+               所以這天沒有日誌檔。<b>但收據證明它跑過了。</b>這正是收據制存在的理由。`
+            : '這天巡邏後沒有落檔項目。'}</div>`}
+    </div>`;
+  };
+  st.innerHTML=days.map(o=>`<button type="button" class="${cls(o)}" data-d="${o.s}"
+    title="${o.s}${o.gap||!o.x?'　沒跑':`　${o.x.how==='auto'?'自動':'人工'}　RED ${o.x.red}／YELLOW ${o.x.yellow}`}"
+    aria-label="${o.s}">${o.s.slice(8)}</button>`).join('');
+  $$('#dlstrip button').forEach(b=>b.onclick=()=>draw(b.dataset.d));
+  /* 預設停在最後一個有紀錄的日子——那是最新狀態 */
+  draw(DL.days[DL.days.length-1].d);
+}
+
 /* ── 事前預測與否證條件 ─────────────────────────────────────────────
    憲法 LAYER 10 決策四問的第四問（「若判斷錯誤，最早可從哪個領先訊號察覺」）落地。
    只列風險不算預測；**敢寫下自己怎麼算輸才算**。
@@ -3155,6 +3285,8 @@ function render(i){
     </div>
   </section>
 
+  ${dailyHTML(S)}
+
   ${journeyHTML(S)}
 
   <section id="trace" data-tab="analysis">
@@ -3335,6 +3467,7 @@ function render(i){
   wireJudge(i);
   wireJourney(i);
   wireBacktest();          /* 回測看的是全部週次，不隨當前週變動，故不吃 i */
+  wireDaily();             /* 同上：每日巡邏是獨立時間軸 */
   /* 匯出鈕隨 render 重建，故在此重綁；資料一律取當下的 DATA，不吃閉包裡的 i */
   $$('.expb').forEach(b=>b.onclick=()=>doExport(b.dataset.exp));
   heroFx();

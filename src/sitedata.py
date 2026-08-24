@@ -231,6 +231,87 @@ def build_alerts(root: pathlib.Path, weeks: list):
     return out
 
 
+def build_daily_layer(root: pathlib.Path):
+    """每日巡邏的站上呈現。
+
+    核心是把「**有沒有跑**」與「**有沒有警報**」分開——這正是收據制存在的理由，
+    也是金庫〈零掃描的假全綠〉那條教訓的落地。四種日子必須可分辨：
+
+      有收據＋有日誌  → 跑了，而且有發現
+      有收據＋無日誌  → 跑了，零警報（GREEN 不落檔）  ← 沒有收據時，這種日子
+                        會跟「根本沒跑」長得一模一樣
+      無收據＋有日誌  → 收據制上線前的人工巡邏（2026-08-22 之前）
+      兩者皆無        → 那天沒跑
+
+    日誌有兩種形狀：歷史淨化匯出版（含 summary、無 matched）與 bot 產生版
+    （含 matched、無 summary）。兩種都吃，缺哪個欄位就不顯示哪個。
+    """
+    rec_dir, dw_dir = root / "logs" / "receipts", root / "logs" / "daily_watch"
+    if not dw_dir.is_dir() and not rec_dir.is_dir():
+        return None
+
+    rec = {}
+    for p in sorted(rec_dir.glob("*.json")) if rec_dir.is_dir() else []:
+        try:
+            rec[p.stem] = load(p)
+        except Exception:
+            continue
+    logs = {}
+    for p in sorted(dw_dir.glob("*.json")) if dw_dir.is_dir() else []:
+        try:
+            logs[p.stem] = load(p)
+        except Exception:
+            continue
+
+    all_days = sorted(set(rec) | set(logs))
+    if not all_days:
+        return None
+    receipt_from = min(rec) if rec else ""
+
+    days = []
+    for d in all_days:
+        r, g = rec.get(d), logs.get(d) or {}
+        items = []
+        for it in (g.get("items") or []):
+            items.append({k: it[k] for k in
+                          ("title", "source", "date", "url", "tier", "ruleId", "summary", "alerted")
+                          if it.get(k) is not None})
+        days.append({
+            "d": d,
+            # auto＝有收據（收據只由 Actions 寫）；manual＝收據制上線前的人工巡邏
+            "how": "auto" if r else "manual",
+            "status": (r or {}).get("status", ""),
+            "mode": (r or {}).get("mode", ""),
+            "scanned": (r or {}).get("scanned"),
+            "at": ((r or {}).get("startedAt") or "")[11:16],
+            "red": g.get("redCount", 0) if g else (r or {}).get("red", 0),
+            "yellow": g.get("yellowCount", 0) if g else (r or {}).get("yellow", 0),
+            "hasLog": bool(g),
+            "items": items,
+        })
+
+    # 缺口：首末日之間沒有任何紀錄的日子。誠實列出，不假裝連續。
+    first = datetime.date.fromisoformat(all_days[0])
+    last = datetime.date.fromisoformat(all_days[-1])
+    have = set(all_days)
+    gaps = []
+    cur = first
+    while cur <= last:
+        s = cur.isoformat()
+        if s not in have:
+            gaps.append(s)
+        cur += datetime.timedelta(days=1)
+
+    return {
+        "receiptFrom": receipt_from,
+        "days": days,
+        "gaps": gaps,
+        "span": [all_days[0], all_days[-1]],
+        "autoDays": sum(1 for x in days if x["how"] == "auto"),
+        "silentButRan": sum(1 for x in days if x["how"] == "auto" and not x["hasLog"]),
+    }
+
+
 def build_alert_layer(root: pathlib.Path, weeks: list):
     """『一則新聞的完整旅程』面板所需：警報規則 ＋ 自證基準。
 
@@ -401,6 +482,8 @@ def build_payload(root: pathlib.Path) -> dict:
         "pbCoverage": build_playbook_coverage(weeks, pb),
         # 警報層與自證基準（同上，須用未跳脫原值）；規則檔為自家版控檔，不施跳脫
         "alertLayer": build_alert_layer(root, weeks),
+        # 每日巡邏：日誌內容為外部新聞文字，與 weeks 同樣施用跳脫
+        "dailyLayer": escape_html_deep(build_daily_layer(root)),
         # 風險回測的評判截止日：晚於此日產出的週次尚未評判，回測面板據此說明而非留白
         "riskJudged": risk_judged,
         # 事前預測與否證條件。人工撰寫之版控檔，同 playbook／kdf_config 不施跳脫。
