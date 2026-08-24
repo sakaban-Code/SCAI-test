@@ -1206,6 +1206,36 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 @keyframes rick{to{transform:rotate(720deg) scale(.15);opacity:0}}
 @media (prefers-reduced-motion:reduce){#alertbar.on,.tb .tbdot,.brand-emblem.jelly,.brand-emblem.rick{animation:none}}
 @media (max-width:600px){#alertbar{margin:8px 10px 0}#alertbar.on{padding:9px 10px;gap:8px}}
+/* ── 劇本覆蓋率（§08 末） ── */
+.pbc{margin-top:18px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.pbc-note{font-size:12px;line-height:1.7;color:var(--muted);margin-bottom:11px}
+.pbc-r{display:grid;grid-template-columns:52px minmax(0,1fr) 90px 62px minmax(0,1.1fr);
+  align-items:center;gap:9px;padding:6px 0;border-top:1px solid var(--line);font-size:12px}
+.pbc-r.zero{grid-template-columns:52px minmax(0,1fr) 78px minmax(0,1.6fr)}
+.pbc-id{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent)}
+.pbc-t{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pbc-bar{height:9px;border-radius:5px;background:rgba(68,83,214,.1);overflow:hidden}
+.pbc-bar i{display:block;height:100%;border-radius:5px;background:var(--accent)}
+.pbc-n{font-family:var(--mono);font-size:11px;color:var(--ink2);white-space:nowrap}
+.pbc-w{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pbc-r.zero .pbc-t{color:var(--ink2)}
+.pbc-r.zero .pbc-n{color:#0d6c86;font-weight:600}
+.pbc-r.bad .pbc-n{color:#b0106a;font-weight:700}
+.pbc-cond{display:flex;flex-direction:column;gap:3px;min-width:0}
+.pbc-b{font-size:11px;line-height:1.5;color:var(--ink2)}
+.pbc-b i{color:var(--muted);font-style:normal}
+.pbc-b.block::before{content:"✗ ";color:#b0106a;font-weight:700}
+.pbc-b.okc::before{content:"✓ ";color:#0d6c86;font-weight:700}
+.pbc-d{margin:2px 0 8px 61px;border-left:2px solid rgba(176,16,106,.35);padding-left:11px}
+.pbc-d summary{font-size:12px;color:#8f0d56;cursor:pointer;font-weight:600;padding:4px 0}
+.pbc-d p{margin:5px 0;font-size:12px;line-height:1.75;color:var(--ink2)}
+.pbc-d p b{color:var(--ink);margin-right:5px}
+@media (max-width:820px){
+  .pbc-r,.pbc-r.zero{grid-template-columns:52px minmax(0,1fr) 62px;grid-auto-flow:row}
+  .pbc-bar,.pbc-w{display:none}
+  .pbc-cond{grid-column:1/-1;margin-left:61px}
+  .pbc-d{margin-left:0}
+}
 /* ── 資料匯出列 ── */
 .expbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px;
   padding:9px 12px;border-radius:11px;border:1px dashed var(--line);
@@ -2200,6 +2230,48 @@ wireAlertBar();
   });
 })();
 
+/* ── 劇本覆蓋率（§08 末）──
+   評審一定會問：八條劇本，Demo 上只看到四五條，其餘呢？
+   「從未觸發」有兩種，性質天差地遠，分開呈現才誠實：
+     · 條件真的沒發生（Spring 擴張窗口要 X 轉正，而十一週全碎裂）→ 正確休眠，是好事
+     · 條件自相矛盾、永不可能成立 → 設計缺陷，必須自己講出來
+   次數與阻擋條件由建置時計算（sitedata.build_playbook_coverage），新增週次自動跟上；
+   缺陷註記則來自 playbook.json 的 _designNote，沒有就不顯示。 */
+function pbCovHTML(S){
+  const C=DATA.pbCoverage; if(!C)return '';
+  const mx=Math.max(...C.rows.map(r=>r.count),1);
+  const row=r=>{
+    const bad=!!r.defect;
+    if(r.count>0)return `<div class="pbc-r">
+      <span class="pbc-id">${r.id}</span>
+      <span class="pbc-t">${r.title}</span>
+      <span class="pbc-bar"><i style="width:${r.count/mx*100}%"></i></span>
+      <span class="pbc-n">${r.count} 次</span>
+      <span class="pbc-w">${r.weeks.length===C.weeks?'每一週':r.weeks.join('、')}</span></div>`;
+    const bl=(r.blockers||[]).map(b=>
+      `<span class="pbc-b${b.metWeeks===0?' block':' okc'}">${b.cond}　${b.metWeeks}/${b.total} 週成立　<i>${b.range}</i></span>`).join('');
+    return `<div class="pbc-r zero${bad?' bad':''}">
+      <span class="pbc-id">${r.id}</span>
+      <span class="pbc-t">${r.title}</span>
+      <span class="pbc-n">${bad?'⚠ 設計缺陷':'未觸發'}</span>
+      <span class="pbc-cond">${bl}</span></div>
+      ${bad?`<details class="pbc-d"><summary>為什麼它永遠不會觸發，以及我們為什麼不改</summary>
+        <p><b>問題</b>${r.defect.issue}——${r.defect.detail}</p>
+        <p><b>實證</b>${r.defect.evidence}</p>
+        <p><b>發現</b>${r.defect.found}</p>
+        <p><b>裁示</b>${r.defect.decision}</p>
+        <p><b>若日後修正</b>${r.defect.ifRevisited}</p></details>`:''}`;
+  };
+  return `
+    <div class="pbc">
+      <div class="ch"><b>劇本覆蓋率</b>
+        <span>${C.weeks} 週中 <b style="color:var(--accent)">${C.everFired}/${C.total}</b> 條曾觸發</span></div>
+      <div class="pbc-note">${S?'沒觸發不等於壞掉——條件真的沒發生是正確休眠。但其中有一條是我們自己找出來的設計缺陷，一併列在下面。'
+        :'區分「條件未發生之正確休眠」與「門檻自相矛盾之設計缺陷」；後者由本系統自行發現並公開揭露。'}</div>
+      ${C.rows.map(row).join('')}
+    </div>`;
+}
+
 /* ── 資料匯出（CSV）──
    2026-08-24 依指導教授意見新增：情報要能「丟進他們自己的內部策略分析」，
    看得到不等於用得到。刻意用 CSV 而非 .xlsx——站上不引入任何函式庫或打包工具，
@@ -2554,6 +2626,7 @@ function render(i){
       <div class="sim-note">25 項 KDF 權重與關鍵字命中維持本週實際值——它們來自事件內容，不是雙軸的函數。
         因此僅受雙軸約束的劇本會隨滑桿變動，其餘維持不變，這本身就顯示了哪些建議由地緣情勢決定、哪些由企業能力決定。</div>
     </div>`:''}
+    ${pbCovHTML(S)}
   </section>
 
   <section id="risk" data-tab="intel">

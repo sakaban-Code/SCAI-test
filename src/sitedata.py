@@ -231,6 +231,59 @@ def build_alerts(root: pathlib.Path, weeks: list):
     return out
 
 
+def build_playbook_coverage(weeks: list, pb: dict):
+    """劇本覆蓋率：每條在已發佈週次中觸發過幾次，未觸發者列出卡在哪個條件。
+
+    刻意於建置時計算而非寫死——新增週次後數字自動跟上，不會出現「網站說 11 週、
+    資料已有 12 週」的過期宣稱。
+
+    「從未觸發」有兩種，性質完全不同，必須分開呈現：
+      · 條件真的沒發生（如 Spring 擴張窗口要 X 轉正，而十一週全碎裂）→ 正確休眠
+      · 條件自相矛盾、永不可能成立 → 設計缺陷
+    後者由 playbook.json 的 _designNote 人工標註；本函式只負責算出「幾次、卡在哪」。
+    """
+    fired = {p["id"]: [] for p in pb["playbooks"]}
+    for w in weeks:
+        for f in ((w.get("companyPlan") or {}).get("firedPlaybooks") or []):
+            if f["id"] in fired:
+                fired[f["id"]].append(w["week"])
+
+    def blockers(p):
+        """未觸發者：逐條件統計在幾週成立，找出從未成立的那些（＝真正的阻擋條件）。"""
+        out = []
+        for c in p["trigger"]["conditions"]:
+            if c["type"] == "axis":
+                vals = [w["xy"][c["axis"]] for w in weeks]
+                label = f'{c["axis"].upper()} {c["op"]} {c["value"]}'
+                rng = f'實際 {min(vals):+.2f}～{max(vals):+.2f}'
+            elif c["type"] == "kdf":
+                vals = [w["w"][c["id"] - 1] for w in weeks]
+                label = f'KDF#{c["id"]} {c["op"]} {c["value"]}'
+                rng = f'實際 {min(vals)}～{max(vals)}'
+            else:
+                continue                      # 關鍵字條件逐週文字比對，不在此統計
+            ok = sum(1 for v in vals if _CMP[c["op"]](v, c["value"]))
+            out.append({"cond": label, "range": rng, "metWeeks": ok, "total": len(weeks)})
+        return out
+
+    rows = []
+    for p in pb["playbooks"]:
+        n = len(fired[p["id"]])
+        r = {"id": p["id"], "title": p["title"], "count": n,
+             "weeks": [f"W{w}" for w in fired[p["id"]]]}
+        if n == 0:
+            r["blockers"] = blockers(p)
+            if p.get("_designNote"):
+                r["defect"] = p["_designNote"]
+        rows.append(r)
+    return {"weeks": len(weeks), "rows": rows,
+            "everFired": sum(1 for r in rows if r["count"] > 0), "total": len(rows)}
+
+
+_CMP = {"<=": lambda a, b: a <= b, ">=": lambda a, b: a >= b,
+        "<": lambda a, b: a < b, ">": lambda a, b: a > b, "==": lambda a, b: a == b}
+
+
 def build_payload(root: pathlib.Path) -> dict:
     weeks = copy.deepcopy(load(root / "data" / "weeks.json"))
     for w in weeks:
@@ -299,6 +352,8 @@ def build_payload(root: pathlib.Path) -> dict:
         "levers": {l["id"]: l for l in prof["decision_levers"]},
         "profile": prof,
         "position": position,
+        # 劇本覆蓋率：以未跳脫的原值計算（同 coverage／companies）
+        "pbCoverage": build_playbook_coverage(weeks, pb),
         "kdfDefs": extras.get("kdfDefs", {}),
         "scenarioMeta": extras.get("scenarioMeta", []),
         "coverage": coverage,
