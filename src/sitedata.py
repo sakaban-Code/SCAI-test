@@ -345,8 +345,11 @@ def build_payload(root: pathlib.Path) -> dict:
     # 風險雷達的事後結果：獨立檔於此合併，weeks.json 不動（append-only）。
     # 與 coverage 同一模式——衍生／後補的顯示值一律不寫回正本。
     oc_path = root / "data" / "risk_outcomes.json"
+    risk_judged = ""
     if oc_path.exists():
-        oc = load(oc_path)["outcomes"]
+        _ocdoc = load(oc_path)
+        risk_judged = _ocdoc.get("_judged", "")
+        oc = _ocdoc["outcomes"]
         used = set()
         for w in weeks:
             for i, r in enumerate(w.get("riskRadar") or []):
@@ -398,6 +401,8 @@ def build_payload(root: pathlib.Path) -> dict:
         "pbCoverage": build_playbook_coverage(weeks, pb),
         # 警報層與自證基準（同上，須用未跳脫原值）；規則檔為自家版控檔，不施跳脫
         "alertLayer": build_alert_layer(root, weeks),
+        # 風險回測的評判截止日：晚於此日產出的週次尚未評判，回測面板據此說明而非留白
+        "riskJudged": risk_judged,
         "kdfDefs": extras.get("kdfDefs", {}),
         "scenarioMeta": extras.get("scenarioMeta", []),
         "coverage": coverage,
