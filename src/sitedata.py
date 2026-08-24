@@ -231,6 +231,91 @@ def build_alerts(root: pathlib.Path, weeks: list):
     return out
 
 
+def build_dept_layer(root: pathlib.Path, weeks: list, prof: dict, pb: dict, cfg: dict):
+    """部門視角：這件事該誰看。
+
+    ⚠ **只做分派，不做評價。** 指導教授 2026-08-24 明確指出我方不掌握欣銓各部門
+    的現況與成熟度，因此本層**不得**產出「某部門應該改善什麼」。可做的是把外部訊號
+    分派到責任範圍（分派可由公開資訊推導），以及把**既有的**劇本建議依權責歸戶。
+    建議本身仍是外部推導之【推斷】，是否適用須由該部門依內部資訊判斷。
+
+    整條鏈全部來自既有資料，沒有新編任何對應表：
+        部門  ← company_profile.decision_levers 的 owner 欄
+        槓桿  → playbook 的 lever 欄  → 策略（劇本）與受影響 KDF（劇本的 kdf 欄）
+        劇本  ← alert_rules 的 playbook 欄 → 該部門該看的警報規則
+        規則  → 每日巡邏日誌與週事件裡命中該規則的項目
+    """
+    levers = prof.get("decision_levers") or []
+    if not levers:
+        return None
+    rules = load(root / "data" / "alert_rules.json")
+    active = rules["ruleSets"][rules["activeCompanyType"]]
+    kdf_name = {k["id"]: k["name"] for k in cfg["kdf"]}
+
+    # owner 可能是複合（「財務／營運」），拆開——一個部門本來就會碰多條槓桿，
+    # 例如「工程」同時出現在 tech／talent／quality 三條的 owner 裡。
+    dept = {}
+    for l in levers:
+        for o in str(l.get("owner", "")).split("／"):
+            o = o.strip()
+            if o:
+                dept.setdefault(o, []).append(l["id"])
+    # 拆完後若兩個名字管的是完全相同的槓桿（策略／董事會、資訊／資安），合併回一列——
+    # 內容一字不差地重複兩次只是噪音，不是資訊。
+    merged = {}
+    for name, lv in dept.items():
+        merged.setdefault(tuple(sorted(lv)), []).append(name)
+    dept = {"／".join(sorted(names)): list(key) for key, names in merged.items()}
+
+    pb_by_lever = {}
+    for p in pb["playbooks"]:
+        pb_by_lever.setdefault(p.get("lever"), []).append(p)
+    rules_by_pb = {}
+    for r in active:
+        if r.get("playbook") and r["playbook"] != "—":
+            rules_by_pb.setdefault(r["playbook"], []).append(r["id"])
+
+    latest = weeks[-1] if weeks else {}
+    fired = {f["id"] for f in ((latest.get("companyPlan") or {}).get("firedPlaybooks") or [])}
+
+    out = []
+    for name in sorted(dept):
+        lv = dept[name]
+        plays, kdfs, rids = [], set(), set()
+        for lid in lv:
+            for p in pb_by_lever.get(lid, []):
+                plays.append({"id": p["id"], "title": p["title"], "lever": lid,
+                              "action": p.get("action", ""), "horizon": p.get("horizon", ""),
+                              "metric": p.get("success_metric", ""), "stop": p.get("stop_loss", ""),
+                              "fired": p["id"] in fired})
+                kdfs.update(p.get("kdf") or [])
+                rids.update(rules_by_pb.get(p["id"], []))
+        out.append({
+            "name": name,
+            "levers": [{"id": l["id"], "name": l["name"], "desc": l.get("desc", ""),
+                        "speed": l.get("speed", "")} for l in levers if l["id"] in lv],
+            "playbooks": sorted(plays, key=lambda x: x["id"]),
+            "kdf": sorted([{"id": i, "name": kdf_name.get(i, "")} for i in kdfs],
+                          key=lambda x: x["id"]),
+            "rules": sorted(rids),
+            "firedNow": sorted(p["id"] for p in plays if p["fired"]),
+            # 該部門名下有哪幾條槓桿完全沒有劇本覆蓋——誠實標出，不假裝建議完整
+            "uncovered": [l["id"] for l in levers
+                          if l["id"] in lv and not pb_by_lever.get(l["id"])],
+        })
+    uncovered = sorted({l["id"] for l in levers if not pb_by_lever.get(l["id"])})
+    return {
+        "week": latest.get("week"),
+        "depts": sorted(out, key=lambda d: (not d["playbooks"], d["name"])),
+        "leverTotal": len(levers),
+        "leverCovered": len(levers) - len(uncovered),
+        "uncoveredLevers": [{"id": l["id"], "name": l["name"], "owner": l.get("owner", "")}
+                            for l in levers if l["id"] in uncovered],
+        "_note": "分派依據為 company_profile.json 之 decision_levers.owner；"
+                 "策略即既有劇本，依 playbook.lever 歸戶。本層只做分派，不評價各部門現況。",
+    }
+
+
 def build_daily_layer(root: pathlib.Path):
     """每日巡邏的站上呈現。
 
@@ -484,6 +569,8 @@ def build_payload(root: pathlib.Path) -> dict:
         "alertLayer": build_alert_layer(root, weeks),
         # 每日巡邏：日誌內容為外部新聞文字，與 weeks 同樣施用跳脫
         "dailyLayer": escape_html_deep(build_daily_layer(root)),
+        # 部門視角：來源皆為自家版控檔（profile／playbook／alert_rules），不施跳脫
+        "deptLayer": build_dept_layer(root, weeks, prof, pb, cfg),
         # 風險回測的評判截止日：晚於此日產出的週次尚未評判，回測面板據此說明而非留白
         "riskJudged": risk_judged,
         # 事前預測與否證條件。人工撰寫之版控檔，同 playbook／kdf_config 不施跳脫。
