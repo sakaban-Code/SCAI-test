@@ -5,3 +5,9 @@ compatibility_date = "2026-08-01"
 
 [ai]
 binding = "AI"
+
+# 跨工作階段用量累計。只存次數與 token 加總，不存問答內容。
+# 建立方式：wrangler kv namespace create USAGE  → 把回傳的 id 填進下面
+[[kv_namespaces]]
+binding = "USAGE"
+id = "PUT_KV_NAMESPACE_ID_HERE"

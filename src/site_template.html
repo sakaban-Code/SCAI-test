@@ -1652,7 +1652,7 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 
 <div class="guide"><div class="wrap">
   <b>第一次看？照這順序</b>
-  <span>① <a href="#overview">本週判定與該做的事</a></span>
+  <span>① <a href="#overview">本週判定與評估方向</a></span>
   <span>② <a href="#plan">給欣銓的具體規畫</a></span>
   <span>③ <a href="#trace">憑什麼這樣判斷（每步可查證）</a></span>
   <span>④ <a href="#gov">這個 Agent 怎麼被控管</a></span>
@@ -1799,7 +1799,7 @@ const CMP_PRESETS=[
    交叉引用（見 §NN）——三者任一沒改，導覽與標頭就會對不起來。 */
 const TABS=[
   {k:'overview',label:'總覽',hint:'本週判定',secs:[
-    ['overview','01','本週戰略簡報','這週的判定、信心與該做的事']]},
+    ['overview','01','本週戰略簡報','這週的判定、信心與值得評估的方向']]},
   /* 定位＝基礎盤：不隨週次變動的結構情報。先知道欣銓在產業裡的位置、
      對手是誰、子彈（供應商）夠不夠，才知道每週該蒐什麼、蒐到的東西重不重要。 */
   {k:'position',label:'定位',hint:'基礎盤',secs:[
@@ -1824,7 +1824,7 @@ const TABS=[
     ['trace','11','決策軌跡','每一次權重調整的依據與來源'],
     ['selfaudit','12','自我稽核','這些判斷如果錯了會怎樣']]},
   {k:'company',label:'公司',hint:'欣銓相關',secs:[
-    ['plan','13','公司規畫','哪些劇本被觸發、該做與不該做什麼'],
+    ['plan','13','公司規畫','哪些劇本被觸發、對應哪些評估方向'],
     ['dept','14','這件事該誰看','外部訊號落在哪個部門的責任範圍'],
     ['profile','15','企業畫像','欣銓是什麼樣的公司——判斷的前提']]},
   {k:'gov',label:'治理',hint:'怎麼控管',secs:[
@@ -3265,8 +3265,8 @@ function render(i){
     .map(x=>({...x,d:x.b-x.a})).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d))[0]:null;
   const sm=(DATA.scenarioMeta||[]).find(s=>w.scenarioEn&&s.name.includes(w.scenarioEn));
 
-  const acts=fired.slice(0,2).map(f=>`<div class="act y"><span class="i">✓</span><div><b>該做</b>${f.action.split('；')[0]}</div></div>`).join('')
-    +(fired[0]?`<div class="act n"><span class="i">✕</span><div><b>停損</b>${fired[0].stop_loss}</div></div>`:'');
+  const acts=fired.slice(0,2).map(f=>`<div class="act y"><span class="i">✓</span><div><b>可評估</b>${f.action.split('；')[0]}</div></div>`).join('')
+    +(fired[0]?`<div class="act n"><span class="i">✕</span><div><b>停損訊號</b>${fired[0].stop_loss}</div></div>`:'');
 
   /* movers vs prev */
   let moversHTML='';
@@ -3360,7 +3360,7 @@ function render(i){
     </div>
 
     <div class="actband rise d4">
-      <div class="actband-h"><b>本週行動建議</b><span class="q">欣銓現在該做什麼？</span></div>
+      <div class="actband-h"><b>本週值得評估的方向</b><span class="q">外部情勢指向哪些議題？</span></div>
       <div class="acts">${acts||'<div class="act"><div style="color:var(--muted)">本週無劇本觸發</div></div>'}</div>
       <div class="actband-f">前三大 KDF${S?'（關鍵決策因素）':''}：${top3.map(t=>`#${t.id} ${t.name.replace(/（.*/,'')} <b class="num">${t.v}</b>`).join('　')}</div>
     </div>
@@ -3375,7 +3375,20 @@ function render(i){
       <span class="cosel-l">企業畫像</span>
       ${CO.map(c=>`<button type="button" class="co-b${c.id===co.id?' on':''}" data-co="${c.id}" aria-pressed="${c.id===co.id}">${c.short}${c.real?'':'<span class="co-tag">示範</span>'}</button>`).join('')}
     </div>`:''}
-    <div class="sh"><span class="ix">§13</span><h2>對${co?co.short:'欣銓'}的公司規畫</h2><span class="q">${co?co.short:'欣銓'}現在該做什麼？</span><span class="sub">${S?`共 ${coFired.length} 條觸發｜含成功指標與停損訊號`:'企業畫像 × 情境 → 觸發式劇本'}</span>${co&&!co.real?'<span class="chip demo" title="虛構企業：畫像與劇本為示範資料；觸發依據引用的週次資料為真實紀錄">示範資料</span>':'<span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>'}</div>
+    <div class="sh"><span class="ix">§13</span><h2>對${co?co.short:'欣銓'}的公司規畫</h2><span class="q">外部情勢對應到哪些既有劇本？</span><span class="sub">${S?`共 ${coFired.length} 條觸發｜含成功指標與停損訊號`:'企業畫像 × 情境 → 觸發式劇本'}</span>${co&&!co.real?'<span class="chip demo" title="虛構企業：畫像與劇本為示範資料；觸發依據引用的週次資料為真實紀錄">示範資料</span>':'<span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>'}</div>
+    <!-- 教授 2026-08-25 意見：外部資料推導的輸出不應寫成執行指令。此框架帶做兩件事——
+         ①把本層在整條鏈裡的位置畫出來（讀者才知道這不是終點）②明說界線與誰該下決定。
+         位置刻意放在觸發劇本之前：讀者看到條目之前就先看到框架。 -->
+    <div class="covbox" style="margin:0 0 14px">
+      <div class="t">這一層在整條鏈的哪裡</div>
+      <div class="d" style="font-family:'IBM Plex Mono','Noto Sans TC',monospace;font-size:11.5px">
+        外部情報／新聞 → 事件辨識 → KDF 影響 → 情境變化 → 風險與機會訊號 → <b>本層：策略評估方向</b>
+      </div>
+      <div class="d" style="margin-top:6px"><b>本層輸出為外部情報推導之評估方向，不是執行建議。</b>
+        我們不掌握${co?co.short:'欣銓'}的產能、成本、客戶結構、訂單、技術能力、供應商與投資規劃，
+        因此不判斷這些方向是否適合採行——那需要結合企業內部資訊與管理者判斷。
+        條目文字沿用劇本庫的原始措辭（<a href="#method">§17</a> 說明其來源），請讀為<b>值得進一步評估的議題</b>。</div>
+    </div>
     ${co&&!co.real?`<div class="demobox"><b>${co.name}</b>為虛構示範企業——同一套週次情境判定，換上不同企業畫像與劇本組，觸發結果隨之改變（可與欣銓對照本週差異）。觸發依據引用的座標、KDF 與關鍵字均為真實週次資料；虛構的只有企業本身。非投資建議。</div>`:''}
     ${coPlan?`<div style="font-size:12.5px;color:var(--ink2);margin-bottom:14px">情境姿態：${coPlan.scenarioStance}</div>`:''}
     <div class="plan">${coFired.map(f=>`
@@ -3587,9 +3600,9 @@ function render(i){
         <tbody>${ch.map(c=>`<tr>
           <td><b>${c.n}</b><div style="color:var(--muted);font-size:11px;margin-top:2px">${c.w}</div></td>
           <td>${c.tool}</td>
-          <td class="num">${cell(c.billableInput,c.state)}</td>
-          <td class="num">${cell(c.output,c.state)}</td>
-          <td class="num">${cell(c.msgs,c.state)}</td></tr>
+          <td class="num"${c.state==='nolog'?' id="aiUseIn"':''}>${cell(c.billableInput,c.state)}</td>
+          <td class="num"${c.state==='nolog'?' id="aiUseOut"':''}>${cell(c.output,c.state)}</td>
+          <td class="num"${c.state==='nolog'?' id="aiUseN"':''}>${cell(c.msgs,c.state)}</td></tr>
           ${c.note?`<tr><td colspan="5" style="color:var(--muted);font-size:11px;padding-top:0;border-bottom:none">↳ ${mdb(c.note)}</td></tr>`:''}`).join('')}
         </tbody>
       </table>
@@ -3690,6 +3703,7 @@ function render(i){
   wireBacktest();          /* 回測看的是全部週次，不隨當前週變動，故不吃 i */
   wireDaily();             /* 同上：每日巡邏是獨立時間軸 */
   wireDept();              /* 部門視角吃 payload 的既有分派，與當前週無關 */
+  aiUsePaint();            /* §16 通道④：每次 render 都重建那張表，累計數要重畫 */
   /* 匯出鈕隨 render 重建，故在此重綁；資料一律取當下的 DATA，不吃閉包裡的 i */
   $$('.expb').forEach(b=>b.onclick=()=>doExport(b.dataset.exp));
   heroFx();
@@ -3891,6 +3905,34 @@ if(pendingSec){const el=document.getElementById(pendingSec);if(el)el.scrollIntoV
 window.SCAI_AI_CONFIG=window.SCAI_AI_CONFIG||{endpoint:'https://scai-ask.leozero0517.workers.dev'};
 const aiFab=$('#aifab'),aiPanel=$('#aipanel'),aiLog=$('#ailog'),aiQ=$('#aiq');
 let aiTok={i:0,o:0,n:0},aiSeq=0;
+/* §16 通道④「站上 AI 問答」的跨工作階段累計。
+   數字來自 Worker 的 KV（只存次數與 token 加總，不存問答內容），**不是本機累計**——
+   決賽當天換一台電腦開，數字照樣在，這正是它存在的理由。
+   取不到就維持建置時的「不累計」，不編造、也不退回成只算本機 session。 */
+/* ⚠ 必須是 var 不是 let：render(cur) 在本行之前就會執行並呼叫 aiUsePaint()，
+   let 的暫時性死區會讓那次呼叫拋 ReferenceError，**並中斷其後整段腳本**。
+   var 會被提升為 undefined，aiUsePaint() 的 !aiUse 判斷即安全跳過。 */
+var aiUse=null;
+function aiUsePaint(){
+  if(!aiUse)return;
+  const n=x=>Number(x||0).toLocaleString('en-US');
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+  set('aiUseIn',n(aiUse.in)); set('aiUseOut',n(aiUse.out)); set('aiUseN',n(aiUse.n));
+}
+/* 推到整段腳本解析完再跑：直接呼叫會撞上 const aiEP 的暫時性死區。
+   同理不可搬到更前面——這條路徑依賴 SCAI_AI_CONFIG 與 aiEP 都已就緒。 */
+setTimeout(aiUseLoad,0);   /* 啟動抓一次；失敗維持「不累計」，不重試、不擋任何東西 */
+async function aiUseLoad(){
+  const ep=aiEP(); if(!ep)return;            // 離線版端點已清空：不發請求，維持「不累計」
+  try{
+    const c=new AbortController(), tm=setTimeout(()=>c.abort(),6000);
+    const r=await fetch(ep,{method:'POST',headers:{'content-type':'application/json'},
+      signal:c.signal,body:JSON.stringify({mode:'stats'})});
+    clearTimeout(tm);
+    const j=await r.json();
+    if(j&&j.totals&&typeof j.totals==='object'){aiUse=j.totals;aiUsePaint()}
+  }catch{/* 後端不在或逾時：保持「不累計」，不影響頁面其餘部分 */}
+}
 /* 離線備援檔（file:// 或建置時標記）一律不外連：斷網保險的意義就在於零外部請求。
    判定沿用前面週次控制區定義的 IS_OFFLINE，不重複實作（原本兩處各寫一份同樣的運算式）。 */
 const AI_OFFLINE=IS_OFFLINE;
@@ -4008,6 +4050,11 @@ async function aiAsk(){
       if(Number.isFinite(iN))aiTok.i+=iN;
       if(Number.isFinite(oN))aiTok.o+=oN;
       aiTok.n++;
+      /* KV 是最終一致的，重新抓會讀到舊值；直接就地加上本次用量，畫面立刻反映。
+         下次重新載入時會被 Worker 的權威值覆蓋。 */
+      if(aiUse){aiUse.in=(aiUse.in||0)+(Number.isFinite(iN)?iN:0);
+                aiUse.out=(aiUse.out||0)+(Number.isFinite(oN)?oN:0);
+                aiUse.n=(aiUse.n||0)+1;aiUsePaint()}
       const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       aiMsg('a',`${esc(j.answer).replace(/\n/g,'<br>')}<div class="ai-src">模型：${esc(j.model||'AI')}｜本次 in ${Number.isFinite(iN)?iN:'—'}／out ${Number.isFinite(oN)?oN:'—'} tokens｜本階段累計 ${aiTok.i}／${aiTok.o}（${aiTok.n} 次）</div>`);
       aiSetMode('live');

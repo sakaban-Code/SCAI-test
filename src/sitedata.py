@@ -223,8 +223,9 @@ def build_token_dev(root: pathlib.Path):
         {"n": "④ 站上 AI 問答", "w": "評審或訪客在本站提問",
          "tool": "Cloudflare Workers AI（@cf/openai/gpt-oss-20b）", "state": "nolog",
          "msgs": None, "billableInput": None, "output": None,
-         "note": "每則回答都附**當次的真實用量**，但本站不記錄問答內容"
-                 "（Worker 無任何儲存呼叫），因此沒有累計數可報。"},
+         "note": "每則回答都附**當次的真實用量**；跨工作階段的累計由 Worker 以 KV 記錄"
+                 "——**只存次數與 token 加總，不存任何問答內容**。"
+                 "取不到累計數時（離線版、後端未回應）本列顯示「不累計」。"},
     ]
 
     return {

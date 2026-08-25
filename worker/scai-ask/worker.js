@@ -10,7 +10,9 @@
  * - 模型與 system prompt 固定在本檔，前端不可指定。
  * - 問題長度上限 300 字、輸出上限 512 tokens。
  * - CORS 白名單鎖定 SCAI 網站來源。
- * - 不記錄問答內容（無任何儲存呼叫）；回應附 token 用量供網站顯示。
+ * - 不記錄問答內容；回應附 token 用量供網站顯示。
+ * - KV 只累計三個數字（次數／輸入／輸出），**不存任何問答內容**——計數不是紀錄。
+ *   未綁定 KV 時整條路徑靜默停用，回答不受影響。
  * - 每 IP 每分鐘 8 次（單一 isolate 內盡力而為；免費額度用罄時 Workers AI 直接回錯，
  *   前端自動降級為展示模式）。
  *
@@ -19,6 +21,36 @@
  */
 
 const MODEL = "@cf/openai/gpt-oss-20b";
+
+// 跨工作階段的用量累計（KV binding: USAGE）。
+// **只存三個數字，不存任何問答內容**——與「不記錄問答」並不衝突：計數不是紀錄。
+// 沒有綁定 KV 時整條路徑靜默停用，回答不受影響（前端據此顯示「不累計」）。
+// ⚠ KV 的讀-改-寫**不是原子操作**，高並發時可能漏計一次。方向是**只會少計不會多計**，
+//   對一個誠實揭露用的數字而言，少計是安全的那一邊。要精確就得換 Durable Object。
+const KV_KEY = "usage-totals";
+
+async function readTotals(env) {
+  try {
+    if (!env.USAGE) return null;                       // 未綁定 → 前端顯示「不累計」
+    const v = await env.USAGE.get(KV_KEY, { type: "json" });
+    return (v && typeof v === "object") ? v : { n: 0, in: 0, out: 0, since: null };
+  } catch { return null; }
+}
+
+async function bumpTotals(env, inTok, outTok) {
+  try {
+    if (!env.USAGE) return;
+    const cur = (await readTotals(env)) || { n: 0, in: 0, out: 0, since: null };
+    const today = new Date().toISOString().slice(0, 10);
+    await env.USAGE.put(KV_KEY, JSON.stringify({
+      n: (cur.n || 0) + 1,
+      in: (cur.in || 0) + (Number(inTok) || 0),
+      out: (cur.out || 0) + (Number(outTok) || 0),
+      since: cur.since || today,
+      updated: today,
+    }));
+  } catch { /* 計數失敗絕不影響回答——這是附屬功能，不是主線 */ }
+}
 
 const ALLOWED_ORIGINS = [
   "https://sakaban-code.github.io",   // GitHub Pages 正式站
@@ -69,7 +101,12 @@ const SYSTEM_JUDGE = [
   "存疑：<這則判斷最可能錯在哪裡，一句>",
   "",
   "規則：一律繁體中文；只依事件本文判斷，不得引入事件之外的數字或事實；",
-  "事件敘述若為否定（例如「本週無天災通報」），代表該風險未發生，不得據以調升相關權重。",
+  // 只寫「不得調升權重」不夠——實測模型守住了 KDF 那行，卻仍給兩軸各 +0.01，
+  // 把「沒發生」讀成利多。這與規則引擎 2026-08-20 修掉的否定誤判是同一個病，
+  // 兩邊敘事必須一致，故此處明確涵蓋雙軸並給出唯一正解。
+  "純記錄性或否定敘述的事件（例如「本週無天災、停電或缺水通報」「查無資料」「未發現異常」），",
+  "代表該風險未發生，本身不構成任何方向的訊號：X 與 Y 一律回 0.00，KDF 一律「不調整」，",
+  "理由寫「純記錄性事件，查無即記無，不產生位移」。不得因為「沒有壞事」而調升充沛度。",
 ].join("\n");
 
 // 單一 isolate 內的簡易限流（重啟即歸零；正式強化可換 KV/Durable Objects）
@@ -105,7 +142,7 @@ const json = (obj, status, extra) =>
   });
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const origin = request.headers.get("origin") || "";
     const ch = cors(origin);
 
@@ -129,6 +166,12 @@ export default {
     // 合法 JSON 的 null／陣列／字串都不可讓下面取值時炸成 500
     if (body === null || typeof body !== "object" || Array.isArray(body)) {
       return json({ error: "bad body" }, 400, ch);
+    }
+
+    // stats 模式：只讀累計數字，不呼叫模型、不耗額度。必須排在 empty question 檢查之前，
+    // 因為它本來就沒有 question。沿用上面所有防護（Origin 白名單、限流、本文大小）。
+    if (body.mode === "stats") {
+      return json({ totals: await readTotals(env) }, 200, ch);
     }
 
     // judge 模式的輸入是一段事件敘述，比問句長，另給上限。
@@ -218,13 +261,17 @@ export default {
     if (!answer) answer = "（模型未回傳內容）";
 
     const u = r?.usage || {};
+    const inTok = u.prompt_tokens ?? u.input_tokens ?? null;
+    const outTok = u.completion_tokens ?? u.output_tokens ?? null;
+
+    // 累計寫入走 waitUntil：回應先送出，計數在背景完成。
+    // 寫失敗也只是這一次沒計到，不影響已經回給使用者的答案。
+    ctx.waitUntil(bumpTotals(env, inTok, outTok));
+
     return json({
       answer,
       model: MODEL,
-      usage: {
-        input_tokens: u.prompt_tokens ?? u.input_tokens ?? null,
-        output_tokens: u.completion_tokens ?? u.output_tokens ?? null,
-      },
+      usage: { input_tokens: inTok, output_tokens: outTok },
     }, 200, ch);
   },
 };
