@@ -7,7 +7,7 @@
 本模組**不讀寫 data/ 以外的東西、也不修改 weeks.json**：`days`／`start`／`end`
 與 `coverage` 全部是由既有的 `range` 字串與 `gen` 欄位**推導**出來的顯示用衍生值。
 """
-import copy, datetime, json, pathlib, sys
+import copy, datetime, json, pathlib, re, sys
 
 import weekcal
 
@@ -582,6 +582,15 @@ def build_payload(root: pathlib.Path) -> dict:
         出現在標題、摘要與決策軌跡，W11 實測全檔命中 3 次但實際只有 1 則。"""
         return sum(1 for x in (items or [])
                    if tag in json.dumps(x, ensure_ascii=False))
+
+    # 週次區間轉 ISO：§05 每日巡邏要標出「選到的這一週」落在時間軸的哪一段。
+    # range 形如 "2026/06/11–06/17"（迄日省略年份），跨年時迄日年份加一。
+    for w in weeks:
+        m = re.match(r"(\d{4})/(\d{2})/(\d{2})\D+(\d{2})/(\d{2})", str(w.get("range") or ""))
+        if m:
+            y, m1, d1, m2, d2 = m.groups()
+            y2 = int(y) + (1 if (m2, d2) < (m1, d1) else 0)
+            w["span"] = [f"{y}-{m1}-{d1}", f"{y2}-{m2}-{d2}"]
 
     for w in weeks:
         ev = w.get("events") or []

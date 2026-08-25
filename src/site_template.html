@@ -1318,6 +1318,9 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 /* 「人工巡邏期」原用 #7c86ad，白字在其上只有 3.58；加深至 #5b678f 才過 4.5。
    圖例色塊與格子共用同一組色，改一處兩邊同步。 */
 .s-man{background:#5b678f}.s-gap{background:rgba(85,98,138,.2)}
+.dl-off{font-size:12px;line-height:1.8;color:var(--ink2);margin-bottom:10px;padding:9px 12px;
+  border:1px solid var(--line2);border-radius:9px;background:var(--card)}
+.dl-off b{color:var(--ink)}
 .dl-strip{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
 .dl-strip button{width:30px;height:30px;border-radius:7px;border:1px solid transparent;
   font-family:var(--mono);font-size:11px;color:#fff;cursor:pointer;padding:0}
@@ -2723,15 +2726,23 @@ function wireDept(){
    ⚠ 每日層與每週層節奏不同、可信度不同，**不可混講**：每日巡邏未經週報四道門檻，
    是即時偵測而非正式紀錄。區段標頭與說明都要寫明這件事。 */
 const DL=DATA.dailyLayer||null;
-function dailyHTML(S){
+function dailyHTML(S,w){
   if(!DL||!DL.days.length)return '';
   const g=DL.gaps.length;
+  /* 每日層是連續時間軸，刻意不隨上方週次切換（每日與每週節奏不同、可信度不同）。
+     但畫面上兩者相鄰，選 W1（六月）卻看到八月的格子會直接被讀成錯誤。
+     不隨週次變動就要自己講出來，落在紀錄範圍之外時再補一句為什麼。 */
+  const sp=w&&w.span, off=sp&&(sp[1]<DL.span[0]||sp[0]>DL.span[1]);
   return `
   <section id="daily" data-tab="intel">
     <div class="sh"><span class="ix">§05</span><h2>每日巡邏</h2><span class="q">每天有沒有真的跑？發現了什麼？</span>
       <span class="sub">${S?'每天掃新聞、照規則分級，紅色最嚴重'
         :'即時偵測 · 每日執行收據 · 與週報四道門檻分屬兩層'}</span>
+      <span class="chip lo" title="每日巡邏為連續時間軸，不隨上方週次切換">${S?'全期・不隨週次變動':'全期時間軸・不隨週次切換'}</span>
       <span class="chip lo" title="每日層為即時偵測，未經週報之四道匯入門檻">${S?'未經每週檢查':'未經週報門檻'}</span></div>
+    ${off?`<div class="dl-off">你現在選的是 <b>W${w.week}（${w.range}）</b>，
+      而每日巡邏自 <b>${DL.span[0]}</b> 才開始有紀錄——這一週還沒有每日層。
+      下方是每日層的完整時間軸，<b>與所選週次無關</b>。</div>`:''}
     <div class="dl-bar">
       <span class="dl-k"><b>${DL.autoDays}</b>天自動執行</span>
       <span class="dl-k"><b>${DL.days.length}</b>天有紀錄</span>
@@ -3510,7 +3521,7 @@ function render(i){
     </div>
   </section>
 
-  ${dailyHTML(S)}
+  ${dailyHTML(S,w)}
 
   ${journeyHTML(S)}
 
