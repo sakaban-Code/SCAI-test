@@ -3123,7 +3123,7 @@ function exportBar(){
    才能說明每週為什麼蒐這些、為什麼這則重要。定位圖刻意用內嵌 SVG 而非 Chart.js——
    靜態內容不必等圖表庫，離線版與列印皆可用。 */
 /* 四級來源標記。「年報」為法定公開揭露之原始數字，可信度最高，給實心底以資區別 */
-const SRCCLS={'年報':'rep','查證':'ok','推斷':'inf','待公司確認':'wait'};
+const SRCCLS={'年報':'rep','查證':'ok','推斷':'inf','待公司確認':'wait','第三方':'wait'};
 /* 來源標記。帶 url 時渲染成可點連結——「查證」這種徽章若點不下去，等於只是宣稱。
    url 由 industry_position.json 提供，指向官網對應單元（查證之處，非逐項深連結；
    官網為 JS 動態站、公開資訊觀測站無穩定深連結，故不宣稱能定位到那一行）。 */
@@ -3188,14 +3188,16 @@ function positionHTML(S){
       </div>
       <div>
         <div class="card" style="margin-bottom:12px">
-          <div class="ch"><b>應用結構</b>（${AP.year}） ${srcTag('查證')}</div>
+          <div class="ch"><b>應用結構</b>（${AP.year}） ${srcTag(AP.src,AP.url)}
+            ${AP.srcNote?`<span style="font-size:11px;color:var(--muted)">${AP.srcNote}</span>`:''}</div>
           <div class="appbar">${AP.mix.map(m=>`<div class="r"><span class="n">${m.n}</span>
             <span class="t"><i style="width:${m.v/26*100}%"></i></span>
             <span class="v">${m.v}%</span></div>`).join('')}</div>
           <div class="pos-read" style="margin-top:9px">${AP.note}</div>
         </div>
         <div class="card">
-          <div class="ch"><b>廠區布局</b> ${srcTag(FP.src)}</div>
+          <div class="ch"><b>廠區布局</b> ${srcTag(FP.src,FP.url)}</div>
+          ${FP.srcNote?`<div class="pos-read" style="font-size:11px;margin:2px 0 8px">${mdb(FP.srcNote)}</div>`:''}
           <div class="sitelist">${FP.sites.map(s=>`<span class="s k-${s.kind}"><b>${s.region}</b><span>${s.detail}</span></span>`).join('')}</div>
           <div class="pos-read" style="margin-top:9px">${FP.riskNote}</div>
         </div>
@@ -3203,7 +3205,7 @@ function positionHTML(S){
     </div>
 
     ${P.customers?`<div class="card" style="margin-top:14px">
-      <div class="ch"><b>${P.customers.title}</b> ${srcTag(P.customers.src)}
+      <div class="ch"><b>${P.customers.title}</b> ${srcTag(P.customers.src,P.customers.url)}
         <span style="font-size:11px;color:var(--muted)">${P.customers.srcNote}</span></div>
       <div class="cust">
         ${P.customers.years.map(y=>`<div class="yr">
