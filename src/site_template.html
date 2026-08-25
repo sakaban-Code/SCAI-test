@@ -1337,6 +1337,9 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 .dl-mf{margin-top:6px;padding:7px 10px;border-radius:8px;font-size:11.5px;line-height:1.7;
   border:1px solid var(--line2);background:var(--card);color:var(--ink2)}
 .dl-mf b{color:var(--warn,#aa5311)}
+.dl-mfn{margin:8px 0 2px;padding:8px 11px;border-radius:9px;font-size:11.5px;line-height:1.75;
+  border:1px solid var(--line2);background:var(--card);color:var(--ink2)}
+.dl-mfn b{color:var(--ink)}
 .rl{cursor:help;border-bottom:1px dotted currentColor}
 .rl-lg{margin-top:7px;font-size:11px;line-height:1.7;color:var(--muted)}
 .dl-none{font-size:12px;line-height:1.8;color:var(--ink2);padding-top:8px;border-top:1px solid var(--line)}
@@ -2779,11 +2782,16 @@ function wireDaily(){
       每日巡邏於 ${DL.receiptFrom} 起才由 GitHub Actions 自動執行，先前為人工不定期巡邏。</div></div>`;return}
     const tag=x.red>0?['有 RED','s-hit']:x.yellow>0?['有 YELLOW','s-yel']
       :x.how==='auto'?['跑了，零警報','s-zero']:['人工巡邏，零警報','s-man'];
+    /* 誤命中的共通說明只講一次：逐則重複同一段政策文字會把當日面板撐到 600px 以上。
+       每則保留一行分類（社群貼文／內容農場／播客／搜尋結果頁），為什麼保留紀錄講在這裡。 */
+    const nmf=x.items.filter(i=>i.misfire).length;
     out.innerHTML=`<div class="dl-day">
       <div class="dl-dh"><b>${d}</b><span class="dl-tag ${tag[1]}">${tag[0]}</span>
         <span class="dl-meta">${x.how==='auto'
           ? `Actions 自動執行 ${x.at}　掃描 ${x.scanned} 則${x.excluded?`（排除非新聞 ${x.excluded} 則）`:''}　收據 status=${x.status}　mode=${x.mode}`
           : '人工巡邏（收據制上線前，無執行收據）'}</span></div>
+      ${nmf?`<div class="dl-mfn">本日 ${x.items.length} 則中 <b>${nmf} 則</b>事後判定為誤命中——
+        來源非新聞，命中關鍵字屬字面巧合。已列入排除清單（2026-08-26），<b>紀錄保留不刪</b>。</div>`:''}
       ${x.items.length?x.items.map(it=>`<div class="dl-i">
           <span class="dl-t t-${it.tier}">${it.tier}</span>
           <div><div class="dl-it">${it.title}</div>
@@ -2791,7 +2799,7 @@ function wireDaily(){
               ${it.url?` · <a href="${safeUrl(it.url)}" target="_blank" rel="noopener">原文 <span class="arw">↗</span></a>`:''}
               ${it.alerted?' · <b>已寄警報信</b>':''}</div>
             ${it.summary?`<div class="dl-iy">${it.summary}</div>`:''}
-            ${it.misfire?`<div class="dl-mf"><b>⚠ 事後判定為誤命中</b>（${it.misfire.at}）：${it.misfire.why}</div>`:''}</div></div>`).join('')
+            ${it.misfire?`<div class="dl-mf"><b>⚠ 誤命中</b>　${it.misfire.cat||it.misfire.why}</div>`:''}</div></div>`).join('')
         :`<div class="dl-none">${x.how==='auto'
             ? `掃描 ${x.scanned} 則，未達 YELLOW 以上；GREEN 不落日誌，故無日誌檔，<b>收據為證</b>。`
             : '這天巡邏後沒有落檔項目。'}</div>`}

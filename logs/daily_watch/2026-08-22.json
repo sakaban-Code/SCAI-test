@@ -29,7 +29,12 @@
           ]
         }
       },
-      "alerted": false
+      "alerted": false,
+      "misfire": {
+        "at": "2026-08-26",
+        "why": "社群平台貼文，非新聞報導。命中關鍵字屬字面巧合（非新聞來源 www.threads.com）。已列入非新聞來源排除清單，本則保留為紀錄。",
+        "cat": "社群平台貼文"
+      }
     },
     {
       "title": "京元電子(2449)股價：可以買嗎？1 個量化訊號觸發中｜FinLab",
@@ -55,7 +60,12 @@
           ]
         }
       },
-      "alerted": false
+      "alerted": false,
+      "misfire": {
+        "at": "2026-08-26",
+        "why": "看盤訊號內容農場，非新聞報導。命中關鍵字屬字面巧合（非新聞來源 finlab.finance）。已列入非新聞來源排除清單，本則保留為紀錄。",
+        "cat": "看盤訊號內容農場"
+      }
     },
     {
       "title": "Instagram",
@@ -72,7 +82,12 @@
           ]
         }
       },
-      "alerted": false
+      "alerted": false,
+      "misfire": {
+        "at": "2026-08-26",
+        "why": "社群平台貼文，非新聞報導。命中關鍵字屬字面巧合（非新聞來源 www.instagram.com）。已列入非新聞來源排除清單，本則保留為紀錄。",
+        "cat": "社群平台貼文"
+      }
     }
   ],
   "redCount": 0,
