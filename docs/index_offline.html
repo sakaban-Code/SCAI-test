@@ -325,12 +325,6 @@ tbody td{transition:background .12s}
   padding:8px 12px;font-size:12px;margin:0 0 14px;line-height:1.6;
   display:flex;align-items:flex-start;gap:8px}
 .heroflag .wi{flex-shrink:0;margin-top:2px;stroke-width:1.5}
-.guide{background:var(--dim);border-bottom:1px solid var(--line)}
-.guide .wrap{display:flex;gap:14px;align-items:center;padding-top:8px;padding-bottom:8px;
-  font-size:12px;color:var(--ink2);flex-wrap:wrap}
-.guide b{color:var(--ink);font-weight:600}
-.guide a{text-decoration:none;font-weight:500}
-.guide a:hover{text-decoration:underline}
 .audit{margin-top:16px;border-top:1px solid var(--line);padding-top:13px;font-size:12px;color:var(--muted);line-height:1.8}
 .audit table{width:auto;font-size:11.5px;margin-top:6px}
 .audit td,.audit th{padding:4px 14px 4px 0;border-bottom:1px solid var(--line)}
@@ -1021,10 +1015,6 @@ details,.trendsum{background:rgba(255,255,255,.72);border-color:rgba(120,130,214
   border-radius:18px}
 .bar{background:rgba(100,115,180,.14);border-radius:var(--radius-pill)}
 .bar i{border-radius:inherit}
-.guide{background:transparent;border:0;margin:0 6px 12px}
-.guide .wrap{display:flex;gap:9px;align-items:center;flex-wrap:wrap;
-  padding:9px 18px;border-radius:var(--radius-pill);
-  background:rgba(255,255,255,.62);border:1px solid rgba(120,130,214,.18)}
 footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
   background:rgba(255,255,255,.6);border:1px solid rgba(120,130,214,.16);color:#4a5878}
 #top{background:#5263ed;box-shadow:0 9px 24px rgba(123,97,255,.28)}
@@ -1106,7 +1096,7 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
   .corner-habitat{display:none}
   .brief-mast,.snap{border-radius:0}
   .brief{border-radius:33px}
-  .actband,.guide .wrap{border-radius:24px}
+  .actband{border-radius:24px}
 }
 @media(max-width:540px){
   .product-frame{border-radius:22px}
@@ -1116,7 +1106,6 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
   .tb .tb-l{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);
     white-space:nowrap}
   .brief{border-radius:26px}
-  .guide .wrap{border-radius:18px;padding:9px 14px}
 }
 /* 舊模板 ≤600px 的 header 雙行規則已被本層的側欄／堆疊佈局取代 */
 @media(max-width:600px){
@@ -1199,7 +1188,6 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 @media (min-width:1100px) and (max-height:780px){
   .product-frame{margin-top:8px}      /* −4 */
   .topbar{min-height:42px}            /* −7 */
-  .guide{margin-bottom:6px}           /* −6 */
   /* .hero 不可省：總覽區段是 <section class="hero" id="overview">，
      而 .hero{padding-top:22px} 的特異性 (0,1,0) 壓過 section (0,0,1)，
      與先後順序無關——只寫 section 那條完全不會生效（實測仍是 22px）。 */
@@ -1244,7 +1232,7 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
   body::before,.ambient-wash,.corner-habitat,.brief-fx{display:none!important}
   .product-frame{display:block;width:auto;margin:0;padding:0;border:0;border-radius:0;
     background:none;box-shadow:none;backdrop-filter:none}
-  header,.topbar,.guide{display:none!important}
+  header,.topbar{display:none!important}
   .workspace{padding:0}
   .card,.pb,.evc,details,.sa,.sc-card,.axc,.brief,.actband,.snap{
     background:#fff!important;box-shadow:none!important;border-color:#bbb!important}
@@ -1634,7 +1622,6 @@ a.src.lk:hover,a.src.lk:focus-visible{text-decoration:underline}
   #alertbar{margin:6px 16px 0}
   #alertbar.on{padding:6px 12px}
   #alertbar .ab-t{-webkit-line-clamp:1}
-  html.alert-on .guide{display:none}
 }
 </style>
 </head>
@@ -1697,14 +1684,6 @@ a.src.lk:hover,a.src.lk:focus-visible{text-decoration:underline}
       <div class="wrap" role="tablist" id="tabbar"></div>
     </nav>
   </div>
-
-<div class="guide"><div class="wrap">
-  <b>第一次看？照這順序</b>
-  <span>① <a href="#overview">本週判定與評估方向</a></span>
-  <span>② <a href="#plan">給欣銓的具體規畫</a></span>
-  <span>③ <a href="#trace">憑什麼這樣判斷（每步可查證）</a></span>
-  <span>④ <a href="#gov">這個 Agent 怎麼被控管</a></span>
-</div></div>
 
 <main class="wrap" id="main"></main>
 
@@ -1925,7 +1904,7 @@ function setTab(k,scrollId,keepScroll){
   /* keepScroll＝render() 重繪時沿用，避免每次換週都被捲回頁頂 */
   if(!keepScroll)scrollTo({top:0,behavior:'smooth'});
 }
-/* 任何指向他頁區段的錨點（導覽列、「第一次看」導引、內文交叉連結）先切分頁再捲動 */
+/* 任何指向他頁區段的錨點（導覽列、內文交叉連結）先切分頁再捲動 */
 document.addEventListener('click',e=>{
   const a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;
   const id=a.getAttribute('href').slice(1),t=SEC_TAB[id];
@@ -1985,9 +1964,9 @@ $('#vfull').onclick=()=>setView('full');
    觸發鈕上，Tab 還會走到覆蓋層背後的控制項。以堆疊管理（放大檢視中點資料點
    會再開週次講解，兩層並存），inert 為主、Tab 陷阱為備援不依賴 inert 支援度。 */
 const modalStack=[];
-/* .skip 與 .guide 也要納入：它們在 header 之外，漏掉的話 aria-modal 期間
+/* .skip 也要納入：它在 header 之外，漏掉的話 aria-modal 期間
    輔助科技仍能直接聚焦背景連結 */
-const BG_SEL='header,nav.secnav,.guide,#main,footer,#top,.skip,#aifab,#aipanel';
+const BG_SEL='header,nav.secnav,#main,footer,#top,.skip,#aifab,#aipanel';
 const FOCUSABLE='a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 /* position:fixed 元素的 offsetParent 為 null，故以 getClientRects 判可見 */
 const focusablesIn=el=>[...el.querySelectorAll(FOCUSABLE)].filter(n=>n.getClientRects().length>0);
