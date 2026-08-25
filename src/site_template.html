@@ -3281,7 +3281,10 @@ function render(i){
   let moversHTML='';
   if(p){
     const reasons={};
-    (w.decisionTrace||[]).forEach(t=>t.kdfChanges.forEach(k=>{reasons[k.id]=k.reason}));
+    /* 簡略吃白話層（data/plain_reasons.json，建置時合併），詳細維持原文。
+       原文是已發佈的紀錄，不因可讀性重寫；白話只是同一段話的另一種說法。 */
+    (w.decisionTrace||[]).forEach(t=>t.kdfChanges.forEach(k=>{
+      reasons[k.id]=(S&&k.reasonPlain)||k.reason}));
     const diffs=DATA.kdf.map((k,j)=>({id:k.id,name:k.name,v:w.w[j],d:w.w[j]-p.w[j],why:reasons[k.id]||''}))
       .filter(x=>Math.abs(x.d)>=2).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d));
     const ups=diffs.filter(x=>x.d>0).slice(0,3), dns=diffs.filter(x=>x.d<0).slice(0,3);
@@ -3518,7 +3521,7 @@ function render(i){
         <span class="kt">${S?`調整 ${t.kdfChanges.length} 項權重`:`ΔX ${fmt(t.xDelta)}　ΔY ${fmt(t.yDelta)} · ${t.kdfChanges.length} 項`}</span></summary>
         <div class="tr-b">
           <div class="kws">${t.keywords.map(k=>`<span class="kw">${k}</span>`).join('')}</div>
-          ${t.kdfChanges.map(k=>`<div class="kdfc">#${k.id} ${k.name}　<b>${k.from}→${k.to}</b>　<span style="color:var(--muted)">${k.reason}</span></div>`).join('')}
+          ${t.kdfChanges.map(k=>`<div class="kdfc">#${k.id} ${k.name}　<b>${k.from}→${k.to}</b>　<span style="color:var(--muted)">${(S&&k.reasonPlain)||k.reason}</span></div>`).join('')}
           ${safeUrl(ev.url)?`<div class="src">${ev.source||''} · ${ev.date||''} · <a href="${safeUrl(ev.url)}" target="_blank" rel="noopener">原文 <span class="arw">↗</span></a></div>`:''}
         </div></details>`}).join('')}
     ${traceSum(i)}

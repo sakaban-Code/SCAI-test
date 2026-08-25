@@ -638,6 +638,30 @@ def build_payload(root: pathlib.Path) -> dict:
             raise SystemExit(f"[錯誤] risk_outcomes.json 有 {len(orphan)} 個鍵找不到對應風險："
                              f"{orphan}——riskRadar 筆數已變動，請重新核對索引")
 
+    # 判斷理由的白話層：簡略檢視用，詳細檢視仍顯示原文。同 risk_outcomes 模式，
+    # 獨立檔於此合併，weeks.json 不動（已發佈週次不因可讀性回頭重寫）。
+    pr_path = root / "data" / "plain_reasons.json"
+    if pr_path.exists():
+        pr = load(pr_path)["reasons"]
+        used = set()
+        for w in weeks:
+            for ti, t in enumerate(w.get("decisionTrace") or []):
+                for k in t.get("kdfChanges") or []:
+                    hit = pr.get(f'W{w["week"]}|{ti}|{k["id"]}')
+                    if not hit:
+                        continue
+                    used.add(f'W{w["week"]}|{ti}|{k["id"]}')
+                    # 白話版是照原文改寫的；原文一旦變動，改寫就可能已不成立。
+                    # 兩者不符即中止——寧可不上站，也不要讓對不上的白話冒充原意。
+                    if hit["orig"] != k.get("reason"):
+                        raise SystemExit(f'[錯誤] plain_reasons 的原文與 weeks.json 不符：'
+                                         f'W{w["week"]}|{ti}|{k["id"]}')
+                    k["reasonPlain"] = hit["plain"]
+        orphan = sorted(set(pr) - used)
+        if orphan:
+            raise SystemExit(f"[錯誤] plain_reasons.json 有 {len(orphan)} 個鍵找不到對應的"
+                             f"決策軌跡：{orphan[:5]}——decisionTrace 已變動，請重新產生")
+
     cfg = load(root / "data" / "kdf_config.json")
     prof = load(root / "data" / "company_profile.json")
     # 產業定位基礎盤（§02）。與 kdf_config／playbook 同屬版本控管之自家設定檔，
