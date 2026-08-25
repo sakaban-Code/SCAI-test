@@ -64,6 +64,9 @@ jobs:
         run: |
           git config user.name  "scai-agent-bot"
           git config user.email "bot@scai-agent"
-          git add data/ weekly/ charts/ reports/ dashboard/ docs/
+          # ⚠ 不可列入不存在的路徑：git add 對沒命中的 pathspec 會 fatal，
+          #   整個步驟失敗，前面算完的東西一次都推不上去。
+          #   `reports/` 全庫從未建立過，2026-08-25 移除。
+          git add data/ weekly/ charts/ dashboard/ docs/
           git diff --cached --quiet || git commit -m "chore(weekly): $(date -u +%F) 自動週報產出"
           git push
