@@ -1233,6 +1233,11 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
   .product-frame{display:block;width:auto;margin:0;padding:0;border:0;border-radius:0;
     background:none;box-shadow:none;backdrop-filter:none}
   header,.topbar{display:none!important}
+  /* 游標粒子層是 position:fixed 的整頁 canvas，Chrome 會把它整片印在第一頁 */
+  #scai-pointer-fx{display:none!important}
+  /* .rise 以 opacity:0 起手、靠動畫淡入；列印是 t=0 的靜態快照，動畫不會跑，
+     §01 六個 .rise 元素全部停在 opacity:0——整張首頁只剩卡片外框。 */
+  .rise,main.fade{opacity:1!important;animation:none!important}
   .workspace{padding:0}
   .card,.pb,.evc,details,.sa,.sc-card,.axc,.brief,.actband,.snap{
     background:#fff!important;box-shadow:none!important;border-color:#bbb!important}
@@ -1913,6 +1918,17 @@ function setTab(k,scrollId,keepScroll){
   /* keepScroll＝render() 重繪時沿用，避免每次換週都被捲回頁頂 */
   if(!keepScroll)scrollTo({top:0,behavior:'smooth'});
 }
+/* 列印時 CSS 會把 section[hidden] 攤開，但那些 canvas 在 hidden 狀態下寬度為 0，
+   Chart.js 不會自行補救——不先 resize 就會印出一片空白圖框。beforeprint 先解除
+   hidden、逼圖表重算，afterprint 只還原自己動過的（data-ph）。 */
+addEventListener('beforeprint',()=>{
+  $$('#main section[data-tab]').forEach(s=>{if(s.hidden){s.hidden=false;s.dataset.ph='1'}});
+  if(typeof Chart!=='undefined')
+    $$('#main canvas').forEach(c=>{const ch=Chart.getChart(c);if(ch)ch.resize()});
+});
+addEventListener('afterprint',()=>{
+  $$('#main section[data-ph]').forEach(s=>{s.hidden=true;delete s.dataset.ph});
+});
 /* 任何指向他頁區段的錨點（導覽列、內文交叉連結）先切分頁再捲動 */
 document.addEventListener('click',e=>{
   const a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;
