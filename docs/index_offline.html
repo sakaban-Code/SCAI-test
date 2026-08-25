@@ -269,6 +269,13 @@ section{padding:40px 0 4px}
 .sh{display:flex;align-items:baseline;gap:11px;margin-bottom:18px;flex-wrap:wrap}
 .sh h2{font-size:18px;font-weight:700;margin:0;letter-spacing:-.3px;text-wrap:balance}
 .sh .sub{font-size:12px;color:var(--muted)}
+/* ── 簡略模式：藏掉「為什麼這樣設計」的解釋性小字 ─────────────────────
+   只藏解釋，不藏揭露。【推斷】、非投資建議、非官方數據、查證連結、鍵盤操作
+   說明一律保留——簡略是為了讓不熟系統的人看得懂，不是讓產品少講該講的話。
+   逐項理由：dl-note＝零警報為何不落日誌；bt-note＝評判截止與不計命中率之方法
+   註記；pd-foot＝三類預測的知識論說明（各則自身的 caveat 仍會顯示，揭露不因此
+   消失）；sim-note＝滑桿為何只動部分劇本。四者皆為設計理由，拿掉不影響讀數。 */
+body.vs .dl-note,body.vs .bt-note,body.vs .pd-foot,body.vs .sim-note{display:none}
 .sh .ix{font-family:"IBM Plex Mono","Noto Sans TC",monospace;font-size:10.5px;font-weight:500;
   color:var(--muted);letter-spacing:.06em;align-self:center;border:1px solid var(--line2);
   border-radius:4px;padding:1px 6px;background:var(--surface);flex-shrink:0}
@@ -1961,9 +1968,11 @@ $('#top').onclick=()=>{scrollTo({top:0,behavior:'smooth'});
   t.setAttribute('tabindex','-1');t.focus({preventScroll:true})};
 $('#wprint').onclick=()=>print();
 function setView(v){if(view===v)return;view=v;
+  document.body.classList.toggle('vs',v==='simple');
   $('#vsimple').classList.toggle('on',v==='simple');
   $('#vfull').classList.toggle('on',v==='full');
   render(cur);}
+document.body.classList.toggle('vs',view==='simple');
 $('#vsimple').onclick=()=>setView('simple');
 $('#vfull').onclick=()=>setView('full');
 
@@ -2644,7 +2653,7 @@ function pbCovHTML(S){
     <div class="pbc">
       <div class="ch"><b>劇本覆蓋率</b>
         <span>${C.weeks} 週中 <b style="color:var(--accent)">${C.everFired}/${C.total}</b> 條曾觸發</span></div>
-      <div class="pbc-note">${S?'未觸發分兩類：條件未成立（休眠），與設計缺陷（下方標示）。'
+      <div class="pbc-note">${S?'沒觸發有兩種：條件還沒發生（正常），和門檻設錯（下方會標出來）。'
         :'區分「條件未發生之正確休眠」與「門檻自相矛盾之設計缺陷」；後者由本系統自行發現並公開揭露。'}</div>
       ${C.rows.map(row).join('')}
     </div>`;
@@ -2664,7 +2673,7 @@ function deptHTML(S){
   return `
   <section id="dept" data-tab="company">
     <div class="sh"><span class="ix">§14</span><h2>這件事該誰看</h2><span class="q">外部訊號落在哪個部門的責任範圍？</span>
-      <span class="sub">${S?'把每日巡邏抓到的訊號與既有劇本建議，依權責歸戶到各部門'
+      <span class="sub">${S?'把每天抓到的訊號和劇本建議，分給該負責的部門'
         :'依 decision_levers.owner 分派 · 串接每日巡邏與事前預測'}</span>
       <span class="chip lo" title="我方不掌握各部門內部現況">只分派不評價</span></div>
     <div class="dp-bar">
@@ -2756,9 +2765,9 @@ function dailyHTML(S){
   return `
   <section id="daily" data-tab="intel">
     <div class="sh"><span class="ix">§05</span><h2>每日巡邏</h2><span class="q">每天有沒有真的跑？發現了什麼？</span>
-      <span class="sub">${S?'每天掃新聞、依規則分級，RED 即寄警報'
+      <span class="sub">${S?'每天掃新聞、照規則分級，紅色最嚴重'
         :'即時偵測 · 每日執行收據 · 與週報四道門檻分屬兩層'}</span>
-      <span class="chip lo" title="每日層為即時偵測，未經週報之四道匯入門檻">未經週報門檻</span></div>
+      <span class="chip lo" title="每日層為即時偵測，未經週報之四道匯入門檻">${S?'未經每週檢查':'未經週報門檻'}</span></div>
     <div class="dl-bar">
       <span class="dl-k"><b>${DL.autoDays}</b>天自動執行</span>
       <span class="dl-k"><b>${DL.days.length}</b>天有紀錄</span>
@@ -2848,7 +2857,7 @@ function predHTML(S){
   return `
   <section id="predict" data-tab="analysis">
     <div class="sh"><span class="ix">§10</span><h2>事前預測與否證條件</h2><span class="q">敢不敢先說，錯了算誰的？</span>
-      <span class="sub">${S?'每則預測都附否證條件'
+      <span class="sub">${S?'每則預測都先寫好「什麼情況算我錯」'
         :'憲法 LAYER 10 第四問落地 · 寫入日早於驗證日 · 結果只追加不覆寫'}</span></div>
     <div class="pd-bar">
       <span class="pd-k"><b>${ps.length}</b>則預測</span>
@@ -3015,7 +3024,9 @@ function wireJourney(i){
   const sc=$('#jnsc'), r=jnSelfCheck();
   if(sc&&r){
     const ok=r.bad.length===0;
-    sc.textContent=ok?`自證 ${r.n}/${r.n} 與正本一致`:`自證不一致 ${r.bad.length}/${r.n}`;
+    sc.textContent=view==='simple'
+      ? (ok?`自己驗過 ${r.n}/${r.n}，和原程式一致`:`自己驗出 ${r.bad.length}/${r.n} 不一致`)
+      : (ok?`自證 ${r.n}/${r.n} 與正本一致`:`自證不一致 ${r.bad.length}/${r.n}`);
     sc.className='chip'+(ok?'':' lo');
     sc.title=ok?`以建置時 Python 正本對 ${r.n} 則歷史事件的分級結果比對，逐則相同`
       :'JS 鏡像與 Python 正本分岔：\n'+r.bad.slice(0,5).join('\n');
@@ -3540,7 +3551,7 @@ function render(i){
   ${journeyHTML(S)}
 
   <section id="trace" data-tab="analysis">
-    <div class="sh"><span class="ix">§11</span><h2>Decision Trace${S?' 決策軌跡':''}</h2><span class="q">每一步判斷怎麼來的？</span><span class="sub">${S?'事件 → 關鍵字 → 軸位移 → 權重調整，逐筆可查證':'可稽核決策軌跡 · 事件 → 關鍵字 → 軸位移 → KDF 調整'}</span></div>
+    <div class="sh"><span class="ix">§11</span><h2>Decision Trace${S?' 決策軌跡':''}</h2><span class="q">每一步判斷怎麼來的？</span><span class="sub">${S?'事件 → 關鍵字 → 座標怎麼移 → 權重怎麼調，每一筆都能查':'可稽核決策軌跡 · 事件 → 關鍵字 → 軸位移 → KDF 調整'}</span></div>
     ${(w.decisionTrace||[]).map(t=>{
       const ev=(w.events||[]).find(e=>e.title===t.event)||{};
       return `<details><summary><span>${t.event}</span>
@@ -3566,9 +3577,12 @@ function render(i){
         <button type="button" class="cmp-more" id="jdgo">交給 AI 判定</button>
       </div>
       <div class="jd-out" id="jdout" aria-live="polite"></div>
-      <p class="jd-note">AI 只看得到你貼的這一則，當時的判定則是在整週九則事件、前一週座標與風險雷達都在眼前的情況下做的——
-        兩邊不同不必然是誰錯，但差得多就值得追問。這一段是判定鏈裡<b>唯一由模型決定</b>的部分；
-        接下來「哪幾條劇本被觸發」是確定性規則，不經模型（可在 §13 的規則模擬器自行重算）。</p>
+      <p class="jd-note">${S
+        ?`AI 只看得到你貼的這一則；當時的判定是看完整週事件才下的，<b>兩邊不一樣很正常</b>。
+          這裡是整條判定鏈<b>唯一由 AI 決定</b>的一段，後面「觸發哪幾條劇本」是固定規則算出來的。`
+        :`AI 只看得到你貼的這一則，當時的判定則是在整週九則事件、前一週座標與風險雷達都在眼前的情況下做的——
+          兩邊不同不必然是誰錯，但差得多就值得追問。這一段是判定鏈裡<b>唯一由模型決定</b>的部分；
+          接下來「哪幾條劇本被觸發」是確定性規則，不經模型（可在 §13 的規則模擬器自行重算）。`}</p>
     </div>`}
     <div class="audit">管線稽核：<a href="https://github.com/sakaban-Code/SCAI-test" target="_blank" rel="noopener">原始碼與資料 repo ↗</a> · <a href="https://github.com/sakaban-Code/SCAI-test/actions/workflows/daily.yml" target="_blank" rel="noopener">每日巡邏執行紀錄 ↗</a>${w.tokenUsage?`　·　本週模型用量 <b class="num">${(w.tokenUsage.total||0).toLocaleString()}</b> tokens${w.tokenUsage.byStep?`<table><thead><tr><th>步驟</th><th>模型</th><th>in</th><th>out</th></tr></thead><tbody>${Object.entries(w.tokenUsage.byStep).map(([k,v])=>`<tr><td>${k}</td><td>${v.model||''}</td><td class="num">${(v.input_tokens||0).toLocaleString()}</td><td class="num">${(v.output_tokens||0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:''}`:'　·　本週為人工分析產出，經四道匯入門檻後寫入資料層；本專案未取得 API 預算，雲端週報管線從未執行，故無逐模型 token 用量'}</div>
   </section>
@@ -3592,7 +3606,9 @@ function render(i){
   </section>
 
   <section id="gov" data-tab="gov">
-    <div class="sh"><span class="ix">§16</span><h2>Agent 治理</h2><span class="q">怎麼讓它可預測、有邊界、可稽核？</span><span class="sub">六個面向，每項均可回到本站或 repo 查證</span></div>
+    <div class="sh"><span class="ix">§16</span><h2>Agent 治理</h2><span class="q">${S?'怎麼確保它不會亂來，而且事後查得到？'
+        :'怎麼讓它可預測、有邊界、可稽核？'}</span><span class="sub">${S?'六個面向，每一項都能在這個網站或原始碼裡查到'
+        :'六個面向，每項均可回到本站或 repo 查證'}</span></div>
     <div class="govgrid">
       <div class="card gov"><div class="gov-t"><span class="gov-k">Task Router</span>任務分派</div>
         <div class="gov-b">四層單向管線，各層可獨立重跑：<b>抓取</b>（純搜尋 API，不用模型）→ <b>判定</b>（人工分析，四道匯入門檻把關）→ <b>規畫</b>（純規則引擎，零 API 呼叫）→ <b>呈現</b>（靜態產物）。規畫層不依賴模型，因此任何一週的公司規畫都能離線重算並比對。</div></div>
