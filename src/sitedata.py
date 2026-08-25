@@ -217,8 +217,9 @@ def build_token_dev(root: pathlib.Path):
         {"n": "③ 每週雲端管線運作", "w": "weekly.yml 自動抓取、判定、產週報",
          "tool": "GitHub Actions", "state": "never",
          "msgs": 0, "billableInput": 0, "output": 0,
-         "note": "從未執行：主辦方補助尚未撥款，ANTHROPIC_API_KEY 未設定，"
-                 "workflow 因此每次綠色跳過。**這一格是 0，不是未統計。**"},
+         "note": "從未執行：本專案自始至終未取得 API 預算，ANTHROPIC_API_KEY 未設定，"
+                 "workflow 每次依守門條件綠色跳過（不假裝跑過）。"
+                 "**這一格是 0，不是未統計，也不是待補。**"},
         {"n": "④ 站上 AI 問答", "w": "評審或訪客在本站提問",
          "tool": "Cloudflare Workers AI（@cf/openai/gpt-oss-20b）", "state": "nolog",
          "msgs": None, "billableInput": None, "output": None,

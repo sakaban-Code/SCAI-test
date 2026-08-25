@@ -2,7 +2,7 @@
   "generated": "2026-08-24",
   "generator": "src/token_stats.py",
   "stage": "development",
-  "note": "開發階段 token，取自三個工具的本機原始 usage 欄位，非估算。運作階段用量待管線首跑後另行產出。",
+  "note": "開發階段 token，取自三個工具的本機原始 usage 欄位，非估算。運作階段用量為 0：未取得 API 預算，雲端管線從未執行。",
   "sources": {
     "claude-code": "~/.claude/projects/**/*.jsonl",
     "cowork": "Claude 桌面版 local-agent-mode-sessions/**/audit.jsonl（每行帶 HMAC 稽核簽章）",
@@ -29,7 +29,7 @@
     "Cowork 的 output_tokens 稽核紀錄不完整，已計為 outputUnknown。因此 output 總量為**低估**，且低估幅度無法從本機紀錄推算。",
     "歸屬採寬口徑：專案期間內的工作階段一律計入，未逐一區分 SCAI 與其他工作。故本數字為**上界性質**，非精確歸屬。",
     "Cowork 網頁版（claude.ai）若有 SCAI 工作，本機無紀錄、未納入。",
-    "本統計僅涵蓋**開發階段**；運作階段（雲端管線）用量待首跑後另計。"
+    "本統計僅涵蓋**開發階段**；運作階段（雲端管線）為 **0**——本專案未取得 API 預算，管線從未執行，非尚未統計。"
   ],
   "scopeFile": "data/token_scope.json",
   "totals": {

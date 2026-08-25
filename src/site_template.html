@@ -3500,7 +3500,7 @@ function render(i){
         兩邊不同不必然是誰錯，但差得多就值得追問。這一段是判定鏈裡<b>唯一由模型決定</b>的部分；
         接下來「哪幾條劇本被觸發」是確定性規則，不經模型（可在 §08 的規則模擬器自行重算）。</p>
     </div>`}
-    <div class="audit">管線稽核：<a href="https://github.com/sakaban-Code/SCAI-test" target="_blank" rel="noopener">原始碼與資料 repo ↗</a> · <a href="https://github.com/sakaban-Code/SCAI-test/actions/workflows/daily.yml" target="_blank" rel="noopener">每日巡邏執行紀錄 ↗</a>${w.tokenUsage?`　·　本週模型用量 <b class="num">${(w.tokenUsage.total||0).toLocaleString()}</b> tokens${w.tokenUsage.byStep?`<table><thead><tr><th>步驟</th><th>模型</th><th>in</th><th>out</th></tr></thead><tbody>${Object.entries(w.tokenUsage.byStep).map(([k,v])=>`<tr><td>${k}</td><td>${v.model||''}</td><td class="num">${(v.input_tokens||0).toLocaleString()}</td><td class="num">${(v.output_tokens||0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:''}`:'　·　本週為人工分析產出，經四道匯入門檻後寫入資料層；逐模型 token 用量待雲端管線首跑後於本區附上'}</div>
+    <div class="audit">管線稽核：<a href="https://github.com/sakaban-Code/SCAI-test" target="_blank" rel="noopener">原始碼與資料 repo ↗</a> · <a href="https://github.com/sakaban-Code/SCAI-test/actions/workflows/daily.yml" target="_blank" rel="noopener">每日巡邏執行紀錄 ↗</a>${w.tokenUsage?`　·　本週模型用量 <b class="num">${(w.tokenUsage.total||0).toLocaleString()}</b> tokens${w.tokenUsage.byStep?`<table><thead><tr><th>步驟</th><th>模型</th><th>in</th><th>out</th></tr></thead><tbody>${Object.entries(w.tokenUsage.byStep).map(([k,v])=>`<tr><td>${k}</td><td>${v.model||''}</td><td class="num">${(v.input_tokens||0).toLocaleString()}</td><td class="num">${(v.output_tokens||0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:''}`:'　·　本週為人工分析產出，經四道匯入門檻後寫入資料層；本專案未取得 API 預算，雲端週報管線從未執行，故無逐模型 token 用量'}</div>
   </section>
 
   ${saHTML}
@@ -3963,7 +3963,7 @@ function aiAnswer(q){
     return `方法論：<b>X 軸＝地緣與供應鏈聚合</b>（−1 碎裂 ↔ +1 聚合）、<b>Y 軸＝資源與政策充沛</b>（−1 匱乏 ↔ +1 充沛），定位四情境後校準 25 項 KDF 權重（中性 50），每次調整附 Decision Trace。詳見「治理」分頁 §11。${SRC}`;
   }
   if(/(治理|token|護欄|控管|harness)/i.test(t)){
-    return `治理六面向見「治理」分頁 §10：任務分派（四層單向管線）、記憶（append-only）、工具（時間窗檢索）、護欄（缺漏防呆＋四道匯入門檻）、可觀測（Decision Trace＋自我稽核）、評估（確定性重算＋外部對抗審查）。Token 用量分兩段講：開發階段有三個工具的本機實測數字（見 §10），運作階段因雲端管線尚未首跑而留白，不以估算值充數。${SRC}`;
+    return `治理六面向見「治理」分頁 §10：任務分派（四層單向管線）、記憶（append-only）、工具（時間窗檢索）、護欄（缺漏防呆＋四道匯入門檻）、可觀測（Decision Trace＋自我稽核）、評估（確定性重算＋外部對抗審查）。Token 用量分兩段講：開發階段有三個工具的本機實測數字（見 §10）；運作階段為 0——本專案自始至終未取得 API 預算，雲端週報管線從未執行，十一週全部由人工分析產出並通過四道門檻。這不是待補的欄位，是本專案的實際條件。${SRC}`;
   }
   if(/(可信|來源|真的|查證|假的)/.test(q)){
     return `本站每則事件附可查證來源連結；每次權重調整附 Decision Trace；§07 自我稽核公開「判斷錯了會怎樣」；§11 揭露期間重疊與缺口等不利事實。X／Y 與建議屬分析判斷【推斷】，非官方數據、非投資建議。${SRC}`;

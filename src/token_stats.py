@@ -5,7 +5,8 @@ SCAI-Agent｜開發階段 Token 用量統計
 
 競賽評分第 3 項（20%）要求說明「開發 AI 員工／以及 AI 員工運作時」的 token 消耗。
 本腳本負責**開發階段**那一半：直接讀三個工具的本機原始紀錄，全部取 usage 欄位，
-不做任何估算。運作階段（管線首跑後的 weekly/W{n}/token_usage.json）另計。
+不做任何估算。運作階段（weekly/W{n}/token_usage.json）為 **0**——本專案自始至終
+未取得 API 預算，雲端週報管線從未執行。那是既定條件，不是待補的另一半。
 
 ────────────────────────────────────────────────────────────────────────
 三個來源，三種**不同**的重複計算陷阱——這是本腳本存在的主要理由
@@ -536,7 +537,7 @@ def main():
         "generator": "src/token_stats.py",
         "stage": "development",
         "note": ("開發階段 token，取自三個工具的本機原始 usage 欄位，非估算。"
-                 "運作階段用量待管線首跑後另行產出。"),
+                 "運作階段用量為 0：未取得 API 預算，雲端管線從未執行。"),
         "sources": {
             "claude-code": "~/.claude/projects/**/*.jsonl",
             "cowork": "Claude 桌面版 local-agent-mode-sessions/**/audit.jsonl（每行帶 HMAC 稽核簽章）",
@@ -565,7 +566,8 @@ def main():
             "歸屬採寬口徑：專案期間內的工作階段一律計入，未逐一區分 SCAI 與"
             "其他工作。故本數字為**上界性質**，非精確歸屬。",
             "Cowork 網頁版（claude.ai）若有 SCAI 工作，本機無紀錄、未納入。",
-            "本統計僅涵蓋**開發階段**；運作階段（雲端管線）用量待首跑後另計。",
+            "本統計僅涵蓋**開發階段**；運作階段（雲端管線）為 **0**——"
+            "本專案未取得 API 預算，管線從未執行，非尚未統計。",
         ],
         "scopeFile": "data/token_scope.json",
         "totals": scopes,
