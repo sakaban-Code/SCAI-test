@@ -3226,7 +3226,7 @@ function positionHTML(S){
       <div class="fc${f.tier==='關鍵'?' key':''}">
         <div class="fh"><span class="nm">${f.name}</span><span class="tierchip ${T[f.tier]}">${f.tier}</span></div>
         <div class="fq">${f.q}</div>
-        ${f.items.map(it=>`<div class="fi"><b>${it.n}</b>　${it.d} ${srcTag(it.src)}</div>`).join('')}
+        ${f.items.map(it=>`<div class="fi"><b>${it.n}</b>　${it.d} ${srcTag(it.src,it.url)}</div>`).join('')}
         <div class="fl">${(f.rules||[]).map(r=>`<span class="tag">${r}</span>`).join('')}${(f.kdf||[]).length?`<span class="tag">KDF#${f.kdf.join('・#')}</span>`:''}<br>${mdb(f.live)}</div>
         ${f.caveat?`<div class="cav">${f.caveat}</div>`:''}
       </div>`).join('')}
