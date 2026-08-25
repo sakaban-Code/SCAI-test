@@ -3561,9 +3561,40 @@ function render(i){
       <div class="it"><div class="k">對話則數</div><div class="v">${num(c.msgs)}</div>
         <div class="n">跨 ${t.days} 天、三個工具${t.generated?`・統計至 ${t.generated}`:''}</div></div>
     </div>
+    ${(()=>{const ch=t.channels||[];if(!ch.length)return '';
+      /* 四種口徑分開列。缺的兩格用 <span class="tbc"> 標示，與全站「待確認」同一種標記，
+         不填 0、也不留空白——0 與「沒統計」是兩件事，正是本表要分開的東西。 */
+      const cell=(v,st)=>v==null?`<span class="tbc">${st==='nolog'?'不累計':'不可得'}</span>`
+                                :(v===0?'<b>0</b>':num(v));
+      const sum=ch.filter(c=>c.billableInput).reduce((s,c)=>s+c.billableInput,0);
+      return `<div class="covbox">
+      <div class="t">Token 用量：四種口徑分開講</div>
+      <div class="d">評分表問的是「<b>開發 AI 員工／以及 AI 員工運作時</b>」的消耗。這兩段本來就不同源，
+        混成一個數字既無法查證也無法優化，因此拆成四段各自交代——<b>缺的兩段照實說缺</b>。</div>
+      <!-- 五欄表在窄版會擠爆。本機瀏覽器窗格壓不到 425px 以下、量不到 320／375 的實況，
+           所以不靠量測靠護欄：容器自己橫捲，min-width 保住欄寬，全頁永遠不橫捲。 -->
+      <div style="overflow-x:auto;margin-top:10px">
+      <table style="min-width:430px">
+        <thead><tr><th>口徑</th><th>工具</th><th>計價輸入</th><th>產出</th><th>則數</th></tr></thead>
+        <tbody>${ch.map(c=>`<tr>
+          <td><b>${c.n}</b><div style="color:var(--muted);font-size:11px;margin-top:2px">${c.w}</div></td>
+          <td>${c.tool}</td>
+          <td class="num">${cell(c.billableInput,c.state)}</td>
+          <td class="num">${cell(c.output,c.state)}</td>
+          <td class="num">${cell(c.msgs,c.state)}</td></tr>
+          ${c.note?`<tr><td colspan="5" style="color:var(--muted);font-size:11px;padding-top:0;border-bottom:none">↳ ${md(c.note)}</td></tr>`:''}`).join('')}
+        </tbody>
+      </table>
+      </div>
+      <div class="d" style="margin-top:8px">① ＋ ② ＝ <b class="num">${num(sum)}</b>，與上方「輸入計價當量」的
+        <b class="num">${num(c.billableInput)}</b> ${sum===c.billableInput?'<b>完全相等</b>——這個表加得起來。':'<b>不相等，請以上方為準</b>。'}
+        ③ 是真的 <b>0</b>（從未執行），不是沒統計；④ 有真實用量但不留紀錄，所以沒有累計數。</div>
+    </div>`})()}
     <div class="covbox">
       <div class="t">Token 用量：怎麼算出來的</div>
-      <div class="d"><b>開發階段</b>用量，直接讀 Claude Code、Cowork、Codex 三個工具的本機原始紀錄取 <code>usage</code> 欄位，<b>非估算</b>。依工具：${tl}。依模型：${ml}。</div>
+      <div class="d"><b>開發階段</b>用量，直接讀 Claude Code、Cowork、Codex 三個工具的本機原始紀錄取 <code>usage</code> 欄位，<b>非估算</b>。依工具：${tl}（合計 ${big(c.billableInput)}，與標頭同口徑）。</div>
+      <div class="d" style="margin-top:4px">依模型：${ml}。<b>⚠ 這一列是另一個口徑</b>——原始統計未逐工作階段拆分模型，
+        故此列含關聯工作階段，合計 ${big(t.byModelScope?t.byModelScope.billableInput:0)}，比上方高。不硬湊成同一個數，寧可講清楚差在哪。</div>
       <ul>
         <li><b>不提供單一「總 token」</b>：四項輸入直接相加會被重讀快取主導（占 ${hr}），得到 ${big(c.processed)} 這種技術上為真、實務上誤導一個數量級的數字。應引用上方的<b>輸入計價當量</b>與<b>產出</b>。</li>
         ${(t.rules||[]).filter(r=>!/^不提供單一/.test(r)).map(r=>`<li>${md(r)}</li>`).join('')}

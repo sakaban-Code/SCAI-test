@@ -171,13 +171,72 @@ def build_token_dev(root: pathlib.Path):
                 ("msgs", "billableInput", "output", "outputUnknown",
                  "processed", "cacheHitRate")}
 
+    # ── 依工具彙總：必須與標頭同一個口徑 ──
+    # 原檔的 byTool／byModel 是 **core＋關聯** 口徑（三工具相加＝4.93 億），
+    # 而標頭取 totals.core（3.80 億）。兩者並排時，評審把三個工具加一遍就對不上標頭
+    # ——與門檻④擋下 W10 的是同一種病（畫面上印著可加總的數，而它加不起來）。
+    # 修法不是改標頭，是自 sessions 逐筆重新彙總 core 口徑；sessions 已在原檔裡，
+    # 不必重跑 token_stats.py（重跑會把統計基準日推到今天，動到整份數字）。
+    _F = ("msgs", "input", "cacheCreate", "cw5m", "cw1h", "cacheRead",
+          "codexCacheRead", "output", "outputUnknown", "processed", "billableInput")
+
+    def agg(scopes):
+        out = {}
+        for s in d.get("sessions") or []:
+            if s.get("scope") not in scopes:
+                continue
+            t = out.setdefault(s.get("tool") or "?", dict.fromkeys(_F, 0))
+            for f in _F:
+                t[f] += s.get(f) or 0
+        return out
+
+    by_tool_core = agg({"core"})
+
+    def sum_of(tools, field):
+        return sum((by_tool_core.get(t) or {}).get(field, 0) for t in tools)
+
+    # ── 四種口徑 ──
+    # 評分表問的是「開發 AI 員工／以及 AI 員工運作時」的消耗。這兩段本來就不同源，
+    # 混成一個數字既無法查證也無法優化。四段各自的狀態不同，**缺的那兩段照實說缺**：
+    #   ①② 有實測數字，且 ①＋② 必須恰好等於標頭（讓人加得起來）
+    #   ③ 真的是 0——不是沒統計，是從未執行
+    #   ④ 有真實用量但刻意不累計——本站不記錄問答內容，見 worker/scai-ask/worker.js
+    BUILD, WEEKLY = ("claude-code", "codex"), ("cowork",)
+    channels = [
+        {"n": "① 建構這套系統", "w": "程式、網站、CI、資料管線與文件",
+         "tool": "Claude Code ＋ Codex", "state": "measured",
+         "msgs": sum_of(BUILD, "msgs"),
+         "billableInput": sum_of(BUILD, "billableInput"),
+         "output": sum_of(BUILD, "output")},
+        {"n": "② 每週報告內容產出", "w": "W1–W11 的事件分析、座標判定與撰寫",
+         "tool": "Cowork", "state": "partial",
+         "msgs": sum_of(WEEKLY, "msgs"),
+         "billableInput": sum_of(WEEKLY, "billableInput"),
+         "output": None,
+         "note": "稽核紀錄於回應完成前寫入，output 不可得（非 0）"},
+        {"n": "③ 每週雲端管線運作", "w": "weekly.yml 自動抓取、判定、產週報",
+         "tool": "GitHub Actions", "state": "never",
+         "msgs": 0, "billableInput": 0, "output": 0,
+         "note": "從未執行：主辦方補助尚未撥款，ANTHROPIC_API_KEY 未設定，"
+                 "workflow 因此每次綠色跳過。**這一格是 0，不是未統計。**"},
+        {"n": "④ 站上 AI 問答", "w": "評審或訪客在本站提問",
+         "tool": "Cloudflare Workers AI（@cf/openai/gpt-oss-20b）", "state": "nolog",
+         "msgs": None, "billableInput": None, "output": None,
+         "note": "每則回答都附**當次的真實用量**，但本站不記錄問答內容"
+                 "（Worker 無任何儲存呼叫），因此沒有累計數可報。"},
+    ]
+
     return {
         "generated": d.get("generated") or "",
         "core": slim(core),
         "all": slim(d["totals"].get("all") or core),
-        "byTool": {k: slim(v) for k, v in (d.get("byTool") or {}).items()},
+        "byTool": {k: slim(v) for k, v in by_tool_core.items()},   # 已對齊標頭口徑
         "byModel": {k: slim(v) for k, v in (d.get("byModel") or {}).items()
                     if (v or {}).get("billableInput")},   # 濾掉 <synthetic> 等 0 用量項
+        # byModel 無法自 sessions 重算（原檔未逐 session 拆模型），仍為 core＋關聯口徑。
+        # 不硬湊：把它的合計一併送出，讓模板明講「這一列是另一個口徑」。
+        "byModelScope": slim(d["totals"].get("core+related") or core),
+        "channels": channels,
         "rules": d.get("countingRules") or [],
         "caveats": d.get("caveats") or [],
         "days": len(d.get("byDay") or []),
