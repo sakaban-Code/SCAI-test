@@ -2570,8 +2570,10 @@ function jnSimilar(title){
      · 條件自相矛盾、永不可能成立 → 設計缺陷，必須自己講出來
    次數與阻擋條件由建置時計算（sitedata.build_playbook_coverage），新增週次自動跟上；
    缺陷註記則來自 playbook.json 的 _designNote，沒有就不顯示。 */
-function pbCovHTML(S){
-  const C=DATA.pbCoverage; if(!C)return '';
+function pbCovHTML(S,co){
+  /* 覆蓋率隨企業切換：示範企業於建置時以自己的劇本組重算（同一批真實週次）。
+     欣銓沒有 pbCoverage 欄位，退回全站那份（其來源是 weeks.json 的 companyPlan）。 */
+  const C=(co&&co.pbCoverage)||DATA.pbCoverage; if(!C)return '';
   const mx=Math.max(...C.rows.map(r=>r.count),1);
   const row=r=>{
     const bad=!!r.defect;
@@ -2598,7 +2600,8 @@ function pbCovHTML(S){
   return `
     <div class="pbc">
       <div class="ch"><b>劇本覆蓋率</b>
-        <span>${C.weeks} 週中 <b style="color:var(--accent)">${C.everFired}/${C.total}</b> 條曾觸發</span></div>
+        <span>${co?co.short:'欣銓科技'}｜${C.weeks} 週中 <b style="color:var(--accent)">${C.everFired}/${C.total}</b> 條曾觸發</span>
+        ${co&&!co.real?'<span class="chip lo" title="示範企業之劇本組，於建置時以同一批真實週次重算">示範資料</span>':''}</div>
       <div class="pbc-note">${S?'沒觸發有兩種：條件還沒發生（正常），和門檻設錯（下方會標出來）。'
         :'區分「條件未發生之正確休眠」與「門檻自相矛盾之設計缺陷」；後者由本系統自行發現並公開揭露。'}</div>
       ${C.rows.map(row).join('')}
@@ -2621,7 +2624,8 @@ function deptHTML(S){
     <div class="sh"><span class="ix">§14</span><h2>這件事該誰看</h2><span class="q">外部訊號落在哪個部門的責任範圍？</span>
       <span class="sub">${S?'把每天抓到的訊號和劇本建議，分給該負責的部門'
         :'依 decision_levers.owner 分派 · 串接每日巡邏與事前預測'}</span>
-      <span class="chip lo" title="我方不掌握各部門內部現況">只分派不評價</span></div>
+      <span class="chip lo" title="我方不掌握各部門內部現況">只分派不評價</span>
+      <span class="chip lo" title="部門與槓桿取自欣銓的 company_profile；示範企業不套用本層">${S?'僅欣銓・不隨企業切換':'僅欣銓・權責來源為 company_profile'}</span></div>
     <div class="dp-bar">
       <span class="dp-k"><b>${DEP.depts.length}</b>個權責單位</span>
       <span class="dp-k"><b>${DEP.leverCovered}/${DEP.leverTotal}</b>條槓桿有劇本</span>
@@ -3434,7 +3438,7 @@ function render(i){
       <div class="sim-note">25 項 KDF 權重與關鍵字命中維持本週實際值——它們來自事件內容，不是雙軸的函數。
         因此僅受雙軸約束的劇本會隨滑桿變動，其餘維持不變。</div>
     </div>`:''}
-    ${pbCovHTML(S)}
+    ${pbCovHTML(S,co)}
   </section>
 
   <section id="risk" data-tab="intel">

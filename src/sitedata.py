@@ -145,6 +145,8 @@ def build_companies(root: pathlib.Path, weeks: list, prof: dict, pb: dict):
         entry = {k: v for k, v in c.items() if k not in ("playbooks", "scenario_stance")}
         entry["real"] = False
         entry["plans"] = plans
+        # 覆蓋率隨企業走：同一批真實週次，換成這家的劇本組重算
+        entry["pbCoverage"] = build_playbook_coverage(weeks, pbwrap, plans)
         companies.append(entry)
     return companies
 
@@ -500,8 +502,12 @@ def build_alert_layer(root: pathlib.Path, weeks: list):
     }
 
 
-def build_playbook_coverage(weeks: list, pb: dict):
+def build_playbook_coverage(weeks: list, pb: dict, plans: dict | None = None):
     """劇本覆蓋率：每條在已發佈週次中觸發過幾次，未觸發者列出卡在哪個條件。
+
+    plans 為 None 時取 weeks[].companyPlan（欣銓的正本紀錄）；示範企業則帶入
+    build_companies 已用 plan_engine 逐週重算好的 {週次: plan}。原本本函式寫死
+    companyPlan，導致切換企業時 §13 會變、覆蓋率卻永遠是欣銓的 PB-01…PB-08。
 
     刻意於建置時計算而非寫死——新增週次後數字自動跟上，不會出現「網站說 11 週、
     資料已有 12 週」的過期宣稱。
@@ -513,7 +519,8 @@ def build_playbook_coverage(weeks: list, pb: dict):
     """
     fired = {p["id"]: [] for p in pb["playbooks"]}
     for w in weeks:
-        for f in ((w.get("companyPlan") or {}).get("firedPlaybooks") or []):
+        plan = plans.get(str(w["week"])) if plans is not None else w.get("companyPlan")
+        for f in ((plan or {}).get("firedPlaybooks") or []):
             if f["id"] in fired:
                 fired[f["id"]].append(w["week"])
 
