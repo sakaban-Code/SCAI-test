@@ -1333,6 +1333,12 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 .dl-is a,.dl-is a .arw{color:var(--accent)}
 .dl-iy{font-size:11.5px;line-height:1.75;color:var(--ink2);margin-top:4px;
   padding-left:9px;border-left:2px solid rgba(68,83,214,.25)}
+/* 誤命中：紀錄不刪，改由系統自己標出來——同 PB-03「設計缺陷｜人工裁示：不修」的處理。 */
+.dl-mf{margin-top:6px;padding:7px 10px;border-radius:8px;font-size:11.5px;line-height:1.7;
+  border:1px solid var(--line2);background:var(--card);color:var(--ink2)}
+.dl-mf b{color:var(--warn,#aa5311)}
+.rl{cursor:help;border-bottom:1px dotted currentColor}
+.rl-lg{margin-top:7px;font-size:11px;line-height:1.7;color:var(--muted)}
 .dl-none{font-size:12px;line-height:1.8;color:var(--ink2);padding-top:8px;border-top:1px solid var(--line)}
 .dl-none b{color:var(--ink)}
 /* ── 事前預測與否證條件 ── */
@@ -2665,7 +2671,8 @@ function wireDept(){
           ${d.kdf.length?`<div class="dp-kd">${d.kdf.map(k=>`<span>#${k.id} ${k.name}</span>`).join('')}</div>`
             :'<div class="dp-none">目前沒有劇本對應到這條槓桿，因此沒有連動的 KDF。</div>'}
           ${d.rules.length?`<div class="ch" style="margin-top:12px"><b>該盯的警報規則</b></div>
-            <div class="dp-kd">${d.rules.map(r=>`<span class="r">${r}</span>`).join('')}</div>`:''}</div>
+            <div class="dp-kd">${d.rules.map(r=>ruleTag(r,'r')).join('')}</div>
+            <div class="rl-lg">RT＝紅色規則（即時寄警報信）　YT＝黃色規則（只記日誌、週報彙整）　滑鼠停留看該條理由</div>`:''}</div>
       </div>
       <div class="dp-sec"><div class="ch"><b>可實行的策略</b>
         <span>${d.playbooks.length?`${d.playbooks.length} 條劇本｜本週觸發 ${d.firedNow.length} 條`:'無'}</span></div>
@@ -2679,11 +2686,12 @@ function wireDept(){
              尚未納入。這是已知缺口，我們選擇標出來而不是留白——沒有建議，就不該假裝有。</div>`}
       </div>
       <div class="dp-two" style="margin-top:12px">
-        <div class="card"><div class="ch"><b>每日巡邏抓到的相關訊號</b><span>${news.length} 則</span></div>
+        <div class="card"><div class="ch"><b>每日巡邏抓到的相關訊號</b><span>${news.length} 則</span>
+          <span class="chip lo" title="每日巡邏為連續時間軸，不隨上方週次切換（同 §05）">全期・不隨週次</span></div>
           ${news.length?news.slice(0,5).map(n=>`<div class="dp-n">
             <span class="dl-t t-${n.tier}">${n.tier}</span>
             <div><div class="dp-nt">${n.title}</div>
-              <div class="dp-ns">${n.d}　<span class="tag">${n.ruleId}</span>${n.source||''}
+              <div class="dp-ns">${n.d}　${ruleTag(n.ruleId)}${n.source||''}
                 ${n.url?` · <a href="${safeUrl(n.url)}" target="_blank" rel="noopener">原文 <span class="arw">↗</span></a>`:''}</div></div></div>`).join('')
             +(news.length>5?`<div class="dp-more">另有 ${news.length-5} 則，見「每日巡邏」區段</div>`:'')
             :'<div class="dp-none">每日巡邏期間內，沒有命中這個部門警報規則的訊號。</div>'}</div>
@@ -2779,10 +2787,11 @@ function wireDaily(){
       ${x.items.length?x.items.map(it=>`<div class="dl-i">
           <span class="dl-t t-${it.tier}">${it.tier}</span>
           <div><div class="dl-it">${it.title}</div>
-            <div class="dl-is">${it.ruleId?`<span class="tag">${it.ruleId}</span>`:''}${it.source||''}${it.date?'　'+it.date:''}
+            <div class="dl-is">${it.ruleId?ruleTag(it.ruleId):''}${it.source||''}${it.date?'　'+it.date:''}
               ${it.url?` · <a href="${safeUrl(it.url)}" target="_blank" rel="noopener">原文 <span class="arw">↗</span></a>`:''}
               ${it.alerted?' · <b>已寄警報信</b>':''}</div>
-            ${it.summary?`<div class="dl-iy">${it.summary}</div>`:''}</div></div>`).join('')
+            ${it.summary?`<div class="dl-iy">${it.summary}</div>`:''}
+            ${it.misfire?`<div class="dl-mf"><b>⚠ 事後判定為誤命中</b>（${it.misfire.at}）：${it.misfire.why}</div>`:''}</div></div>`).join('')
         :`<div class="dl-none">${x.how==='auto'
             ? `掃描 ${x.scanned} 則，未達 YELLOW 以上；GREEN 不落日誌，故無日誌檔，<b>收據為證</b>。`
             : '這天巡邏後沒有落檔項目。'}</div>`}
@@ -3127,6 +3136,14 @@ const SRCCLS={'年報':'rep','查證':'ok','推斷':'inf','待公司確認':'wai
 /* 來源標記。帶 url 時渲染成可點連結——「查證」這種徽章若點不下去，等於只是宣稱。
    url 由 industry_position.json 提供，指向官網對應單元（查證之處，非逐項深連結；
    官網為 JS 動態站、公開資訊觀測站無穩定深連結，故不宣稱能定位到那一行）。 */
+/* 警報規則編號站上一直是裸的：RT-04、YT-03 直接印出來，全站零處說明它們是什麼。
+   規則的 tier 與 why 其實早就在 DATA.alertLayer.rules 裡，只是沒被用上。
+   RT＝RED（即時寄警報信）、YT＝YELLOW（只記日誌、週報彙整）。 */
+const RULE={};(((DATA.alertLayer||{}).rules)||[]).forEach(r=>{RULE[r.id]=r});
+const ruleTag=(id,cls)=>{const r=RULE[id];
+  if(!r)return `<span class="${cls||'tag'}">${id}</span>`;
+  const t=r.tier==='RED'?'RED 即時通報':'YELLOW 記日誌';
+  return `<span class="${cls||'tag'} rl" title="${id}　${t}｜${r.why||''}">${id}</span>`;};
 const srcTag=(s,u)=>{if(!s)return'';const c=SRCCLS[s]||'inf';
   return u?`<a class="src ${c} lk" href="${safeUrl(u)}" target="_blank" rel="noopener" title="開啟來源頁">${s} ↗</a>`
           :`<span class="src ${c}">${s}</span>`;};
@@ -3227,7 +3244,7 @@ function positionHTML(S){
         <div class="fh"><span class="nm">${f.name}</span><span class="tierchip ${T[f.tier]}">${f.tier}</span></div>
         <div class="fq">${f.q}</div>
         ${f.items.map(it=>`<div class="fi"><b>${it.n}</b>　${it.d} ${srcTag(it.src,it.url)}</div>`).join('')}
-        <div class="fl">${(f.rules||[]).map(r=>`<span class="tag">${r}</span>`).join('')}${(f.kdf||[]).length?`<span class="tag">KDF#${f.kdf.join('・#')}</span>`:''}<br>${mdb(f.live)}</div>
+        <div class="fl">${(f.rules||[]).map(r=>ruleTag(r)).join('')}${(f.kdf||[]).length?`<span class="tag">KDF#${f.kdf.join('・#')}</span>`:''}<br>${mdb(f.live)}</div>
         ${f.caveat?`<div class="cav">${f.caveat}</div>`:''}
       </div>`).join('')}
     </div>

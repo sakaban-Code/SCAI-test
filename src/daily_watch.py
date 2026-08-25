@@ -233,7 +233,11 @@ def fetch_news():
     items, seen = [], set()
     for q in DAILY_QUERIES:
         try:
-            r = client.search(query=q, topic="news", days=2, max_results=5)
+            # 同時在 API 層排除：max_results 只有 5，被社群貼文吃掉的名額
+            # 就是真新聞進不來的名額。2026-08-22～26 五個自動巡邏日共 9 則，
+            # 其中 6 則來自這些站——排掉才輪得到新聞。
+            r = client.search(query=q, topic="news", days=2, max_results=5,
+                              exclude_domains=list(EXCLUDE_HOSTS))
         except Exception as e:
             print(f"[warn] tavily 查詢失敗：{q}：{e}")
             continue

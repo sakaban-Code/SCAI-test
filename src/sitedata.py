@@ -422,7 +422,8 @@ def build_daily_layer(root: pathlib.Path):
         items = []
         for it in (g.get("items") or []):
             items.append({k: it[k] for k in
-                          ("title", "source", "date", "url", "tier", "ruleId", "summary", "alerted")
+                          ("title", "source", "date", "url", "tier", "ruleId", "summary",
+                           "alerted", "misfire")
                           if it.get(k) is not None})
         days.append({
             "d": d,
