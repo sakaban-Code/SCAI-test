@@ -142,7 +142,7 @@ const json = (obj, status, extra) =>
   });
 
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request, env, execCtx) {   // ⚠ 不可命名為 ctx：本函式內已有 const ctx（當週脈絡）
     const origin = request.headers.get("origin") || "";
     const ch = cors(origin);
 
@@ -266,7 +266,7 @@ export default {
 
     // 累計寫入走 waitUntil：回應先送出，計數在背景完成。
     // 寫失敗也只是這一次沒計到，不影響已經回給使用者的答案。
-    ctx.waitUntil(bumpTotals(env, inTok, outTok));
+    execCtx.waitUntil(bumpTotals(env, inTok, outTok));
 
     return json({
       answer,

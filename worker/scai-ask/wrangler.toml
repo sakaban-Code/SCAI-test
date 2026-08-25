@@ -10,4 +10,4 @@ binding = "AI"
 # 建立方式：wrangler kv namespace create USAGE  → 把回傳的 id 填進下面
 [[kv_namespaces]]
 binding = "USAGE"
-id = "PUT_KV_NAMESPACE_ID_HERE"
+id = "b43856787455441088a10ee9984f75e8"

@@ -3375,7 +3375,7 @@ function render(i){
       <span class="cosel-l">企業畫像</span>
       ${CO.map(c=>`<button type="button" class="co-b${c.id===co.id?' on':''}" data-co="${c.id}" aria-pressed="${c.id===co.id}">${c.short}${c.real?'':'<span class="co-tag">示範</span>'}</button>`).join('')}
     </div>`:''}
-    <div class="sh"><span class="ix">§13</span><h2>對${co?co.short:'欣銓'}的公司規畫</h2><span class="q">外部情勢對應到哪些既有劇本？</span><span class="sub">${S?`共 ${coFired.length} 條觸發｜含成功指標與停損訊號`:'企業畫像 × 情境 → 觸發式劇本'}</span>${co&&!co.real?'<span class="chip demo" title="虛構企業：畫像與劇本為示範資料；觸發依據引用的週次資料為真實紀錄">示範資料</span>':'<span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>'}</div>
+    <div class="sh"><span class="ix">§13</span><h2>對${co?co.short:'欣銓'}的公司規畫</h2><span class="q">外部情勢對應到哪些既有劇本？</span><span class="sub">${S?`共 ${coFired.length} 條觸發｜含成功指標與停損訊號`:'企業畫像 × 情境 → 觸發式劇本'}</span>${co&&!co.real?'<span class="chip demo" title="示範企業：名稱虛構；觸發依據引用的週次資料為真實紀錄">示範資料</span>':'<span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>'}</div>
     <!-- 教授 2026-08-25 意見：外部資料推導的輸出不應寫成執行指令。此框架帶做兩件事——
          ①把本層在整條鏈裡的位置畫出來（讀者才知道這不是終點）②明說界線與誰該下決定。
          位置刻意放在觸發劇本之前：讀者看到條目之前就先看到框架。 -->
@@ -3389,7 +3389,7 @@ function render(i){
         因此不判斷這些方向是否適合採行——那需要結合企業內部資訊與管理者判斷。
         條目文字沿用劇本庫的原始措辭（<a href="#method">§17</a> 說明其來源），請讀為<b>值得進一步評估的議題</b>。</div>
     </div>
-    ${co&&!co.real?`<div class="demobox"><b>${co.name}</b>為虛構示範企業——同一套週次情境判定，換上不同企業畫像與劇本組，觸發結果隨之改變（可與欣銓對照本週差異）。觸發依據引用的座標、KDF 與關鍵字均為真實週次資料；虛構的只有企業本身。非投資建議。</div>`:''}
+    ${co&&!co.real?`<div class="demobox"><b>${co.name}</b>——同一套週次情境判定，換上不同企業畫像與劇本組，觸發結果隨之改變（可與欣銓對照本週差異）。觸發依據引用的座標、KDF 與關鍵字均為真實週次資料。非投資建議。</div>`:''}
     ${coPlan?`<div style="font-size:12.5px;color:var(--ink2);margin-bottom:14px">情境姿態：${coPlan.scenarioStance}</div>`:''}
     <div class="plan">${coFired.map(f=>`
       <div class="pb">
@@ -3531,7 +3531,7 @@ function render(i){
   ${deptHTML(S)}
 
   <section id="profile" data-tab="company">
-    <div class="sh"><span class="ix">§15</span><h2>企業畫像</h2><span class="q">這些建議是對誰而言？</span><span class="sub">${co?`${co.name}｜${co.tickerLabel}`:'欣銓科技 3264.TWO · 公開資料'}</span>${co&&!co.real?'<span class="chip demo" title="虛構企業：畫像數字為示範資料">示範資料</span>':''}</div>
+    <div class="sh"><span class="ix">§15</span><h2>企業畫像</h2><span class="q">這些建議是對誰而言？</span><span class="sub">${co?`${co.name}｜${co.tickerLabel}`:'欣銓科技 3264.TWO · 公開資料'}</span>${co&&!co.real?'<span class="chip demo" title="示範企業：名稱虛構，畫像數字為示範資料">示範資料</span>':''}</div>
     ${co&&co.industry?`<div style="font-size:12px;color:var(--ink2);margin-bottom:12px">${co.industry}${co.positioning?`——${co.positioning}`:''}</div>`:''}
     <div class="pf">
       ${(co?co.stats:[]).map(s2=>`<div class="it"><div class="k">${s2.k}</div><div class="v">${s2.v}</div><div class="n">${s2.n}${s2.tbc?' <span class="tbc">待確認</span>':''}${co.real?'':' <span class="tbc">示範</span>'}</div></div>`).join('')}

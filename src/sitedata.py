@@ -140,7 +140,7 @@ def build_companies(root: pathlib.Path, weeks: list, prof: dict, pb: dict):
         plans = {}
         for w in weeks:                      # weeks＝正規化後、跳脫前的原值
             p = plan_engine.build_plan(w, profwrap, pbwrap)
-            p["note"] = "示範資料：虛構企業，用於展示引擎可移植性；觸發依據引用的週次資料為真實紀錄。"
+            p["note"] = "示範資料：示範企業（名稱虛構），用於展示引擎可移植性；觸發依據引用的週次資料為真實紀錄。"
             plans[str(w["week"])] = p
         entry = {k: v for k, v in c.items() if k not in ("playbooks", "scenario_stance")}
         entry["real"] = False
