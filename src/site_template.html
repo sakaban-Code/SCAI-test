@@ -2609,7 +2609,7 @@ function pbCovHTML(S){
     <div class="pbc">
       <div class="ch"><b>劇本覆蓋率</b>
         <span>${C.weeks} 週中 <b style="color:var(--accent)">${C.everFired}/${C.total}</b> 條曾觸發</span></div>
-      <div class="pbc-note">${S?'沒觸發不等於壞掉——條件真的沒發生是正確休眠。但其中有一條是我們自己找出來的設計缺陷，一併列在下面。'
+      <div class="pbc-note">${S?'未觸發分兩類：條件未成立（休眠），與設計缺陷（下方標示）。'
         :'區分「條件未發生之正確休眠」與「門檻自相矛盾之設計缺陷」；後者由本系統自行發現並公開揭露。'}</div>
       ${C.rows.map(row).join('')}
     </div>`;
@@ -2881,9 +2881,9 @@ function backtestHTML(S){
       <span class="bt-k"><b>${res}</b>已化解</span>
       <span class="bt-k"><b>${wat}</b>追蹤中</span>
       ${un?`<span class="bt-k mut"><b>${un}</b>未評判</span>`:''}
-      <span class="bt-note">${jd?`評判截止 ${jd}——晚於此日產出的週次標「未評判」，不假裝追蹤過。`:''}
+      <span class="bt-note">${jd?`評判截止 ${jd}——晚於此日產出的週次標「未評判」。`:''}
         ${none?`另有 ${none} 週無風險雷達（W3 起才產出，歷史事實不回頭補寫）。`:''}
-        <b>不計算命中率</b>：把「追蹤中」算成成功或失敗都是誤導，數字照分類原樣呈現。</span>
+        <b>不計算命中率</b>：「追蹤中」不是結果，數字照分類原樣呈現。</span>
     </div>
     <div class="bt-tl" id="bttl" role="tablist" aria-label="選擇週次"></div>
     <div id="btout"></div>
@@ -3303,7 +3303,7 @@ function render(i){
         ${a.action?`<div class="sa-r"><div class="k">因此採取</div><div class="v">${clean(a.action)}</div></div>`:''}
         ${a.downside?`<div class="sa-d"><div class="k">若這個判斷錯了</div><div class="v">${clean(a.downside)}</div></div>`:''}
       </div>`).join('')}</div>
-    <div class="cap">本區為系統對自身判斷的反面檢視：每項列出「若判斷錯誤的代價」與「最早可觀察到的翻盤訊號」，供讀者自行監看、不必全盤採信本站結論。</div>
+    <div class="cap">本區為系統對自身判斷的反面檢視：每項列出「若判斷錯誤的代價」與「最早可觀察到的翻盤訊號」，供讀者自行監看。</div>
   </section>`:'';
 
   /* scenario meta cards */
@@ -3539,7 +3539,7 @@ function render(i){
       <div class="card gov"><div class="gov-t"><span class="gov-k">Memory Manager</span>記憶管理</div>
         <div class="gov-b">單一真相為 <code>weeks.json</code>，<b>append-only</b>：既有週次不因後見之明重寫。上週基準由編號推導而非順序，避免資料列順序影響判斷。劇本修訂<b>只對往後生效</b>，已發佈的決策紀錄不回頭重算。</div></div>
       <div class="card gov"><div class="gov-t"><span class="gov-k">Tools</span>工具</div>
-        <div class="gov-b">檢索工具鎖定時間窗（起訖日）而非「最近 N 天」，回補歷史週時自動跳過不保留歷史的來源並在原始檔誠實標記。圖表與規畫引擎為確定性工具，相同輸入必得相同輸出。</div></div>
+        <div class="gov-b">檢索工具鎖定時間窗（起訖日）而非「最近 N 天」，回補歷史週時自動跳過不保留歷史的來源並在原始檔標記。圖表與規畫引擎為確定性工具，相同輸入必得相同輸出。</div></div>
       <div class="card gov"><div class="gov-t"><span class="gov-k">Guardrails</span>護欄</div>
         <div class="gov-b">距上一期超過 8 天即<b>中止</b>並要求先回補（防止週次與日期永久錯位）；週次已存在拒絕覆寫；迄日未到拒絕回補；人工產出須通過<b>四道匯入門檻</b>；外部文字輸出前一律跳脫、連結限 http(s) 協定。</div></div>
       <div class="card gov"><div class="gov-t"><span class="gov-k">Observability</span>可觀測性</div>
@@ -3623,7 +3623,7 @@ function render(i){
     <div class="dims" aria-label="五大 KDF 維度">
       ${DATA.dims.map((d,j)=>`<span class="dimtag"><span class="sw" style="background:${DC[j]}"></span>${d.name}（${d.members.length} 項）</span>`).join('')}
     </div>
-    <div class="cap" style="margin-top:12px">每週流程：外部事件擷取（附來源）→ 雙軸衝擊評估 → 情境判定 → 25 KDF 權重校準（附 Decision Trace）→ H+6 風險雷達 → 企業劇本比對 → 報告與通知。此流程目前由人工分析執行，產出須通過四道匯入門檻才寫入資料層；每日巡邏則由 GitHub Actions 自動執行，兩者節奏與可信度不同。</div>
+    <div class="cap" style="margin-top:12px">每週流程：外部事件擷取（附來源）→ 雙軸衝擊評估 → 情境判定 → 25 KDF 權重校準（附 Decision Trace）→ H+6 風險雷達 → 企業劇本比對 → 報告與通知。此流程目前由人工分析執行，產出須通過四道匯入門檻才寫入資料層；每日巡邏則由 GitHub Actions 自動執行。</div>
     <!-- 判讀底層：憲法 LAYER 10-3／10-4 的呈現層。**正本為 cowork/CLAUDE.md**，此處為渲染副本，
          改動須兩邊同步（同 X／Y 軸敘述的既有做法）。原本這兩層只存在於憲法，站上完全看不到。 -->
     <div class="sh" style="margin-top:26px"><h2 style="font-size:15px">判讀底層</h2><span class="q">為什麼是這樣判，而不是跟著新聞情緒走？</span></div>
@@ -3646,8 +3646,8 @@ function render(i){
       <div class="t">三大領域爭議：本站目前站在哪一邊【推斷】</div>
       <div class="d">這個領域有三個尚無定論的爭議。本站對每一項的立場列於下方；立場可隨證據改變，改變本身記錄於 Decision Trace。</div>
       <ul>
-        <li><b>出口管制有效性</b>　一方認為管制能實質延緩對手的技術進程；另一方認為只會推升全球成本並加速自主替代。<b>本站傾向後者、但不走極端</b>：W9 中國鎢材對日出口歸零，日系兩大 WF6 廠停產（約占全球四分之一供給）、關鍵製程氣體漲約九成——管制確實造成實質衝擊，但形式是<b>成本與交期</b>，不是技術斷絕。</li>
-        <li><b>AI 資本支出：超級循環還是泡沫</b>　一方以雲端資本支出與訂單能見度為據；另一方指估值已透支未來需求。<b>本站尚未選邊，且明說未選</b>：W5 標記疑慮後以「三連燈」追蹤，Y 軸自 W5 觸底連四週回升至 W9 的 +0.53，但 Nvidia 8/26 財報仍列為分水嶺——<b>第三盞燈未亮之前不下結論</b>。</li>
+        <li><b>出口管制有效性</b>　一方認為管制能實質延緩對手的技術進程；另一方認為只會推升全球成本並加速自主替代。<b>本站傾向後者</b>：W9 中國鎢材對日出口歸零，日系兩大 WF6 廠停產（約占全球四分之一供給）、關鍵製程氣體漲約九成——管制確實造成實質衝擊，但形式是<b>成本與交期</b>，不是技術斷絕。</li>
+        <li><b>AI 資本支出：超級循環還是泡沫</b>　一方以雲端資本支出與訂單能見度為據；另一方指估值已透支未來需求。<b>本站尚未選邊</b>：W5 標記疑慮後以「三連燈」追蹤，Y 軸自 W5 觸底連四週回升至 W9 的 +0.53，但 Nvidia 8/26 財報仍列為分水嶺——<b>第三盞燈未亮之前不下結論</b>。</li>
         <li><b>在地化：韌性還是效率</b>　一方認為分散產能是必要保險；另一方認為重複建置侵蝕成本競爭力。<b>本站傾向前者，且本期有一次兌現</b>：W8 熊本 M7.1 地震後，JASM 於 8/2 恢復全產能，W9 據此解除天災下修——同一組資料裡，韌性投資的價值被驗證了一次。</li>
       </ul>
       <div class="d2">以上為分析性判斷【推斷】，非投資建議。三項爭議與六個框架之正本為《週報運作憲法》LAYER 10-3／10-4；本區塊為其呈現層。</div>
