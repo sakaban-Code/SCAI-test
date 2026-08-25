@@ -2754,16 +2754,16 @@ function dailyHTML(S){
   return `
   <section id="daily" data-tab="intel">
     <div class="sh"><span class="ix">§05</span><h2>每日巡邏</h2><span class="q">每天有沒有真的跑？發現了什麼？</span>
-      <span class="sub">${S?'即時偵測層——每天掃新聞、依規則分級，發現 RED 就寄警報。與每週正式紀錄是兩套節奏'
+      <span class="sub">${S?'每天掃新聞、依規則分級，RED 即寄警報'
         :'即時偵測 · 每日執行收據 · 與週報四道門檻分屬兩層'}</span>
       <span class="chip lo" title="每日層為即時偵測，未經週報之四道匯入門檻">未經週報門檻</span></div>
     <div class="dl-bar">
       <span class="dl-k"><b>${DL.autoDays}</b>天自動執行</span>
       <span class="dl-k"><b>${DL.days.length}</b>天有紀錄</span>
       <span class="dl-k mut"><b>${g}</b>天沒跑</span>
-      <span class="dl-note">零警報的日子不落日誌，故以執行收據區分「跑了但沒事」與「沒跑」。
-        ${DL.receiptFrom?`${DL.receiptFrom} 起每次執行必寫收據。`:''}
-        ${DL.silentButRan?`目前有 <b>${DL.silentButRan}</b> 天屬於「跑了但零警報」。`:''}</span>
+      <span class="dl-note">零警報不落日誌，故另寫執行收據。
+        ${DL.receiptFrom?`${DL.receiptFrom} 起每次執行必寫。`:''}
+        ${DL.silentButRan?`其中 <b>${DL.silentButRan}</b> 天為「跑了但零警報」。`:''}</span>
     </div>
     <div class="dl-lg">
       <span><i class="s-hit"></i>有 RED</span><span><i class="s-yel"></i>有 YELLOW</span>
@@ -2815,8 +2815,7 @@ function wireDaily(){
               ${it.alerted?' · <b>已寄警報信</b>':''}</div>
             ${it.summary?`<div class="dl-iy">${it.summary}</div>`:''}</div></div>`).join('')
         :`<div class="dl-none">${x.how==='auto'
-            ? `掃描了 ${x.scanned} 則，沒有任何一則達到 YELLOW 以上——<b>GREEN 不落日誌</b>，
-               所以這天沒有日誌檔。<b>但收據證明它跑過了。</b>這正是收據制存在的理由。`
+            ? `掃描 ${x.scanned} 則，未達 YELLOW 以上；GREEN 不落日誌，故無日誌檔，<b>收據為證</b>。`
             : '這天巡邏後沒有落檔項目。'}</div>`}
     </div>`;
   };
@@ -2847,15 +2846,14 @@ function predHTML(S){
   return `
   <section id="predict" data-tab="analysis">
     <div class="sh"><span class="ix">§10</span><h2>事前預測與否證條件</h2><span class="q">敢不敢先說，錯了算誰的？</span>
-      <span class="sub">${S?'每則預測都附「什麼訊號出現代表我們錯了」——沒有否證條件的預測只是換句話說的描述'
+      <span class="sub">${S?'每則預測都附否證條件'
         :'憲法 LAYER 10 第四問落地 · 寫入日早於驗證日 · 結果只追加不覆寫'}</span></div>
     <div class="pd-bar">
       <span class="pd-k"><b>${ps.length}</b>則預測</span>
       <span class="pd-k"><b>${open}</b>待驗證</span>
       ${done?`<span class="pd-k"><b>${done}</b>已結果</span>`:''}
-      <span class="pd-note"><b>為什麼可信「這是事前寫的」</b>：本檔（<code>data/predictions.json</code>）
-        於寫入當日提交進 git，<b>commit 時間即時間戳</b>，事後無法偽造；且結果欄只追加，
-        預測內容與否證條件一字不改。錯了就記錄錯了。</span>
+      <span class="pd-note"><code>data/predictions.json</code> 於寫入當日提交進 git，
+        <b>commit 時間即時間戳</b>；結果欄只追加，預測與否證條件不改。</span>
     </div>
     ${ps.map(p=>{
       const st=p.outcome?(p.outcome.correct?['命中','o-hit']:['未命中','o-miss']):['待驗證','o-wait'];
@@ -2907,16 +2905,16 @@ function backtestHTML(S){
   return `
   <section id="backtest" data-tab="analysis">
     <div class="sh"><span class="ix">§09</span><h2>回測時光機</h2><span class="q">當時說了什麼？後來怎麼了？</span>
-      <span class="sub">${S?'拉時間軸回到任一週，把當週判定與事後結果並排——全部是既有紀錄，不新增判定'
+      <span class="sub">${S?'把當週判定與事後結果並排'
         :'逐週對照 · 當週判定 vs 事後結果 · 既有資料重新呈現'}</span></div>
     <div class="bt-sum">
       <span class="bt-k"><b>${hit}</b>已應驗</span>
       <span class="bt-k"><b>${res}</b>已化解</span>
       <span class="bt-k"><b>${wat}</b>追蹤中</span>
       ${un?`<span class="bt-k mut"><b>${un}</b>未評判</span>`:''}
-      <span class="bt-note">${jd?`評判截止 ${jd}——晚於此日產出的週次標「未評判」。`:''}
-        ${none?`另有 ${none} 週無風險雷達（W3 起才產出，歷史事實不回頭補寫）。`:''}
-        <b>不計算命中率</b>：「追蹤中」不是結果，數字照分類原樣呈現。</span>
+      <span class="bt-note">${jd?`評判截止 ${jd}，晚於此日產出者標「未評判」。`:''}
+        ${none?`另 ${none} 週無風險雷達（W3 起才產出）。`:''}
+        <b>不計算命中率</b>。</span>
     </div>
     <div class="bt-tl" id="bttl" role="tablist" aria-label="選擇週次"></div>
     <div id="btout"></div>
@@ -2986,7 +2984,7 @@ function journeyHTML(S){
   return `
   <section id="journey" data-tab="intel">
     <div class="sh"><span class="ix">§06</span><h2>試一則新聞</h2><span class="q">情報進來之後，實際發生什麼事？</span>
-      <span class="sub">${S?'貼任何一則新聞，看它穿過系統每一層——每層都會說明依據哪個檔、以及有沒有呼叫模型'
+      <span class="sub">${S?'貼一則新聞，看它穿過系統每一層'
         :'完整判定鏈路 · 逐層可稽核 · 六層中五層為確定性規則'}</span>
       <span class="chip" id="jnsc" title="以建置時 Python 正本的結果自我比對">自證中…</span></div>
     <div class="jn">
@@ -3197,7 +3195,7 @@ function positionHTML(S){
   const T={'關鍵':'t1','主要':'t2','次要':'t3'};
   return `
   <section id="position" data-tab="position">
-    <div class="sh"><span class="ix">§02</span><h2>產業定位</h2><span class="q">欣銓在哪裡？對手、客戶與供應商是誰？</span><span class="sub">${S?'不隨週次變動的基礎盤——它決定每週該蒐什麼、蒐到的東西重不重要':'結構情報基礎盤 · 五力 × 競爭定位 × 情報分級'}</span><span class="chip" title="競爭定位座標為依公開業務描述之分析判斷，非官方數據">推斷</span></div>
+    <div class="sh"><span class="ix">§02</span><h2>產業定位</h2><span class="q">欣銓在哪裡？對手、客戶與供應商是誰？</span><span class="sub">${S?'不隨週次變動的結構情報':'結構情報基礎盤 · 五力 × 競爭定位 × 情報分級'}</span><span class="chip" title="競爭定位座標為依公開業務描述之分析判斷，非官方數據">推斷</span></div>
 
     <div class="pos-role">
       <span class="rt">${C.role}</span>
@@ -3669,7 +3667,7 @@ function render(i){
     <div class="dims" aria-label="五大 KDF 維度">
       ${DATA.dims.map((d,j)=>`<span class="dimtag"><span class="sw" style="background:${DC[j]}"></span>${d.name}（${d.members.length} 項）</span>`).join('')}
     </div>
-    <div class="cap" style="margin-top:12px">每週流程：外部事件擷取（附來源）→ 雙軸衝擊評估 → 情境判定 → 25 KDF 權重校準（附 Decision Trace）→ H+6 風險雷達 → 企業劇本比對 → 報告與通知。此流程目前由人工分析執行，產出須通過四道匯入門檻才寫入資料層；每日巡邏則由 GitHub Actions 自動執行。</div>
+    <div class="cap" style="margin-top:12px">每週流程：外部事件擷取（附來源）→ 雙軸衝擊評估 → 情境判定 → 25 KDF 權重校準（附 Decision Trace）→ H+6 風險雷達 → 企業劇本比對 → 報告與通知。每週流程由人工分析執行並通過四道匯入門檻；每日巡邏由 GitHub Actions 自動執行。</div>
     <!-- 判讀底層：憲法 LAYER 10-3／10-4 的呈現層。**正本為 cowork/CLAUDE.md**，此處為渲染副本，
          改動須兩邊同步（同 X／Y 軸敘述的既有做法）。原本這兩層只存在於憲法，站上完全看不到。 -->
     <div class="sh" style="margin-top:26px"><h2 style="font-size:15px">判讀底層</h2><span class="q">為什麼是這樣判，而不是跟著新聞情緒走？</span></div>
