@@ -2650,16 +2650,23 @@ function deptHTML(S){
     <div id="dpout"></div>
   </section>`;
 }
-function wireDept(){
+function wireDept(w){
   const tabs=$('#dptabs'), out=$('#dpout'); if(!tabs||!DEP)return;
+  /* 訊號限定在所選週次的窗口內。§05 是在講「每日層自己」，連續時間軸有意義；
+     這一節問的是「這一週的訊號該誰看」，跨到別週的日期就答非所問。
+     每日層自 2026-08-01 起才有紀錄，W1–W7 因此為空——空就講出來，不留白。 */
+  const sp=w&&w.span;
+  const inWeek=d=>!sp||(d>=sp[0]&&d<=sp[1]);
   const draw=i=>{
     $$('#dptabs button').forEach(b=>{const on=+b.dataset.i===i;
       b.classList.toggle('on',on); b.setAttribute('aria-selected',on)});
     const d=DEP.depts[i], rs=new Set(d.rules);
     /* ① 每日巡邏裡命中該部門警報規則的項目 */
     const news=[];
-    ((DATA.dailyLayer||{}).days||[]).forEach(day=>(day.items||[]).forEach(it=>{
-      if(it.ruleId&&rs.has(it.ruleId))news.push({d:day.d,...it})}));
+    ((DATA.dailyLayer||{}).days||[]).forEach(day=>{
+      if(!inWeek(day.d))return;
+      (day.items||[]).forEach(it=>{
+        if(it.ruleId&&rs.has(it.ruleId))news.push({d:day.d,...it})})});
     news.reverse();
     /* ③ 提到該部門規則或劇本的預測 */
     const ids=[...rs,...d.playbooks.map(p=>p.id)];
@@ -2691,14 +2698,16 @@ function wireDept(){
       </div>
       <div class="dp-two" style="margin-top:12px">
         <div class="card"><div class="ch"><b>每日巡邏抓到的相關訊號</b><span>${news.length} 則</span>
-          <span class="chip lo" title="每日巡邏為連續時間軸，不隨上方週次切換（同 §05）">全期・不隨週次</span></div>
+          <span class="chip lo" title="只列所選週次窗口內、命中本部門警報規則的訊號">${sp?`限 ${sp[0].slice(5)}–${sp[1].slice(5)}`:'全期'}</span></div>
           ${news.length?news.slice(0,5).map(n=>`<div class="dp-n">
             <span class="dl-t t-${n.tier}">${n.tier}</span>
             <div><div class="dp-nt">${n.title}</div>
               <div class="dp-ns">${n.d}　${ruleTag(n.ruleId)}${n.source||''}
                 ${n.url?` · <a href="${safeUrl(n.url)}" target="_blank" rel="noopener">原文 <span class="arw">↗</span></a>`:''}</div></div></div>`).join('')
             +(news.length>5?`<div class="dp-more">另有 ${news.length-5} 則，見「每日巡邏」區段</div>`:'')
-            :'<div class="dp-none">每日巡邏期間內，沒有命中這個部門警報規則的訊號。</div>'}</div>
+            :`<div class="dp-none">${sp&&DL&&(sp[1]<DL.span[0]||sp[0]>DL.span[1])
+                ? `這一週（${sp[0]}–${sp[1]}）早於每日巡邏開始的 ${DL.span[0]}，因此沒有每日層訊號。`
+                : '這一週沒有命中這個部門警報規則的訊號。'}</div>`}</div>
         <div class="card"><div class="ch"><b>相關的事前預測</b><span>${preds.length} 則</span></div>
           ${preds.length?preds.map(p=>`<div class="dp-pr"><span class="pd-id">${p.id}</span>
             <span class="pd-t ${PT_CLS[p.type]||''}">${p.type}</span>
@@ -3755,7 +3764,7 @@ function render(i){
   wireJourney(i);
   wireBacktest();          /* 回測看的是全部週次，不隨當前週變動，故不吃 i */
   wireDaily();             /* 同上：每日巡邏是獨立時間軸 */
-  wireDept();              /* 部門視角吃 payload 的既有分派，與當前週無關 */
+  wireDept(w);              /* 分派結構不隨週次變，但每日訊號只取所選週次窗口內的 */
   aiUsePaint();            /* §16 通道④：每次 render 都重建那張表，累計數要重畫 */
   /* 匯出鈕隨 render 重建，故在此重綁；資料一律取當下的 DATA，不吃閉包裡的 i */
   $$('.expb').forEach(b=>b.onclick=()=>doExport(b.dataset.exp));
