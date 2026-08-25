@@ -1754,6 +1754,10 @@ const fmt=n=>(n>0?'+':'')+n.toFixed(2);
 const xWord=v=>v<=-0.4?'明顯碎裂':v<=-0.15?'偏碎裂':v<0.15?'接近中性':v<0.4?'偏聚合':'明顯聚合';
 const yWord=v=>v<=-0.4?'明顯匱乏':v<=-0.15?'偏匱乏':v<0.15?'接近中性':v<0.4?'偏充沛':'明顯充沛';
 const clean=s=>(s||'').replace(/^【推斷】/,'');
+/* 設定檔（industry_position／predictions／playbook）的文字用 **粗體** 標重點——同一份
+   字串也給非 HTML 的消費端讀，故不直接寫 <b>。此處轉為標籤；**只施用於這些自家設定檔**，
+   weeks.json 那類外來資料不套用。先前這個轉換各處自己寫一份，漏掉的區段就把 ** 原樣印出來。 */
+const mdb=s=>String(s==null?'':s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
 /* 觸發依據標記：僅包裝 ✓／✗ 為可辨識標籤，判斷文字本身不變 */
 const evTag=s=>(s||'').replace(/✓/g,'<span class="tk ok">✓</span>')
   .replace(/✗/g,'<span class="tk no">✗</span>').replace(/✕/g,'<span class="tk no">✕</span>');
@@ -2305,7 +2309,7 @@ function traceSum(i){
       ${row('本期宣告座標',w.xy.x,w.xy.y,'cur')}
     </tbody></table>
     <p class="tsum-n">${ok
-      ?'✓ 相符。這條關係自 W2 起每一週都成立，但一直到 2026-08-18 才被寫成匯入門檻——W10 首版是開站以來第一次不吻合，因此被退回重修。'
+      ?'✓ 相符。'
       :'✗ 不吻合。差 ΔX '+fmt(r3(ex-w.xy.x))+'、ΔY '+fmt(r3(ey-w.xy.y))+'——此為缺陷，不應出現。'}</p></div>`;
 }
 
@@ -2627,12 +2631,15 @@ function pbCovHTML(S){
       <span class="pbc-t">${r.title}</span>
       <span class="pbc-n">${bad?'⚠ 設計缺陷':'未觸發'}</span>
       <span class="pbc-cond">${bl}</span></div>
-      ${bad?`<details class="pbc-d"><summary>為什麼它永遠不會觸發，以及我們為什麼不改</summary>
-        <p><b>問題</b>${r.defect.issue}——${r.defect.detail}</p>
-        <p><b>實證</b>${r.defect.evidence}</p>
-        <p><b>發現</b>${r.defect.found}</p>
-        <p><b>裁示</b>${r.defect.decision}</p>
-        <p><b>若日後修正</b>${r.defect.ifRevisited}</p></details>`:''}`;
+      ${bad?(()=>{
+        /* 缺陷說明的 **粗體** 先前直接印出字面，此處轉為 <b>；來源是版本控管的
+           playbook.json，與 §16 token 段的 md() 同一個既有做法。
+           `decision` 只取第一句（結論），`ifRevisited` 不上站——修法建議屬報告內容。 */
+        return `<details class="pbc-d"><summary>為什麼它永遠不會觸發</summary>
+        <p><b>問題</b>${mdb(r.defect.issue)}——${mdb(r.defect.detail)}</p>
+        <p><b>實證</b>${mdb(r.defect.evidence)}</p>
+        <p><b>發現</b>${mdb(r.defect.found)}</p>
+        <p><b>裁示</b>${mdb(String(r.defect.decision).split('。')[0])}。</p></details>`})():''}`;
   };
   return `
     <div class="pbc">
@@ -2665,7 +2672,7 @@ function deptHTML(S){
       <span class="dp-k"><b>${DEP.depts.length}</b>個權責單位</span>
       <span class="dp-k"><b>${DEP.leverCovered}/${DEP.leverTotal}</b>條槓桿有劇本</span>
       <span class="dp-note"><b>這一層只回答「該誰看」，不回答「該怎麼改」。</b>
-        我們不掌握欣銓各部門的產能、流程與成熟度，因此**不會**提出部門改善建議；
+        我們不掌握欣銓各部門的產能、流程與成熟度，因此<b>不會</b>提出部門改善建議；
         這裡列出的策略是既有劇本依權責歸戶的結果，仍屬外部推導之【推斷】，
         是否適用須由該部門依內部資訊判斷。
         ${DEP.uncoveredLevers.length?`另有 <b>${DEP.uncoveredLevers.length}</b> 條槓桿目前沒有任何劇本覆蓋
@@ -2757,10 +2764,9 @@ function dailyHTML(S){
       <span class="dl-k"><b>${DL.autoDays}</b>天自動執行</span>
       <span class="dl-k"><b>${DL.days.length}</b>天有紀錄</span>
       <span class="dl-k mut"><b>${g}</b>天沒跑</span>
-      <span class="dl-note"><b>為什麼要分「跑了」和「有警報」</b>：零警報的日子不落日誌
-        （避免噪音），所以在收據制上線前，<b>「跑了而且沒事」跟「根本沒跑」長得一模一樣</b>。
-        ${DL.receiptFrom?`${DL.receiptFrom} 起每次執行都寫收據，兩者從此可分。`:''}
-        ${DL.silentButRan?`目前已有 <b>${DL.silentButRan}</b> 天屬於「跑了但零警報」——沒有收據的話，這些日子會被誤讀成沒跑。`:''}</span>
+      <span class="dl-note">零警報的日子不落日誌，故以執行收據區分「跑了但沒事」與「沒跑」。
+        ${DL.receiptFrom?`${DL.receiptFrom} 起每次執行必寫收據。`:''}
+        ${DL.silentButRan?`目前有 <b>${DL.silentButRan}</b> 天屬於「跑了但零警報」。`:''}</span>
     </div>
     <div class="dl-lg">
       <span><i class="s-hit"></i>有 RED</span><span><i class="s-yel"></i>有 YELLOW</span>
@@ -2851,7 +2857,7 @@ function predHTML(S){
       <span class="pd-k"><b>${open}</b>待驗證</span>
       ${done?`<span class="pd-k"><b>${done}</b>已結果</span>`:''}
       <span class="pd-note"><b>為什麼可信「這是事前寫的」</b>：本檔（<code>data/predictions.json</code>）
-        於寫入當日提交進 git，**commit 時間即時間戳**，事後無法偽造；且結果欄只追加，
+        於寫入當日提交進 git，<b>commit 時間即時間戳</b>，事後無法偽造；且結果欄只追加，
         預測內容與否證條件一字不改。錯了就記錄錯了。</span>
     </div>
     ${ps.map(p=>{
@@ -2869,7 +2875,7 @@ function predHTML(S){
           <div class="pd-sec"><b>依據</b><ul>${(p.basis||[]).map(b=>`<li>${b}</li>`).join('')}</ul></div>
           <div class="pd-sec"><b>若錯了</b>${p.ifWrong||''}</div>
           <div class="pd-sec"><b>驗證方式</b>${p.verifyBy||''}　信心 ${p.confidence||'—'}</div>
-          ${p.caveat?`<div class="pd-cav">${p.caveat}</div>`:''}
+          ${p.caveat?`<div class="pd-cav">${mdb(p.caveat)}</div>`:''}
         </details>
         ${p.outcome?`<div class="pd-out"><b>事後結果（${p.outcome.on}）</b>${p.outcome.note}</div>`:''}
       </div>`}).join('')}
@@ -3236,7 +3242,7 @@ function positionHTML(S){
           <div class="leg">${y.rows.filter(r=>r.desc&&r.desc!=='同上').map((r,j)=>
             `<span><i style="background:${['#3f55ff','#007689','#834ad9'][j]||'#55628a'}"></i>${r.n}：${r.desc}</span>`).join('')}</div>
         </div>`).join('')}
-        <div class="cr">${P.customers.read}</div>
+        <div class="cr">${mdb(P.customers.read)}</div>
         <div class="cr">${P.customers.meaning}</div>
         <div class="cw">📌 ${P.customers.watch}</div>
       </div>
@@ -3248,7 +3254,7 @@ function positionHTML(S){
         <div class="fh"><span class="nm">${f.name}</span><span class="tierchip ${T[f.tier]}">${f.tier}</span></div>
         <div class="fq">${f.q}</div>
         ${f.items.map(it=>`<div class="fi"><b>${it.n}</b>　${it.d} ${srcTag(it.src)}</div>`).join('')}
-        <div class="fl">${(f.rules||[]).map(r=>`<span class="tag">${r}</span>`).join('')}${(f.kdf||[]).length?`<span class="tag">KDF#${f.kdf.join('・#')}</span>`:''}<br>${f.live}</div>
+        <div class="fl">${(f.rules||[]).map(r=>`<span class="tag">${r}</span>`).join('')}${(f.kdf||[]).length?`<span class="tag">KDF#${f.kdf.join('・#')}</span>`:''}<br>${mdb(f.live)}</div>
         ${f.caveat?`<div class="cav">${f.caveat}</div>`:''}
       </div>`).join('')}
     </div>
@@ -3267,7 +3273,7 @@ function positionHTML(S){
         <h4>已知缺口：我們拿不到的東西</h4>
         <div class="gn">${G._note.split('：')[1]||G._note}</div>
         <ul>${G.items.map(x=>`<li>${x}</li>`).join('')}</ul>
-        <div class="im">${G.impact}</div>
+        <div class="im">${mdb(G.impact)}</div>
       </div>
     </div>
   </section>`;
@@ -3571,9 +3577,9 @@ function render(i){
       <div class="card gov"><div class="gov-t"><span class="gov-k">Tools</span>工具</div>
         <div class="gov-b">檢索工具鎖定時間窗（起訖日）而非「最近 N 天」，回補歷史週時自動跳過不保留歷史的來源並在原始檔誠實標記。圖表與規畫引擎為確定性工具，相同輸入必得相同輸出。</div></div>
       <div class="card gov"><div class="gov-t"><span class="gov-k">Guardrails</span>護欄</div>
-        <div class="gov-b">距上一期超過 8 天即<b>中止</b>並要求先回補（防止週次與日期永久錯位）；週次已存在拒絕覆寫；迄日未到拒絕回補；人工產出須通過<b>四道匯入門檻</b>；外部文字輸出前一律跳脫、連結限 http(s) 協定。所有強制路徑都留有明示的逃生門。</div></div>
+        <div class="gov-b">距上一期超過 8 天即<b>中止</b>並要求先回補（防止週次與日期永久錯位）；週次已存在拒絕覆寫；迄日未到拒絕回補；人工產出須通過<b>四道匯入門檻</b>；外部文字輸出前一律跳脫、連結限 http(s) 協定。</div></div>
       <div class="card gov"><div class="gov-t"><span class="gov-k">Observability</span>可觀測性</div>
-        <div class="gov-b">每一次權重調整都附<a href="#trace">依據與來源連結</a>；${sa.length?'<a href="#selfaudit">自我稽核</a>':'自我稽核'}逐項列出「判斷錯了的代價」與「最早翻盤訊號」${sa.length?'':'（本週無此欄位，W3／W5 起才有）'}；<a href="#method">期間涵蓋與已知落差</a>公開重疊、缺口與產出延遲——<b>不利於自己的事實同樣揭露</b>。</div></div>
+        <div class="gov-b">每一次權重調整都附<a href="#trace">依據與來源連結</a>；${sa.length?'<a href="#selfaudit">自我稽核</a>':'自我稽核'}逐項列出「判斷錯了的代價」與「最早翻盤訊號」${sa.length?'':'（本週無此欄位，W3／W5 起才有）'}；<a href="#method">期間涵蓋與已知落差</a>公開重疊、缺口與產出延遲。</div></div>
       <div class="card gov"><div class="gov-t"><span class="gov-k">Evaluation</span>評估</div>
         <div class="gov-b">規畫層以確定性引擎<b>重算比對</b>，逐欄位差異須為零才准匯入；八週逐週模擬確認規則修訂不污染歷史；另引入<b>外部 AI 對抗式審查</b>並以實機量測驗證（版面溢出、對比度、鍵盤焦點、注入防護）。</div></div>
     </div>
@@ -3583,7 +3589,6 @@ function render(i){
       /* 產物的規則／限制字串以 **…** 標重點（同一份文字也給非 HTML 的消費端用）。
          此處轉成 <b>：DATA.tokenDev 已於建置時整棵跳脫，字串內不可能有生的 '<'，
          故這裡引入的標籤必定只有我們自己這一對。 */
-      const md=s=>String(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
       const big=n=>{n=Number(n||0);return n>=1e8?(n/1e8).toFixed(2)+' 億':n>=1e4?(n/1e4).toFixed(0)+' 萬':num(n)};
       const c=t.core,hr=c.cacheHitRate!=null?(c.cacheHitRate*100).toFixed(1)+'%':'—';
       const tools={'claude-code':'Claude Code','cowork':'Cowork','codex':'Codex'};
@@ -3609,8 +3614,7 @@ function render(i){
       const sum=ch.filter(c=>c.billableInput).reduce((s,c)=>s+c.billableInput,0);
       return `<div class="covbox">
       <div class="t">Token 用量：四種口徑分開講</div>
-      <div class="d">評分表問的是「<b>開發 AI 員工／以及 AI 員工運作時</b>」的消耗。這兩段本來就不同源，
-        混成一個數字既無法查證也無法優化，因此拆成四段各自交代——<b>缺的兩段照實說缺</b>。</div>
+      <div class="d">開發階段與運作階段不同源，分四段列示；沒有數字的兩段各自標明性質。</div>
       <!-- 五欄表在窄版會擠爆。本機瀏覽器窗格壓不到 425px 以下、量不到 320／375 的實況，
            所以不靠量測靠護欄：容器自己橫捲，min-width 保住欄寬，全頁永遠不橫捲。 -->
       <div style="overflow-x:auto;margin-top:10px">
@@ -3622,24 +3626,24 @@ function render(i){
           <td class="num">${cell(c.billableInput,c.state)}</td>
           <td class="num">${cell(c.output,c.state)}</td>
           <td class="num">${cell(c.msgs,c.state)}</td></tr>
-          ${c.note?`<tr><td colspan="5" style="color:var(--muted);font-size:11px;padding-top:0;border-bottom:none">↳ ${md(c.note)}</td></tr>`:''}`).join('')}
+          ${c.note?`<tr><td colspan="5" style="color:var(--muted);font-size:11px;padding-top:0;border-bottom:none">↳ ${mdb(c.note)}</td></tr>`:''}`).join('')}
         </tbody>
       </table>
       </div>
       <div class="d" style="margin-top:8px">① ＋ ② ＝ <b class="num">${num(sum)}</b>，與上方「輸入計價當量」的
-        <b class="num">${num(c.billableInput)}</b> ${sum===c.billableInput?'<b>完全相等</b>——這個表加得起來。':'<b>不相等，請以上方為準</b>。'}
+        <b class="num">${num(c.billableInput)}</b> ${sum===c.billableInput?'<b>完全相等</b>。':'<b>不相等，請以上方為準</b>。'}
         ③ 是真的 <b>0</b>（從未執行），不是沒統計；④ 有真實用量但不留紀錄，所以沒有累計數。</div>
     </div>`})()}
     <div class="covbox">
       <div class="t">Token 用量：怎麼算出來的</div>
       <div class="d"><b>開發階段</b>用量，直接讀 Claude Code、Cowork、Codex 三個工具的本機原始紀錄取 <code>usage</code> 欄位，<b>非估算</b>。依工具：${tl}（合計 ${big(c.billableInput)}，與標頭同口徑）。</div>
       <div class="d" style="margin-top:4px">依模型：${ml}。<b>⚠ 這一列是另一個口徑</b>——原始統計未逐工作階段拆分模型，
-        故此列含關聯工作階段，合計 ${big(t.byModelScope?t.byModelScope.billableInput:0)}，比上方高。不硬湊成同一個數，寧可講清楚差在哪。</div>
+        故此列含關聯工作階段，合計 ${big(t.byModelScope?t.byModelScope.billableInput:0)}，比上方高。</div>
       <ul>
-        <li><b>不提供單一「總 token」</b>：四項輸入直接相加會被重讀快取主導（占 ${hr}），得到 ${big(c.processed)} 這種技術上為真、實務上誤導一個數量級的數字。應引用上方的<b>輸入計價當量</b>與<b>產出</b>。</li>
-        ${(t.rules||[]).filter(r=>!/^不提供單一/.test(r)).map(r=>`<li>${md(r)}</li>`).join('')}
+        <li><b>不提供單一「總 token」</b>：四項輸入直接相加會被重讀快取主導（占 ${hr}），得到 ${big(c.processed)}，與實際成本結構不符。應引用上方的<b>輸入計價當量</b>與<b>產出</b>。</li>
+        ${(t.rules||[]).filter(r=>!/^不提供單一/.test(r)).map(r=>`<li>${mdb(r)}</li>`).join('')}
       </ul>
-      <div class="d2"><b>已知限制</b>（與上方期間涵蓋同一個揭露標準）：${(t.caveats||[]).map(md).join('　／　')}</div>
+      <div class="d2"><b>已知限制</b>：${(t.caveats||[]).map(mdb).join('　／　')}</div>
     </div>`})()}
   </section>
 
@@ -3676,7 +3680,7 @@ function render(i){
     </div>
     <div class="covbox">
       <div class="t">三大領域爭議：本站目前站在哪一邊【推斷】</div>
-      <div class="d">這個領域有三個尚無定論的爭議。判讀時必須自問站在哪一方、為什麼——<b>不表態就會在不同週之間前後矛盾而不自知</b>。立場可隨證據改變，改變本身記錄於 Decision Trace。</div>
+      <div class="d">這個領域有三個尚無定論的爭議。本站對每一項的立場列於下方；立場可隨證據改變，改變本身記錄於 Decision Trace。</div>
       <ul>
         <li><b>出口管制有效性</b>　一方認為管制能實質延緩對手的技術進程；另一方認為只會推升全球成本並加速自主替代。<b>本站傾向後者、但不走極端</b>：W9 中國鎢材對日出口歸零，日系兩大 WF6 廠停產（約占全球四分之一供給）、關鍵製程氣體漲約九成——管制確實造成實質衝擊，但形式是<b>成本與交期</b>，不是技術斷絕。</li>
         <li><b>AI 資本支出：超級循環還是泡沫</b>　一方以雲端資本支出與訂單能見度為據；另一方指估值已透支未來需求。<b>本站尚未選邊，且明說未選</b>：W5 標記疑慮後以「三連燈」追蹤，Y 軸自 W5 觸底連四週回升至 W9 的 +0.53，但 Nvidia 8/26 財報仍列為分水嶺——<b>第三盞燈未亮之前不下結論</b>。</li>
