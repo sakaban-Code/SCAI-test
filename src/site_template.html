@@ -3293,7 +3293,7 @@ function render(i){
       ${x.why?`<div class="why">${x.why}</div>`:''}</div></div>`;
     if(ups.length||dns.length)moversHTML=`
     <section id="movers" data-tab="analysis" style="padding-top:18px">
-      <div class="sh"><span class="ix">§07</span><h2>本週最大變動</h2><span class="q">這週哪些因素變重要了？</span><span class="sub">${S?`相對 W${p.week}｜附每項權重調整理由`:`相對 W${p.week} · 附調整理由`}</span></div>
+      <div class="sh"><span class="ix">§07</span><h2>本週最大變動</h2><span class="q">這週哪些因素變重要了？</span><span class="sub">${S?`相對 W${p.week} · 附調整理由`:`相對 W${p.week}｜附每項權重調整理由`}</span></div>
       <div class="movers">
         <div class="card"><div style="font-size:11px;color:var(--muted);margin-bottom:6px">權重上調</div>${ups.map(row).join('')||'<div class="mv"><div class="body"><div class="why">無顯著上調</div></div></div>'}</div>
         <div class="card"><div style="font-size:11px;color:var(--muted);margin-bottom:6px">權重下調</div>${dns.map(row).join('')||'<div class="mv"><div class="body"><div class="why">無顯著下調</div></div></div>'}</div>
@@ -3306,7 +3306,7 @@ function render(i){
   const sa=w.selfAudit||[];
   const saHTML=sa.length?`
   <section id="selfaudit" data-tab="analysis">
-    <div class="sh"><span class="ix">§12</span><h2>自我稽核</h2><span class="q">這些判斷如果錯了會怎樣？</span><span class="sub">${S?`本週 ${sa.length} 項關鍵判斷｜含代價與最早翻盤訊號`:`關鍵判斷之依據、行動與反面情境（憲法自我稽核要求）`}</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
+    <div class="sh"><span class="ix">§12</span><h2>自我稽核</h2><span class="q">這些判斷如果錯了會怎樣？</span><span class="sub">${S?`本週 ${sa.length} 項關鍵判斷`:`本週 ${sa.length} 項｜依據、行動與反面情境　含代價與最早翻盤訊號`}</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
     <div class="sa-list">${sa.map((a,j)=>`
       <div class="sa">
         <div class="sa-h"><span class="sa-n num">${String(j+1).padStart(2,'0')}</span><b>${clean(a.judgment||'')}</b></div>
@@ -3396,7 +3396,7 @@ function render(i){
       <span class="cosel-l">企業畫像</span>
       ${CO.map(c=>`<button type="button" class="co-b${c.id===co.id?' on':''}" data-co="${c.id}" aria-pressed="${c.id===co.id}">${c.short}${c.real?'':'<span class="co-tag">示範</span>'}</button>`).join('')}
     </div>`:''}
-    <div class="sh"><span class="ix">§13</span><h2>對${co?co.short:'欣銓'}的公司規畫</h2><span class="q">外部情勢對應到哪些既有劇本？</span><span class="sub">${S?`共 ${coFired.length} 條觸發｜含成功指標與停損訊號`:'企業畫像 × 情境 → 觸發式劇本'}</span>${co&&!co.real?'<span class="chip demo" title="示範企業：名稱虛構；觸發依據引用的週次資料為真實紀錄">示範資料</span>':'<span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>'}</div>
+    <div class="sh"><span class="ix">§13</span><h2>對${co?co.short:'欣銓'}的公司規畫</h2><span class="q">外部情勢對應到哪些既有劇本？</span><span class="sub">${S?`共 ${coFired.length} 條觸發`:`企業畫像 × 情境 → 觸發式劇本｜共 ${coFired.length} 條，含成功指標與停損訊號`}</span>${co&&!co.real?'<span class="chip demo" title="示範企業：名稱虛構；觸發依據引用的週次資料為真實紀錄">示範資料</span>':'<span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>'}</div>
     <!-- 教授 2026-08-25 意見：外部資料推導的輸出不應寫成執行指令。此框架帶做兩件事——
          ①把本層在整條鏈裡的位置畫出來（讀者才知道這不是終點）②明說界線與誰該下決定。
          位置刻意放在觸發劇本之前：讀者看到條目之前就先看到框架。 -->
@@ -3447,7 +3447,7 @@ function render(i){
   </section>
 
   <section id="risk" data-tab="intel">
-    <div class="sh"><span class="ix">§03</span><h2>H+6 風險雷達</h2><span class="q">未來六個月要提防什麼？</span><span class="sub">${S?'欣銓／測試廠視角｜含領先訊號與規避動作':'未來六個月 · 欣銓／測試廠視角'}</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
+    <div class="sh"><span class="ix">§03</span><h2>H+6 風險雷達</h2><span class="q">未來六個月要提防什麼？</span><span class="sub">${S?'未來六個月 · 欣銓視角':'未來六個月 · 欣銓／測試廠視角｜含領先訊號與規避動作'}</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
     <div class="card" style="overflow-x:auto">
       <table><thead><tr><th style="width:30%">風險</th><th style="width:28%">領先訊號</th><th style="width:7%">KDF</th><th>規避動作</th></tr></thead><tbody>
       ${(w.riskRadar||[]).map((r,j)=>{
@@ -3463,7 +3463,7 @@ function render(i){
   </section>
 
   <section id="trend" data-tab="analysis">
-    <div class="sh"><span class="ix">§08</span><h2>情境軌跡與權重</h2><span class="q">局勢往哪個方向走？</span><span class="sub">${S?`W1–W${w.week} 累積｜資料只追加不覆寫`:`W1–W${w.week} 累積 · 只追加不覆寫`}</span></div>
+    <div class="sh"><span class="ix">§08</span><h2>情境軌跡與權重</h2><span class="q">局勢往哪個方向走？</span><span class="sub">${S?`W1–W${w.week} 累積`:`W1–W${w.week} 累積 · 資料只追加不覆寫`}</span></div>
     ${exportBar()}
     ${p?`<div class="trendsum">累積觀察（W${w0.week}→W${w.week}）：X 軸由 <b class="num">${fmt(w0.xy.x)}</b> 移至 <b class="num">${fmt(w.xy.x)}</b>（${w.xy.x<w0.xy.x?'碎裂加深':'聚合改善'} ${Math.abs(w.xy.x-w0.xy.x).toFixed(2)}）；Y 軸由 <b class="num">${fmt(w0.xy.y)}</b> 至 <b class="num">${fmt(w.xy.y)}</b>。期間情境${scenSpan.length===1?`維持 ${scenSpan[0]}`:`歷經 ${scenSpan.join(' → ')}`}；五維中累積變動最大＝${dimTop.n}（<b class="num">${dimTop.a.toFixed(1)}→${dimTop.b.toFixed(1)}</b>）。</div>`:''}
     <div class="g2">
@@ -3494,7 +3494,7 @@ function render(i){
   ${predHTML(S)}
 
   <section id="events" data-tab="intel">
-    <div class="sh"><span class="ix">§04</span><h2>本週事件</h2><span class="q">這些判斷根據哪些事實？</span><span class="sub">${S?'每則均可點回原文查證':'真實可追溯'} · ${(w.events||[]).length} 則 · ${[...new Set((w.events||[]).map(e=>e.source).filter(Boolean))].length} 個來源</span></div>
+    <div class="sh"><span class="ix">§04</span><h2>本週事件</h2><span class="q">這些判斷根據哪些事實？</span><span class="sub">${S?'每則都能點回原文':'真實可追溯 · 每則均可點回原文查證'} · ${(w.events||[]).length} 則 · ${[...new Set((w.events||[]).map(e=>e.source).filter(Boolean))].length} 個來源</span></div>
     ${alertCard(i)}
     <div class="evgrid">
       ${(w.events||[]).map(e=>`<div class="evc">
@@ -3570,8 +3570,8 @@ function render(i){
 
   <section id="gov" data-tab="gov">
     <div class="sh"><span class="ix">§16</span><h2>Agent 治理</h2><span class="q">${S?'怎麼確保它不會亂來，而且事後查得到？'
-        :'怎麼讓它可預測、有邊界、可稽核？'}</span><span class="sub">${S?'六個面向，每一項都能在這個網站或原始碼裡查到'
-        :'六個面向，每項均可回到本站或 repo 查證'}</span></div>
+        :'怎麼讓它可預測、有邊界、可稽核？'}</span><span class="sub">${S?'六個面向，每項都查得到'
+        :'六個面向，每項均可回到本站或 repo 查證（原始碼公開）'}</span></div>
     <div class="govgrid">
       <div class="card gov"><div class="gov-t"><span class="gov-k">Task Router</span>任務分派</div>
         <div class="gov-b">四層單向管線，各層可獨立重跑：<b>抓取</b>（純搜尋 API，不用模型）→ <b>判定</b>（人工分析，四道匯入門檻把關）→ <b>規畫</b>（純規則引擎，零 API 呼叫）→ <b>呈現</b>（靜態產物）。規畫層不依賴模型，因此任何一週的公司規畫都能離線重算並比對。</div></div>
