@@ -3800,6 +3800,7 @@ function render(i){
   wireJourney(i);
   wireBacktest();          /* 回測看的是全部週次，不隨當前週變動，故不吃 i */
   wireDaily();             /* 同上：每日巡邏是獨立時間軸 */
+  setTimeout(aiSugsRender,0);   /* 建議問題跟著週次／企業走；延後避免 TDZ */
   wireDept(w);              /* 分派結構不隨週次變，但每日訊號只取所選週次窗口內的 */
   aiUsePaint();            /* §16 通道④：每次 render 都重建那張表，累計數要重畫 */
   /* 匯出鈕隨 render 重建，故在此重綁；資料一律取當下的 DATA，不吃閉包裡的 i */
@@ -4069,9 +4070,22 @@ addEventListener('keydown',e=>{
   if(aiPanel.contains(document.activeElement))return;   // 區域處理器已接手
   aiClose();
 });
-const AI_SUGS=['本週判定是什麼？','為什麼觸發 PB-07？','三家企業本週差在哪？','這些資料可信嗎？'];
-$('#aisug').innerHTML=AI_SUGS.map(s=>`<button type="button">${s}</button>`).join('');
-$$('#aisug button').forEach(b=>b.onclick=()=>{aiQ.value=b.textContent;aiAsk()});
+/* 建議問題不可寫死劇本編號。原本固定寫 PB-07——它在 W8–W10 觸發過，W11 沒有；
+   而面板送出的脈絡是「當前選到的週次與企業」之觸發清單，所以模型只能答
+   「本週資料未涵蓋」。答不出來的不是模型，是我們給了一個不在脈絡裡的問題。
+   改為每次 render 依當前週次／企業實際觸發的第一條重算。 */
+function aiSugsRender(){
+  const el=$('#aisug'); if(!el)return;
+  const w=DATA.weeks[cur], co=(DATA.companies||[]).find(c=>c.id===curCompany);
+  const fired=(co&&!co.real?(((co.plans||{})[String(w.week)]||{}).firedPlaybooks)
+                           :((w.companyPlan||{}).firedPlaybooks))||[];
+  const sugs=['本週判定是什麼？',
+    fired.length?`為什麼觸發 ${fired[0].id}？`:'本週為什麼沒有劇本觸發？',
+    '三家企業本週差在哪？','這些資料可信嗎？'];
+  el.innerHTML=sugs.map(s=>`<button type="button">${s}</button>`).join('');
+  $$('#aisug button').forEach(b=>b.onclick=()=>{aiQ.value=b.textContent;aiAsk()});
+}
+aiSugsRender();
 $('#aiform').onsubmit=e=>{e.preventDefault();aiAsk()};
 
 function aiAnswer(q){
@@ -4116,7 +4130,7 @@ function aiAnswer(q){
   if(/(可信|來源|真的|查證|假的)/.test(q)){
     return `本站每則事件附可查證來源連結；每次權重調整附 Decision Trace；§12 自我稽核公開「判斷錯了會怎樣」；§17 揭露期間重疊與缺口等不利事實。X／Y 與建議屬分析判斷【推斷】，非官方數據、非投資建議。${SRC}`;
   }
-  return `展示模式能回答：<br>・「本週判定是什麼」<br>・任一劇本編號（如「為什麼觸發 PB-07」）<br>・「三家企業差在哪」<br>・「風險雷達」「方法論」「治理」「資料可信嗎」<br>其餘問題待後端連接真 AI 後支援。${SRC}`;
+  return `展示模式能回答：<br>・「本週判定是什麼」<br>・任一劇本編號（如「為什麼觸發 ${((DATA.weeks[cur].companyPlan||{}).firedPlaybooks||[{id:'PB-01'}])[0].id}」）<br>・「三家企業差在哪」<br>・「風險雷達」「方法論」「治理」「資料可信嗎」<br>其餘問題待後端連接真 AI 後支援。${SRC}`;
 }
 
 async function aiAsk(){
