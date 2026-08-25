@@ -2595,15 +2595,12 @@ function pbCovHTML(S){
       <span class="pbc-t">${r.title}</span>
       <span class="pbc-n">${bad?'⚠ 設計缺陷':'未觸發'}</span>
       <span class="pbc-cond">${bl}</span></div>
-      ${bad?(()=>{
-        /* 缺陷說明的 **粗體** 先前直接印出字面，此處轉為 <b>；來源是版本控管的
-           playbook.json，與 §16 token 段的 md() 同一個既有做法。
-           `decision` 只取第一句（結論），`ifRevisited` 不上站——修法建議屬報告內容。 */
-        return `<details class="pbc-d"><summary>為什麼它永遠不會觸發</summary>
-        <p><b>問題</b>${mdb(r.defect.issue)}——${mdb(r.defect.detail)}</p>
-        <p><b>實證</b>${mdb(r.defect.evidence)}</p>
-        <p><b>發現</b>${mdb(r.defect.found)}</p>
-        <p><b>裁示</b>${mdb(String(r.defect.decision).split('。')[0])}。</p></details>`})():''}`;
+      ${bad?`<div class="pbc-d"><b>${mdb(r.defect.issue)}</b>　人工裁示：<b>不修</b>（改門檻會動到已發佈紀錄）。</div>`:''}`;
+      /* 缺陷的技術說明（問題／實證／發現／裁示全文）自 2026-08-25 起不上站——
+         揭露不靠散文：同一列已印「⚠ 設計缺陷」與「✗ Y<=0.0　0/11 週成立　實際 +0.35～+0.57」，
+         門檻與實際值域不重疊是數字自己講完的。散文是解釋不是揭露，而它會引出
+         台上答不了的技術追問（決賽當天上台者未參與建置）。全文見 Demo 包 Q&A。
+         playbook.json 的 _designNote 完整保留，它才是稽核紀錄的所在。 */
   };
   return `
     <div class="pbc">
@@ -3420,7 +3417,7 @@ function render(i){
         <button type="button" class="cmp-more" id="simreset">回到本週實際值</button></div>
       <div id="simout" aria-live="polite"></div>
       <div class="sim-note">25 項 KDF 權重與關鍵字命中維持本週實際值——它們來自事件內容，不是雙軸的函數。
-        因此僅受雙軸約束的劇本會隨滑桿變動，其餘維持不變，這本身就顯示了哪些建議由地緣情勢決定、哪些由企業能力決定。</div>
+        因此僅受雙軸約束的劇本會隨滑桿變動，其餘維持不變。</div>
     </div>`:''}
     ${pbCovHTML(S)}
   </section>
