@@ -3595,7 +3595,7 @@ function render(i){
     <div class="sh"><span class="ix">§16</span><h2>Agent 治理</h2><span class="q">怎麼讓它可預測、有邊界、可稽核？</span><span class="sub">六個面向，每項均可回到本站或 repo 查證</span></div>
     <div class="govgrid">
       <div class="card gov"><div class="gov-t"><span class="gov-k">Task Router</span>任務分派</div>
-        <div class="gov-b">四層單向管線，各層可獨立重跑：<b>抓取</b>（純搜尋 API，不用模型）→ <b>判定</b>（雙模型交叉驗證）→ <b>規畫</b>（純規則引擎，零 API 呼叫）→ <b>呈現</b>（靜態產物）。規畫層不依賴模型，因此任何一週的公司規畫都能離線重算並比對。</div></div>
+        <div class="gov-b">四層單向管線，各層可獨立重跑：<b>抓取</b>（純搜尋 API，不用模型）→ <b>判定</b>（人工分析，四道匯入門檻把關）→ <b>規畫</b>（純規則引擎，零 API 呼叫）→ <b>呈現</b>（靜態產物）。規畫層不依賴模型，因此任何一週的公司規畫都能離線重算並比對。</div></div>
       <div class="card gov"><div class="gov-t"><span class="gov-k">Memory Manager</span>記憶管理</div>
         <div class="gov-b">單一真相為 <code>weeks.json</code>，<b>append-only</b>：既有週次不因後見之明重寫。上週基準由編號推導而非順序，避免資料列順序影響判斷。劇本修訂<b>只對往後生效</b>，已發佈的決策紀錄不回頭重算。</div></div>
       <div class="card gov"><div class="gov-t"><span class="gov-k">Tools</span>工具</div>
