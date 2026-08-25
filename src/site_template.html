@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SCAI-Agent｜半導體前瞻戰略情報</title>
-<meta name="description" content="SCAI-Agent：情境感知半導體戰略情報系統。雙軸情境判定 × 25 項 KDF 動態校準 × 企業專屬風險規畫，每週自動運轉。">
+<meta name="description" content="SCAI-Agent：情境感知半導體戰略情報系統。雙軸情境判定 × 25 項 KDF 動態校準 × 企業專屬風險規畫。每日自動巡邏並分級警報；每週由人工分析產出，須通過四道匯入門檻。">
 <meta property="og:title" content="SCAI-Agent 半導體前瞻戰略情報">
-<meta property="og:description" content="每週自動判定產業情境、校準 25 項關鍵決策因素、輸出可執行的風險規畫。">
+<meta property="og:description" content="每週判定產業情境、校準 25 項關鍵決策因素、輸出可執行的風險規畫；每日自動巡邏產業訊號並分級警報。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sakaban-code.github.io/SCAI-test/">
 <meta property="og:image" content="https://sakaban-code.github.io/SCAI-test/assets/scai-og-1200x630.png">
@@ -3466,7 +3466,7 @@ function render(i){
         兩邊不同不必然是誰錯，但差得多就值得追問。這一段是判定鏈裡<b>唯一由模型決定</b>的部分；
         接下來「哪幾條劇本被觸發」是確定性規則，不經模型（可在 §08 的規則模擬器自行重算）。</p>
     </div>`}
-    <div class="audit">管線稽核：<a href="https://github.com/sakaban-Code/SCAI-test" target="_blank" rel="noopener">原始碼與資料 repo ↗</a> · <a href="https://github.com/sakaban-Code/SCAI-test/actions/workflows/weekly.yml" target="_blank" rel="noopener">每週自動執行紀錄 ↗</a>${w.tokenUsage?`　·　本週模型用量 <b class="num">${(w.tokenUsage.total||0).toLocaleString()}</b> tokens${w.tokenUsage.byStep?`<table><thead><tr><th>步驟</th><th>模型</th><th>in</th><th>out</th></tr></thead><tbody>${Object.entries(w.tokenUsage.byStep).map(([k,v])=>`<tr><td>${k}</td><td>${v.model||''}</td><td class="num">${(v.input_tokens||0).toLocaleString()}</td><td class="num">${(v.output_tokens||0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:''}`:'　·　自 W7 起由雲端管線自動產出，並於本區附逐模型 token 用量'}</div>
+    <div class="audit">管線稽核：<a href="https://github.com/sakaban-Code/SCAI-test" target="_blank" rel="noopener">原始碼與資料 repo ↗</a> · <a href="https://github.com/sakaban-Code/SCAI-test/actions/workflows/daily.yml" target="_blank" rel="noopener">每日巡邏執行紀錄 ↗</a>${w.tokenUsage?`　·　本週模型用量 <b class="num">${(w.tokenUsage.total||0).toLocaleString()}</b> tokens${w.tokenUsage.byStep?`<table><thead><tr><th>步驟</th><th>模型</th><th>in</th><th>out</th></tr></thead><tbody>${Object.entries(w.tokenUsage.byStep).map(([k,v])=>`<tr><td>${k}</td><td>${v.model||''}</td><td class="num">${(v.input_tokens||0).toLocaleString()}</td><td class="num">${(v.output_tokens||0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:''}`:'　·　本週為人工分析產出，經四道匯入門檻後寫入資料層；逐模型 token 用量待雲端管線首跑後於本區附上'}</div>
   </section>
 
   ${saHTML}
@@ -3497,7 +3497,7 @@ function render(i){
       <div class="card gov"><div class="gov-t"><span class="gov-k">Tools</span>工具</div>
         <div class="gov-b">檢索工具鎖定時間窗（起訖日）而非「最近 N 天」，回補歷史週時自動跳過不保留歷史的來源並在原始檔誠實標記。圖表與規畫引擎為確定性工具，相同輸入必得相同輸出。</div></div>
       <div class="card gov"><div class="gov-t"><span class="gov-k">Guardrails</span>護欄</div>
-        <div class="gov-b">距上一期超過 8 天即<b>中止</b>並要求先回補（防止週次與日期永久錯位）；週次已存在拒絕覆寫；迄日未到拒絕回補；人工產出須通過<b>三道匯入門檻</b>；外部文字輸出前一律跳脫、連結限 http(s) 協定。所有強制路徑都留有明示的逃生門。</div></div>
+        <div class="gov-b">距上一期超過 8 天即<b>中止</b>並要求先回補（防止週次與日期永久錯位）；週次已存在拒絕覆寫；迄日未到拒絕回補；人工產出須通過<b>四道匯入門檻</b>；外部文字輸出前一律跳脫、連結限 http(s) 協定。所有強制路徑都留有明示的逃生門。</div></div>
       <div class="card gov"><div class="gov-t"><span class="gov-k">Observability</span>可觀測性</div>
         <div class="gov-b">每一次權重調整都附<a href="#trace">依據與來源連結</a>；${sa.length?'<a href="#selfaudit">自我稽核</a>':'自我稽核'}逐項列出「判斷錯了的代價」與「最早翻盤訊號」${sa.length?'':'（本週無此欄位，W3／W5 起才有）'}；<a href="#method">期間涵蓋與已知落差</a>公開重疊、缺口與產出延遲——<b>不利於自己的事實同樣揭露</b>。</div></div>
       <div class="card gov"><div class="gov-t"><span class="gov-k">Evaluation</span>評估</div>
@@ -3550,7 +3550,7 @@ function render(i){
     <div class="dims" aria-label="五大 KDF 維度">
       ${DATA.dims.map((d,j)=>`<span class="dimtag"><span class="sw" style="background:${DC[j]}"></span>${d.name}（${d.members.length} 項）</span>`).join('')}
     </div>
-    <div class="cap" style="margin-top:12px">每週流程：外部事件擷取（附來源）→ 雙軸衝擊評估 → 情境判定 → 25 KDF 權重校準（附 Decision Trace）→ H+6 風險雷達 → 企業劇本比對 → 報告與通知。全程自動，人工只需審閱。</div>
+    <div class="cap" style="margin-top:12px">每週流程：外部事件擷取（附來源）→ 雙軸衝擊評估 → 情境判定 → 25 KDF 權重校準（附 Decision Trace）→ H+6 風險雷達 → 企業劇本比對 → 報告與通知。此流程目前由人工分析執行，產出須通過四道匯入門檻才寫入資料層；每日巡邏則由 GitHub Actions 自動執行，兩者節奏與可信度不同。</div>
     <!-- 判讀底層：憲法 LAYER 10-3／10-4 的呈現層。**正本為 cowork/CLAUDE.md**，此處為渲染副本，
          改動須兩邊同步（同 X／Y 軸敘述的既有做法）。原本這兩層只存在於憲法，站上完全看不到。 -->
     <div class="sh" style="margin-top:26px"><h2 style="font-size:15px">判讀底層</h2><span class="q">為什麼是這樣判，而不是跟著新聞情緒走？</span></div>
@@ -3898,7 +3898,7 @@ function aiAnswer(q){
     return `方法論：<b>X 軸＝地緣與供應鏈聚合</b>（−1 碎裂 ↔ +1 聚合）、<b>Y 軸＝資源與政策充沛</b>（−1 匱乏 ↔ +1 充沛），定位四情境後校準 25 項 KDF 權重（中性 50），每次調整附 Decision Trace。詳見「治理」分頁 §11。${SRC}`;
   }
   if(/(治理|token|護欄|控管|harness)/i.test(t)){
-    return `治理六面向見「治理」分頁 §10：任務分派（四層單向管線）、記憶（append-only）、工具（時間窗檢索）、護欄（缺漏防呆＋三道匯入門檻）、可觀測（Decision Trace＋自我稽核）、評估（確定性重算＋外部對抗審查）。Token 用量目前誠實留白——管線尚未首跑，不以估算值充數。${SRC}`;
+    return `治理六面向見「治理」分頁 §10：任務分派（四層單向管線）、記憶（append-only）、工具（時間窗檢索）、護欄（缺漏防呆＋四道匯入門檻）、可觀測（Decision Trace＋自我稽核）、評估（確定性重算＋外部對抗審查）。Token 用量分兩段講：開發階段有三個工具的本機實測數字（見 §10），運作階段因雲端管線尚未首跑而留白，不以估算值充數。${SRC}`;
   }
   if(/(可信|來源|真的|查證|假的)/.test(q)){
     return `本站每則事件附可查證來源連結；每次權重調整附 Decision Trace；§07 自我稽核公開「判斷錯了會怎樣」；§11 揭露期間重疊與缺口等不利事實。X／Y 與建議屬分析判斷【推斷】，非官方數據、非投資建議。${SRC}`;
