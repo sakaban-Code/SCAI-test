@@ -1,0 +1,37 @@
+{
+  "date": "2026-08-25",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "調度吃緊…菲移工限簽 衝擊科技廠人力 | 科技產業 | 產經 | 聯合新聞網",
+      "source": "udn.com",
+      "date": "Tue, 18 Au",
+      "url": "https://udn.com/news/story/7240/9700015",
+      "tier": "YELLOW",
+      "ruleId": "YT-03",
+      "matched": {
+        "YT-03": {
+          "any": [
+            "財報"
+          ],
+          "anyB": [
+            "台積電",
+            "輝達"
+          ]
+        },
+        "YT-05": {
+          "any": [
+            "人才"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 1
+}
