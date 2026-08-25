@@ -1518,6 +1518,8 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 /* 10px 小字一律以 4.5 為門檻（非大字例外）；#aa5311 在卡片底上只有 4.37，故加深。
    .tierchip 的 #aa5311 是白字在其上、方向相反且已達標，不可一併改。 */
 .src.ok{color:#0d6c86}.src.inf{color:#8a420b}.src.wait{color:#b0106a}
+a.src.lk{text-decoration:none;cursor:pointer}
+a.src.lk:hover,a.src.lk:focus-visible{text-decoration:underline}
 .src.rep{color:#fff;background:#0d6c86;border-color:#0d6c86}
 .pos-grid{display:grid;gap:14px;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
 @media (max-width:900px){.pos-grid{grid-template-columns:1fr}}
@@ -1799,7 +1801,7 @@ const CMP_PRESETS=[
    交叉引用（見 §NN）——三者任一沒改，導覽與標頭就會對不起來。 */
 const TABS=[
   {k:'overview',label:'總覽',hint:'本週判定',secs:[
-    ['overview','01','本週戰略簡報','這週的判定、信心與值得評估的方向']]},
+    ['overview','01','本週戰略簡報','這週的判定、支撐與值得評估的方向']]},
   /* 定位＝基礎盤：不隨週次變動的結構情報。先知道欣銓在產業裡的位置、
      對手是誰、子彈（供應商）夠不夠，才知道每週該蒐什麼、蒐到的東西重不重要。 */
   {k:'position',label:'定位',hint:'基礎盤',secs:[
@@ -2006,7 +2008,7 @@ function showWeekPop(k){
     <div class="wp-s">${wk.scenarioEn||''}｜${wk.scenario}</div>
     <div class="wp-xy num">X ${fmt(wk.xy.x)}（${xWord(wk.xy.x)}）　Y ${fmt(wk.xy.y)}（${yWord(wk.xy.y)}）</div>
     <p class="wp-p">${first}</p>
-    <div class="wp-m">觸發劇本 ${firedN} 條${wk.confidence?`｜信心 ${wk.confidence}`:''}｜完整內容含事件、決策軌跡與規畫</div>`;
+    <div class="wp-m">觸發劇本 ${firedN} 條${wk.support?`｜支撐 ${wk.support.events} 則`:''}｜完整內容含事件、決策軌跡與規畫</div>`;
   $('#wpgo').textContent=`跳轉到 W${wk.week}`;
   openModal('weekpop');
 }
@@ -3117,7 +3119,12 @@ function exportBar(){
    靜態內容不必等圖表庫，離線版與列印皆可用。 */
 /* 四級來源標記。「年報」為法定公開揭露之原始數字，可信度最高，給實心底以資區別 */
 const SRCCLS={'年報':'rep','查證':'ok','推斷':'inf','待公司確認':'wait'};
-const srcTag=s=>s?`<span class="src ${SRCCLS[s]||'inf'}">${s}</span>`:'';
+/* 來源標記。帶 url 時渲染成可點連結——「查證」這種徽章若點不下去，等於只是宣稱。
+   url 由 industry_position.json 提供，指向官網對應單元（查證之處，非逐項深連結；
+   官網為 JS 動態站、公開資訊觀測站無穩定深連結，故不宣稱能定位到那一行）。 */
+const srcTag=(s,u)=>{if(!s)return'';const c=SRCCLS[s]||'inf';
+  return u?`<a class="src ${c} lk" href="${safeUrl(u)}" target="_blank" rel="noopener" title="開啟來源頁">${s} ↗</a>`
+          :`<span class="src ${c}">${s}</span>`;};
 function posMap(P){
   const A=P.axes,PL=P.players;
   const X=v=>90+v/100*860, Y=v=>520-v/100*480;
@@ -3165,7 +3172,7 @@ function positionHTML(S){
       <span class="rt">${C.role}</span>
       <span class="rn">${C.roleNote}</span>
     </div>
-    <div class="pos-facts">${C.facts.map(f=>`<span class="f"><b>${f.k}</b> ${f.v} ${srcTag(f.src)}</span>`).join('')}</div>
+    <div class="pos-facts">${C.facts.map(f=>`<span class="f"><b>${f.k}</b> ${f.v} ${srcTag(f.src,f.url)}</span>`).join('')}</div>
 
     <div class="pos-grid">
       <div class="card">
@@ -3318,7 +3325,7 @@ function render(i){
         ${w.days&&w.days!==7?`<span class="chip" title="本期涵蓋 ${w.days} 個日曆天，非標準 7 天週期；成因見 §17 方法論">${w.days} 天窗口</span>`:''}
         <span class="sp"></span>
         <span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>
-        ${w.crossCheck?`<span class="chip cc${w.confidence==='低'?' lo':''}">雙模型${w.crossCheck.agreement?'一致 ✓':'不一致 ✕'}｜信心 ${w.confidence||'—'}</span>`:''}
+        
       </div>
       <div class="brief-body">
         <div class="brief-main">
@@ -3345,7 +3352,16 @@ function render(i){
           <div class="sr-row"><span class="sr-k">情境判定</span><span class="sr-v">${w.scenarioEn||''}<span class="sm">${w.scenario}</span></span></div>
           <div class="sr-row"><span class="sr-k">X · 地緣供應鏈</span><span class="sr-v">${fmt(w.xy.x)}${p?` <span class="${dx<0?'d':'u'}">${dx<0?'▼':'▲'}${Math.abs(dx).toFixed(2)}</span>`:''}</span></div>
           <div class="sr-row"><span class="sr-k">Y · 資源與政策</span><span class="sr-v">${fmt(w.xy.y)}${p?` <span class="${dy<0?'d':'u'}">${dy<0?'▼':'▲'}${Math.abs(dy).toFixed(2)}</span>`:''}</span></div>
-          <div class="sr-row"><span class="sr-k">判定信心</span><span class="sr-v">${w.confidence||'—'}</span></div>
+          <div class="sr-row"><span class="sr-k">判定支撐</span><span class="sr-v">${(()=>{const s=w.support;
+            if(!s)return '—';
+            /* 不給高／中／低等級——那對已發佈的十一週而言是後見之明。只列既有紀錄本身
+               就有的事實，並照實標出兩個減分項（補記事件＝窗口外、資料不足）。 */
+            /* ⚠ 這一列必須維持單行：折成兩行會吃掉 17px，而 720p 投影的摺線餘裕
+               十一週最少只有 30px。W10 同時有補記與資料不足，是最長的一週，
+               措辭以它為準壓到單行。 */
+            return `${s.events} 事件・${s.linked} 來源`
+              + (s.backfilled?`・補記 ${s.backfilled}`:'')
+              + (s.lack?`・資料不足 ${s.lack}`:'');})()}</span></div>
           ${w.crossCheck?`<div class="sr-row"><span class="sr-k">雙模型交叉</span><span class="sr-v">${w.crossCheck.agreement?'一致':'不一致'}</span></div>`:''}
           <div class="sr-row"><span class="sr-k">觸發劇本</span><span class="sr-v">${fired.length} 條</span></div>
           <div class="sr-row"><span class="sr-k">資料更新</span><span class="sr-v">${w.gen}</span></div>

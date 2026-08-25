@@ -569,6 +569,34 @@ def build_payload(root: pathlib.Path) -> dict:
         w["start"] = start.isoformat()
         w["end"] = end.isoformat()
 
+    # ── 判定支撐：這一週的判斷有多少可查證的東西撐著 ──
+    # 讀數面板原本有一列「判定信心」，但 weeks.json 從來沒有 confidence 欄位，
+    # 十一週一路顯示「—」——介面承諾了資料沒交付的東西。
+    #
+    # 補法刻意**不是**補一個高／中／低等級：那要嘛是新判斷（對已發佈的十一週而言
+    # 就是後見之明，違反 append-only 的精神），要嘛是憑空的量表。改為列出**既有紀錄
+    # 本身就有的事實**——事件數、附連結數、決策軌跡筆數，以及兩個減分項（補記事件、
+    # 資料不足標記）。這不是新的宣稱，是把已經在檔案裡的東西數出來。
+    def _tagged(items, tag):
+        """帶某標記的**條目數**。不可用全檔字串計數——同一則補記事件的標記會同時
+        出現在標題、摘要與決策軌跡，W11 實測全檔命中 3 次但實際只有 1 則。"""
+        return sum(1 for x in (items or [])
+                   if tag in json.dumps(x, ensure_ascii=False))
+
+    for w in weeks:
+        ev = w.get("events") or []
+        dt = w.get("decisionTrace") or []
+        w["support"] = {
+            "events": len(ev),
+            "linked": sum(1 for e in ev if (e or {}).get("url")),
+            "trace": len(dt),
+            # 補記事件的標記依 2026-08-18 裁定加在 decisionTrace 的 event 欄，
+            # 故以軌跡層為準（W10=3、W11=1，與週報紀錄相符）。
+            "backfilled": _tagged(dt, "【補記事件"),
+            "lack": (_tagged(ev, "【資料不足】") + _tagged(dt, "【資料不足】")
+                     + _tagged(w.get("riskRadar"), "【資料不足】")),
+        }
+
     # 風險雷達的事後結果：獨立檔於此合併，weeks.json 不動（append-only）。
     # 與 coverage 同一模式——衍生／後補的顯示值一律不寫回正本。
     oc_path = root / "data" / "risk_outcomes.json"
