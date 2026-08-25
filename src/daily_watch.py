@@ -285,7 +285,10 @@ def patrol():
             tier = tier_of(matches)
             if tier == "GREEN":
                 continue  # GREEN 不落檔；「當天有跑」由收據證明
-            rec = {"title": it["title"], "source": it["source"], "date": it["date"],
+            # summary 必須落檔：判定用的是 title＋snippet，不留下 snippet，
+            # verify() 的歷史回歸就只能拿半份文字重跑（沿用人工整理檔的同一個鍵）。
+            rec = {"title": it["title"], "summary": it["snippet"],
+                   "source": it["source"], "date": it["date"],
                    "url": it["url"], "tier": tier,
                    "ruleId": top_rule(matches, tier)["id"],
                    "matched": {r["id"]: h for r, h in matches}, "alerted": False}
@@ -407,10 +410,17 @@ def verify():
     files = sorted((ROOT / "logs" / "daily_watch").glob("*.json"))
     red = yel = n_items = 0
     mism = []
+    # 判定當下用的是 title＋snippet；沒把那份文字留下來的紀錄無法重跑，
+    # 把它算成「不符」是假警報——2026-08-22 cron 上線後 patrol() 未落檔 summary，
+    # 本項對自動化期間全盲，五則「未解釋不符」全出於此。單獨計數並印出，不靜默跳過。
+    notext = []
     for f in files:
         d = json.loads(f.read_text(encoding="utf-8"))
         for it in d.get("items", []):
             n_items += 1
+            if "summary" not in it:
+                notext.append(f"{d.get('date')}｜{it.get('title', '')[:36]}")
+                continue
             matches = classify(f"{it.get('title', '')} {it.get('summary', '')}")
             tier = tier_of(matches)
             ids = [r["id"] for r, _ in matches]
@@ -428,9 +438,12 @@ def verify():
     unexplained = [t for w, t in mism if w is None]
     ok1 = not unexplained
     results.append((f"① 歷史回歸（{len(files)} 檔 {n_items} 則 → 引擎 RED {red}／YELLOW {yel}；"
-                    f"不符 {len(mism)}，其中未解釋 {len(unexplained)}）", ok1))
+                    f"不符 {len(mism)}，其中未解釋 {len(unexplained)}"
+                    + (f"；無法重跑 {len(notext)}" if notext else "") + "）", ok1))
     for _, t in mism:
         print("   " + t)
+    for t in notext:
+        print(f"   [無法重跑] {t}（原始文本未留存，非不符）")
 
     # ② 否定與假設語氣：「園區無停電」「若新竹缺水」皆不觸發 RT-04；真事故必須觸發（三向）
     calm = "本週台灣新竹、龍潭、桃園園區無天災、停電或缺水通報"
