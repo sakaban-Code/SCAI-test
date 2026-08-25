@@ -482,7 +482,7 @@ details[open] summary::after{content:"−"}
 .src a{text-decoration:none}
 .src a:hover{text-decoration:underline}
 
-/* ── §07 自我稽核 ── */
+/* ── §12 自我稽核 ── */
 .sa-list{display:grid;gap:12px}
 .sa{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
 .sa-h{display:flex;gap:10px;align-items:baseline;margin-bottom:12px}
@@ -559,7 +559,11 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
   .tb.on{border-left-color:var(--accent-br)}
   nav.secnav{order:5;flex:1;border-top:1px solid var(--ink-line);margin-top:6px}
   .secnav .wrap{flex-direction:column;padding:10px 10px 12px;gap:1px;overflow:visible}
-  .secnav a{display:block;padding:7px 12px;border-bottom:none;border-left:2px solid transparent;border-radius:0 6px 6px 0}
+  /* ⚠ white-space:normal 必須在此覆蓋：.secnav a 全域是 nowrap，那是給 <1100px
+     的**橫向**分頁列用的（一列橫捲，斷行會破版）。側欄是直向 block，繼承 nowrap
+     會讓長提示撐出 238px 側欄，再被 header 的 overflow:hidden 裁掉——實測最長的
+     「任務分派、記憶、工具、護欄、可觀測性、評估」被切 30px。改為正常斷行。 */
+  .secnav a{display:block;padding:7px 12px;border-bottom:none;border-left:2px solid transparent;border-radius:0 6px 6px 0;white-space:normal}
   .nh{display:block;font-size:9.5px;line-height:1.45;color:#55628a;margin-top:2px}
   .secnav a::after{display:none}
   .secnav a:hover{background:rgba(255,255,255,.72)}
@@ -700,7 +704,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
      副標統一 #55628a，逐底色驗過最差 5.24:1 */
   .nh{display:block;font-size:9.5px;line-height:1.45;color:#55628a;margin-top:2px}
 }
-/* §10 Agent 治理 */
+/* §16 Agent 治理 */
 .govgrid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--gut)}
 .card.gov{grid-column:span 6;min-width:0}
 .gov-t{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
@@ -756,7 +760,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 }
 @media (prefers-reduced-motion:no-preference){#aipanel{animation:aiin .18s ease-out}}
 @keyframes aiin{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
-/* 企業畫像切換（§08/§09）：欣銓官方＋兩家虛構示範企業 */
+/* 企業畫像切換（§13/§15）：欣銓官方＋兩家虛構示範企業 */
 .cosel{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:14px}
 .cosel-l{font-size:10px;letter-spacing:.08em;color:var(--muted);
   font-family:"IBM Plex Mono","Noto Sans TC",monospace;text-transform:uppercase}
@@ -794,7 +798,7 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:28px 0 48px;font
 .wrow.in .wrow-cb{background:var(--accent);border-color:var(--accent)}
 .cmpnote{margin-top:9px;font-size:11px;line-height:1.65;color:var(--ink2);
   background:rgba(255,255,255,.64);border-left:2px solid var(--accent);border-radius:0 6px 6px 0;padding:8px 11px}
-/* §09 期間涵蓋揭露：內容由建置時推導的 DATA.coverage 產生，資料變動即自動同步 */
+/* §17 期間涵蓋揭露：內容由建置時推導的 DATA.coverage 產生，資料變動即自動同步 */
 .covbox{margin-top:16px;border:1px solid var(--line);border-left:3px solid var(--accent);
   border-radius:8px;padding:14px 16px;background:rgba(255,255,255,.64)}
 .covbox .t{font-size:12px;font-weight:600;color:var(--ink);letter-spacing:.02em;margin-bottom:6px}
@@ -1451,7 +1455,7 @@ footer{border:0;margin:22px 6px 0;padding:16px 20px;border-radius:18px;
 .jn-note{margin-top:9px;padding:8px 11px;border-radius:9px;font-size:11.5px;line-height:1.7;
   color:var(--ink2);background:rgba(170,83,17,.06);border:1px solid rgba(170,83,17,.22)}
 .jn-note code{font-family:var(--mono);font-size:11px}
-/* ── 劇本覆蓋率（§08 末） ── */
+/* ── 劇本覆蓋率（§13 末） ── */
 .pbc{margin-top:18px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
 .pbc-note{font-size:12px;line-height:1.7;color:var(--muted);margin-bottom:11px}
 .pbc-r{display:grid;grid-template-columns:52px minmax(0,1fr) 90px 62px minmax(0,1.1fr);
@@ -1785,7 +1789,7 @@ const CMP_PRESETS=[
    先「他在哪裡」（定位）→ 再「這週發生什麼」（情報）→ 再「怎麼推導」（分析）
    → 最後才「所以可以考慮什麼」（公司），治理獨立於內容層、殿後。 */
 /* 每列＝[區段 id, 全站 § 編號, 標題, 白話副標]。編號沿用區段標頭的 §NN 而非
-   分頁內流水號，否則導覽寫 01 而標頭寫 §07 會對不起來。
+   分頁內流水號，否則導覽寫 01 而標頭寫 §12 會對不起來。
    § 編號已於 2026-08-24 隨分頁重排一併重編為閱讀順序；改動編號時**必須同步**
    區段標頭的 <span class="ix">、本註解下方的 secs 陣列、以及內文與 AI 問答裡的
    交叉引用（見 §NN）——三者任一沒改，導覽與標頭就會對不起來。 */
@@ -1802,26 +1806,26 @@ const TABS=[
   {k:'intel',label:'情報',hint:'外部動態',secs:[
     ['risk','03','風險雷達','未來六個月要盯哪些訊號'],
     ['events','04','本週事件','外部發生了什麼，每則附可查證來源'],
-    ['daily','','每日巡邏','每天有沒有真的跑、發現了什麼'],
+    ['daily','05','每日巡邏','每天有沒有真的跑、發現了什麼'],
     /* 不給 § 編號：它是可操作的示範而非週報內容，且新增編號會牽動其後全部區段
        與六處交叉引用。先例＝本週最大變動（movers）亦無編號。 */
-    ['journey','','試一則新聞','貼一則新聞，看它穿過系統每一層']]},
+    ['journey','06','試一則新聞','貼一則新聞，看它穿過系統每一層']]},
   {k:'analysis',label:'分析',hint:'走勢與依據',secs:[
-    ['movers','','本週最大變動','哪些因素這週變重要了，為什麼'],
+    ['movers','07','本週最大變動','哪些因素這週變重要了，為什麼'],
     /* 副標不寫死週數——曾寫「八週走勢」而站上已累積十一週，資料長大它不會跟著改 */
-    ['trend','05','趨勢圖表','歷週走勢、25 項因素權重與週次對比'],
+    ['trend','08','趨勢圖表','歷週走勢、25 項因素權重與週次對比'],
     /* 同 journey：不給 § 編號，避免牽動其後全部編號與交叉引用 */
-    ['backtest','','回測時光機','當時說了什麼、後來怎麼了'],
-    ['predict','','事前預測','敢不敢先說，錯了算誰的'],
-    ['trace','06','決策軌跡','每一次權重調整的依據與來源'],
-    ['selfaudit','07','自我稽核','這些判斷如果錯了會怎樣']]},
+    ['backtest','09','回測時光機','當時說了什麼、後來怎麼了'],
+    ['predict','10','事前預測','敢不敢先說，錯了算誰的'],
+    ['trace','11','決策軌跡','每一次權重調整的依據與來源'],
+    ['selfaudit','12','自我稽核','這些判斷如果錯了會怎樣']]},
   {k:'company',label:'公司',hint:'欣銓相關',secs:[
-    ['plan','08','公司規畫','哪些劇本被觸發、該做與不該做什麼'],
-    ['dept','','這件事該誰看','外部訊號落在哪個部門的責任範圍'],
-    ['profile','09','企業畫像','欣銓是什麼樣的公司——判斷的前提']]},
+    ['plan','13','公司規畫','哪些劇本被觸發、該做與不該做什麼'],
+    ['dept','14','這件事該誰看','外部訊號落在哪個部門的責任範圍'],
+    ['profile','15','企業畫像','欣銓是什麼樣的公司——判斷的前提']]},
   {k:'gov',label:'治理',hint:'怎麼控管',secs:[
-    ['gov','10','Agent 治理','任務分派、記憶、工具、護欄、可觀測性、評估'],
-    ['method','11','方法論','雙軸情境與 25 項關鍵決策因素怎麼運作']]},
+    ['gov','16','Agent 治理','任務分派、記憶、工具、護欄、可觀測性、評估'],
+    ['method','17','方法論','雙軸情境與 25 項關鍵決策因素怎麼運作']]},
 ];
 const SEC_TAB={};TABS.forEach(t=>t.secs.forEach(s=>SEC_TAB[s[0]]=t.k));
 let curTab='overview';
@@ -2562,7 +2566,7 @@ function jnSimilar(title){
   return out.sort((a,b)=>b.s-a.s).slice(0,3);
 }
 
-/* ── 劇本覆蓋率（§08 末）──
+/* ── 劇本覆蓋率（§13 末）──
    評審一定會問：八條劇本，Demo 上只看到四五條，其餘呢？
    「從未觸發」有兩種，性質天差地遠，分開呈現才誠實：
      · 條件真的沒發生（Spring 擴張窗口要 X 轉正，而十一週全碎裂）→ 正確休眠，是好事
@@ -2617,7 +2621,7 @@ function deptHTML(S){
   if(!DEP||!DEP.depts.length)return '';
   return `
   <section id="dept" data-tab="company">
-    <div class="sh"><h2>這件事該誰看</h2><span class="q">外部訊號落在哪個部門的責任範圍？</span>
+    <div class="sh"><span class="ix">§14</span><h2>這件事該誰看</h2><span class="q">外部訊號落在哪個部門的責任範圍？</span>
       <span class="sub">${S?'把每日巡邏抓到的訊號與既有劇本建議，依權責歸戶到各部門'
         :'依 decision_levers.owner 分派 · 串接每日巡邏與事前預測'}</span>
       <span class="chip lo" title="我方不掌握各部門內部現況">只分派不評價</span></div>
@@ -2709,7 +2713,7 @@ function dailyHTML(S){
   const g=DL.gaps.length;
   return `
   <section id="daily" data-tab="intel">
-    <div class="sh"><h2>每日巡邏</h2><span class="q">每天有沒有真的跑？發現了什麼？</span>
+    <div class="sh"><span class="ix">§05</span><h2>每日巡邏</h2><span class="q">每天有沒有真的跑？發現了什麼？</span>
       <span class="sub">${S?'即時偵測層——每天掃新聞、依規則分級，發現 RED 就寄警報。與每週正式紀錄是兩套節奏'
         :'即時偵測 · 每日執行收據 · 與週報四道門檻分屬兩層'}</span>
       <span class="chip lo" title="每日層為即時偵測，未經週報之四道匯入門檻">未經週報門檻</span></div>
@@ -2803,7 +2807,7 @@ function predHTML(S){
   const open=ps.filter(p=>!p.outcome).length, done=ps.length-open;
   return `
   <section id="predict" data-tab="analysis">
-    <div class="sh"><h2>事前預測與否證條件</h2><span class="q">敢不敢先說，錯了算誰的？</span>
+    <div class="sh"><span class="ix">§10</span><h2>事前預測與否證條件</h2><span class="q">敢不敢先說，錯了算誰的？</span>
       <span class="sub">${S?'每則預測都附「什麼訊號出現代表我們錯了」——沒有否證條件的預測只是換句話說的描述'
         :'憲法 LAYER 10 第四問落地 · 寫入日早於驗證日 · 結果只追加不覆寫'}</span></div>
     <div class="pd-bar">
@@ -2863,7 +2867,7 @@ function backtestHTML(S){
   const jd=DATA.riskJudged||'';
   return `
   <section id="backtest" data-tab="analysis">
-    <div class="sh"><h2>回測時光機</h2><span class="q">當時說了什麼？後來怎麼了？</span>
+    <div class="sh"><span class="ix">§09</span><h2>回測時光機</h2><span class="q">當時說了什麼？後來怎麼了？</span>
       <span class="sub">${S?'拉時間軸回到任一週，把當週判定與事後結果並排——全部是既有紀錄，不新增判定'
         :'逐週對照 · 當週判定 vs 事後結果 · 既有資料重新呈現'}</span></div>
     <div class="bt-sum">
@@ -2942,7 +2946,7 @@ function journeyHTML(S){
   if(!AL)return '';
   return `
   <section id="journey" data-tab="intel">
-    <div class="sh"><h2>試一則新聞</h2><span class="q">情報進來之後，實際發生什麼事？</span>
+    <div class="sh"><span class="ix">§06</span><h2>試一則新聞</h2><span class="q">情報進來之後，實際發生什麼事？</span>
       <span class="sub">${S?'貼任何一則新聞，看它穿過系統每一層——每層都會說明依據哪個檔、以及有沒有呼叫模型'
         :'完整判定鏈路 · 逐層可稽核 · 六層中五層為確定性規則'}</span>
       <span class="chip" id="jnsc" title="以建置時 Python 正本的結果自我比對">自證中…</span></div>
@@ -3241,7 +3245,7 @@ function render(i){
   $('#wprev').disabled=(i===0);$('#wnext').disabled=(i===DATA.weeks.length-1);
   const dx=p?w.xy.x-p.xy.x:0, dy=p?w.xy.y-p.xy.y:0;
   const plan=w.companyPlan, fired=plan?plan.firedPlaybooks:[];
-  /* 企業畫像切換：§01 總覽維持欣銓官方週報；§08／§09 依 curCompany 切換。
+  /* 企業畫像切換：§01 總覽維持欣銓官方週報；§13／§15 依 curCompany 切換。
      欣銓（real）取 weeks.json 正本；示範企業取建置時以引擎重算的 plans。 */
   const CO=DATA.companies||[];
   const co=CO.find(c=>c.id===curCompany)||CO[0]||null;
@@ -3271,7 +3275,7 @@ function render(i){
       ${x.why?`<div class="why">${x.why}</div>`:''}</div></div>`;
     if(ups.length||dns.length)moversHTML=`
     <section id="movers" data-tab="analysis" style="padding-top:18px">
-      <div class="sh"><h2>本週最大變動</h2><span class="q">這週哪些因素變重要了？</span><span class="sub">${S?`相對 W${p.week}｜附每項權重調整理由`:`相對 W${p.week} · 附調整理由`}</span></div>
+      <div class="sh"><span class="ix">§07</span><h2>本週最大變動</h2><span class="q">這週哪些因素變重要了？</span><span class="sub">${S?`相對 W${p.week}｜附每項權重調整理由`:`相對 W${p.week} · 附調整理由`}</span></div>
       <div class="movers">
         <div class="card"><div style="font-size:11px;color:var(--muted);margin-bottom:6px">權重上調</div>${ups.map(row).join('')||'<div class="mv"><div class="body"><div class="why">無顯著上調</div></div></div>'}</div>
         <div class="card"><div style="font-size:11px;color:var(--muted);margin-bottom:6px">權重下調</div>${dns.map(row).join('')||'<div class="mv"><div class="body"><div class="why">無顯著下調</div></div></div>'}</div>
@@ -3279,12 +3283,12 @@ function render(i){
     </section>`;
   }
 
-  /* §07 自我稽核：僅在該週有資料時才出現（W1／W2／W4 無此欄位）。
+  /* §12 自我稽核：僅在該週有資料時才出現（W1／W2／W4 無此欄位）。
      導覽項不需另外處理——buildSecBar() 只列實際存在於 DOM 的區段。 */
   const sa=w.selfAudit||[];
   const saHTML=sa.length?`
   <section id="selfaudit" data-tab="analysis">
-    <div class="sh"><span class="ix">§07</span><h2>自我稽核</h2><span class="q">這些判斷如果錯了會怎樣？</span><span class="sub">${S?`本週 ${sa.length} 項關鍵判斷｜含代價與最早翻盤訊號`:`關鍵判斷之依據、行動與反面情境（憲法自我稽核要求）`}</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
+    <div class="sh"><span class="ix">§12</span><h2>自我稽核</h2><span class="q">這些判斷如果錯了會怎樣？</span><span class="sub">${S?`本週 ${sa.length} 項關鍵判斷｜含代價與最早翻盤訊號`:`關鍵判斷之依據、行動與反面情境（憲法自我稽核要求）`}</span><span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span></div>
     <div class="sa-list">${sa.map((a,j)=>`
       <div class="sa">
         <div class="sa-h"><span class="sa-n num">${String(j+1).padStart(2,'0')}</span><b>${clean(a.judgment||'')}</b></div>
@@ -3310,7 +3314,7 @@ function render(i){
         <span class="ix">§01</span>
         <span class="mt">本週戰略簡報</span>
         <span class="mn">W${String(w.week).padStart(2,'0')}　${w.range}</span>
-        ${w.days&&w.days!==7?`<span class="chip" title="本期涵蓋 ${w.days} 個日曆天，非標準 7 天週期；成因見 §11 方法論">${w.days} 天窗口</span>`:''}
+        ${w.days&&w.days!==7?`<span class="chip" title="本期涵蓋 ${w.days} 個日曆天，非標準 7 天週期；成因見 §17 方法論">${w.days} 天窗口</span>`:''}
         <span class="sp"></span>
         <span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>
         ${w.crossCheck?`<span class="chip cc${w.confidence==='低'?' lo':''}">雙模型${w.crossCheck.agreement?'一致 ✓':'不一致 ✕'}｜信心 ${w.confidence||'—'}</span>`:''}
@@ -3365,7 +3369,7 @@ function render(i){
       <span class="cosel-l">企業畫像</span>
       ${CO.map(c=>`<button type="button" class="co-b${c.id===co.id?' on':''}" data-co="${c.id}" aria-pressed="${c.id===co.id}">${c.short}${c.real?'':'<span class="co-tag">示範</span>'}</button>`).join('')}
     </div>`:''}
-    <div class="sh"><span class="ix">§08</span><h2>對${co?co.short:'欣銓'}的公司規畫</h2><span class="q">${co?co.short:'欣銓'}現在該做什麼？</span><span class="sub">${S?`共 ${coFired.length} 條觸發｜含成功指標與停損訊號`:'企業畫像 × 情境 → 觸發式劇本'}</span>${co&&!co.real?'<span class="chip demo" title="虛構企業：畫像與劇本為示範資料；觸發依據引用的週次資料為真實紀錄">示範資料</span>':'<span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>'}</div>
+    <div class="sh"><span class="ix">§13</span><h2>對${co?co.short:'欣銓'}的公司規畫</h2><span class="q">${co?co.short:'欣銓'}現在該做什麼？</span><span class="sub">${S?`共 ${coFired.length} 條觸發｜含成功指標與停損訊號`:'企業畫像 × 情境 → 觸發式劇本'}</span>${co&&!co.real?'<span class="chip demo" title="虛構企業：畫像與劇本為示範資料；觸發依據引用的週次資料為真實紀錄">示範資料</span>':'<span class="chip" title="X/Y 座標、權重與建議皆為分析判斷，非企業官方數據">推斷</span>'}</div>
     ${co&&!co.real?`<div class="demobox"><b>${co.name}</b>為虛構示範企業——同一套週次情境判定，換上不同企業畫像與劇本組，觸發結果隨之改變（可與欣銓對照本週差異）。觸發依據引用的座標、KDF 與關鍵字均為真實週次資料；虛構的只有企業本身。非投資建議。</div>`:''}
     ${coPlan?`<div style="font-size:12.5px;color:var(--ink2);margin-bottom:14px">情境姿態：${coPlan.scenarioStance}</div>`:''}
     <div class="plan">${coFired.map(f=>`
@@ -3419,7 +3423,7 @@ function render(i){
   </section>
 
   <section id="trend" data-tab="analysis">
-    <div class="sh"><span class="ix">§05</span><h2>情境軌跡與權重</h2><span class="q">局勢往哪個方向走？</span><span class="sub">${S?`W1–W${w.week} 累積｜資料只追加不覆寫`:`W1–W${w.week} 累積 · 只追加不覆寫`}</span></div>
+    <div class="sh"><span class="ix">§08</span><h2>情境軌跡與權重</h2><span class="q">局勢往哪個方向走？</span><span class="sub">${S?`W1–W${w.week} 累積｜資料只追加不覆寫`:`W1–W${w.week} 累積 · 只追加不覆寫`}</span></div>
     ${exportBar()}
     ${p?`<div class="trendsum">累積觀察（W${w0.week}→W${w.week}）：X 軸由 <b class="num">${fmt(w0.xy.x)}</b> 移至 <b class="num">${fmt(w.xy.x)}</b>（${w.xy.x<w0.xy.x?'碎裂加深':'聚合改善'} ${Math.abs(w.xy.x-w0.xy.x).toFixed(2)}）；Y 軸由 <b class="num">${fmt(w0.xy.y)}</b> 至 <b class="num">${fmt(w.xy.y)}</b>。期間情境${scenSpan.length===1?`維持 ${scenSpan[0]}`:`歷經 ${scenSpan.join(' → ')}`}；五維中累積變動最大＝${dimTop.n}（<b class="num">${dimTop.a.toFixed(1)}→${dimTop.b.toFixed(1)}</b>）。</div>`:''}
     <div class="g2">
@@ -3470,7 +3474,7 @@ function render(i){
   ${journeyHTML(S)}
 
   <section id="trace" data-tab="analysis">
-    <div class="sh"><span class="ix">§06</span><h2>Decision Trace${S?' 決策軌跡':''}</h2><span class="q">每一步判斷怎麼來的？</span><span class="sub">${S?'事件 → 關鍵字 → 軸位移 → 權重調整，逐筆可查證':'可稽核決策軌跡 · 事件 → 關鍵字 → 軸位移 → KDF 調整'}</span></div>
+    <div class="sh"><span class="ix">§11</span><h2>Decision Trace${S?' 決策軌跡':''}</h2><span class="q">每一步判斷怎麼來的？</span><span class="sub">${S?'事件 → 關鍵字 → 軸位移 → 權重調整，逐筆可查證':'可稽核決策軌跡 · 事件 → 關鍵字 → 軸位移 → KDF 調整'}</span></div>
     ${(w.decisionTrace||[]).map(t=>{
       const ev=(w.events||[]).find(e=>e.title===t.event)||{};
       return `<details><summary><span>${t.event}</span>
@@ -3498,7 +3502,7 @@ function render(i){
       <div class="jd-out" id="jdout" aria-live="polite"></div>
       <p class="jd-note">AI 只看得到你貼的這一則，當時的判定則是在整週九則事件、前一週座標與風險雷達都在眼前的情況下做的——
         兩邊不同不必然是誰錯，但差得多就值得追問。這一段是判定鏈裡<b>唯一由模型決定</b>的部分；
-        接下來「哪幾條劇本被觸發」是確定性規則，不經模型（可在 §08 的規則模擬器自行重算）。</p>
+        接下來「哪幾條劇本被觸發」是確定性規則，不經模型（可在 §13 的規則模擬器自行重算）。</p>
     </div>`}
     <div class="audit">管線稽核：<a href="https://github.com/sakaban-Code/SCAI-test" target="_blank" rel="noopener">原始碼與資料 repo ↗</a> · <a href="https://github.com/sakaban-Code/SCAI-test/actions/workflows/daily.yml" target="_blank" rel="noopener">每日巡邏執行紀錄 ↗</a>${w.tokenUsage?`　·　本週模型用量 <b class="num">${(w.tokenUsage.total||0).toLocaleString()}</b> tokens${w.tokenUsage.byStep?`<table><thead><tr><th>步驟</th><th>模型</th><th>in</th><th>out</th></tr></thead><tbody>${Object.entries(w.tokenUsage.byStep).map(([k,v])=>`<tr><td>${k}</td><td>${v.model||''}</td><td class="num">${(v.input_tokens||0).toLocaleString()}</td><td class="num">${(v.output_tokens||0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`:''}`:'　·　本週為人工分析產出，經四道匯入門檻後寫入資料層；本專案未取得 API 預算，雲端週報管線從未執行，故無逐模型 token 用量'}</div>
   </section>
@@ -3508,7 +3512,7 @@ function render(i){
   ${deptHTML(S)}
 
   <section id="profile" data-tab="company">
-    <div class="sh"><span class="ix">§09</span><h2>企業畫像</h2><span class="q">這些建議是對誰而言？</span><span class="sub">${co?`${co.name}｜${co.tickerLabel}`:'欣銓科技 3264.TWO · 公開資料'}</span>${co&&!co.real?'<span class="chip demo" title="虛構企業：畫像數字為示範資料">示範資料</span>':''}</div>
+    <div class="sh"><span class="ix">§15</span><h2>企業畫像</h2><span class="q">這些建議是對誰而言？</span><span class="sub">${co?`${co.name}｜${co.tickerLabel}`:'欣銓科技 3264.TWO · 公開資料'}</span>${co&&!co.real?'<span class="chip demo" title="虛構企業：畫像數字為示範資料">示範資料</span>':''}</div>
     ${co&&co.industry?`<div style="font-size:12px;color:var(--ink2);margin-bottom:12px">${co.industry}${co.positioning?`——${co.positioning}`:''}</div>`:''}
     <div class="pf">
       ${(co?co.stats:[]).map(s2=>`<div class="it"><div class="k">${s2.k}</div><div class="v">${s2.v}</div><div class="n">${s2.n}${s2.tbc?' <span class="tbc">待確認</span>':''}${co.real?'':' <span class="tbc">示範</span>'}</div></div>`).join('')}
@@ -3522,7 +3526,7 @@ function render(i){
   </section>
 
   <section id="gov" data-tab="gov">
-    <div class="sh"><span class="ix">§10</span><h2>Agent 治理</h2><span class="q">怎麼讓它可預測、有邊界、可稽核？</span><span class="sub">六個面向，每項均可回到本站或 repo 查證</span></div>
+    <div class="sh"><span class="ix">§16</span><h2>Agent 治理</h2><span class="q">怎麼讓它可預測、有邊界、可稽核？</span><span class="sub">六個面向，每項均可回到本站或 repo 查證</span></div>
     <div class="govgrid">
       <div class="card gov"><div class="gov-t"><span class="gov-k">Task Router</span>任務分派</div>
         <div class="gov-b">四層單向管線，各層可獨立重跑：<b>抓取</b>（純搜尋 API，不用模型）→ <b>判定</b>（雙模型交叉驗證）→ <b>規畫</b>（純規則引擎，零 API 呼叫）→ <b>呈現</b>（靜態產物）。規畫層不依賴模型，因此任何一週的公司規畫都能離線重算並比對。</div></div>
@@ -3604,7 +3608,7 @@ function render(i){
   </section>
 
   <section id="method" data-tab="gov">
-    <div class="sh"><span class="ix">§11</span><h2>方法論</h2><span class="q">這套判定怎麼運作？</span><span class="sub">${S?'雙軸情境 × 25 項關鍵決策因素（KDF）':'雙軸情境分析 × 25 KDF 動態校準（SCAI-Agent）'}</span></div>
+    <div class="sh"><span class="ix">§17</span><h2>方法論</h2><span class="q">這套判定怎麼運作？</span><span class="sub">${S?'雙軸情境 × 25 項關鍵決策因素（KDF）':'雙軸情境分析 × 25 KDF 動態校準（SCAI-Agent）'}</span></div>
     <div class="axbox">
       <div class="axc"><div class="t">X 軸｜地緣與供應鏈聚合程度（−1 碎裂 ↔ +1 聚合）</div>
         <div class="d">碎裂訊號：保護主義、出口管制、關稅、技術封鎖、斷鏈、供應鏈區域化。聚合訊號：自由貿易、國際合作、供應鏈穩定、跨國協作。</div></div>
@@ -3960,13 +3964,13 @@ function aiAnswer(q){
   }
   /* 用詞邊界比對：原本的 /(x|y|…)/ 會把英文 why 裡的 y 當成軸向查詢 */
   if(/(\bx\s*軸|\by\s*軸|\bx\b|\by\b|軸|座標|象限|方法論|kdf)/i.test(t)){
-    return `方法論：<b>X 軸＝地緣與供應鏈聚合</b>（−1 碎裂 ↔ +1 聚合）、<b>Y 軸＝資源與政策充沛</b>（−1 匱乏 ↔ +1 充沛），定位四情境後校準 25 項 KDF 權重（中性 50），每次調整附 Decision Trace。詳見「治理」分頁 §11。${SRC}`;
+    return `方法論：<b>X 軸＝地緣與供應鏈聚合</b>（−1 碎裂 ↔ +1 聚合）、<b>Y 軸＝資源與政策充沛</b>（−1 匱乏 ↔ +1 充沛），定位四情境後校準 25 項 KDF 權重（中性 50），每次調整附 Decision Trace。詳見「治理」分頁 §17。${SRC}`;
   }
   if(/(治理|token|護欄|控管|harness)/i.test(t)){
-    return `治理六面向見「治理」分頁 §10：任務分派（四層單向管線）、記憶（append-only）、工具（時間窗檢索）、護欄（缺漏防呆＋四道匯入門檻）、可觀測（Decision Trace＋自我稽核）、評估（確定性重算＋外部對抗審查）。Token 用量分兩段講：開發階段有三個工具的本機實測數字（見 §10）；運作階段為 0——本專案自始至終未取得 API 預算，雲端週報管線從未執行，十一週全部由人工分析產出並通過四道門檻。這不是待補的欄位，是本專案的實際條件。${SRC}`;
+    return `治理六面向見「治理」分頁 §16：任務分派（四層單向管線）、記憶（append-only）、工具（時間窗檢索）、護欄（缺漏防呆＋四道匯入門檻）、可觀測（Decision Trace＋自我稽核）、評估（確定性重算＋外部對抗審查）。Token 用量分兩段講：開發階段有三個工具的本機實測數字（見 §16）；運作階段為 0——本專案自始至終未取得 API 預算，雲端週報管線從未執行，十一週全部由人工分析產出並通過四道門檻。這不是待補的欄位，是本專案的實際條件。${SRC}`;
   }
   if(/(可信|來源|真的|查證|假的)/.test(q)){
-    return `本站每則事件附可查證來源連結；每次權重調整附 Decision Trace；§07 自我稽核公開「判斷錯了會怎樣」；§11 揭露期間重疊與缺口等不利事實。X／Y 與建議屬分析判斷【推斷】，非官方數據、非投資建議。${SRC}`;
+    return `本站每則事件附可查證來源連結；每次權重調整附 Decision Trace；§12 自我稽核公開「判斷錯了會怎樣」；§17 揭露期間重疊與缺口等不利事實。X／Y 與建議屬分析判斷【推斷】，非官方數據、非投資建議。${SRC}`;
   }
   return `展示模式能回答：<br>・「本週判定是什麼」<br>・任一劇本編號（如「為什麼觸發 PB-07」）<br>・「三家企業差在哪」<br>・「風險雷達」「方法論」「治理」「資料可信嗎」<br>其餘問題待後端連接真 AI 後支援。${SRC}`;
 }

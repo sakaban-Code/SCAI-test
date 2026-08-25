@@ -98,15 +98,15 @@ def escape_html_deep(obj):
 def build_companies(root: pathlib.Path, weeks: list, prof: dict, pb: dict):
     """企業畫像可切換：欣銓＋兩家虛構示範企業。
 
-    - 欣銓（real=True）：§02 規畫仍取 weeks.json 的 companyPlan（append-only 官方紀錄，
-      不重算）；此處只帶 §08 畫像顯示資料。
+    - 欣銓（real=True）：§13 規畫仍取 weeks.json 的 companyPlan（append-only 官方紀錄，
+      不重算）；此處只帶 §15 畫像顯示資料。
     - 示範企業（real=False）：於建置時以 plan_engine 對**真實週次資料**逐週重算——
       觸發依據引用的座標／KDF／關鍵字都是真實的，虛構的只有企業本身。
       展示「同一套情境判定 × 不同企業畫像 → 不同觸發結果」的引擎可移植性。
     demo_profiles.json 不存在時只回傳欣銓一筆，網站自動退回單一企業模式（不顯示切換器）。
     """
-    # 欣銓的畫像資料（§08 四張統計卡）改由此供給，故 demo_profiles.json 不存在時
-    # 不能整個回 None——那會讓 §08 拿到空的 stats 陣列而少掉四張卡。
+    # 欣銓的畫像資料（§15 四張統計卡）改由此供給，故 demo_profiles.json 不存在時
+    # 不能整個回 None——那會讓 §15 拿到空的 stats 陣列而少掉四張卡。
     # 改為仍回傳只含欣銓的單筆清單，模板照樣以 CO[0] 渲染、只是不出現切換器。
     demo_path = root / "data" / "demo_profiles.json"
     import sys as _sys
@@ -131,7 +131,7 @@ def build_companies(root: pathlib.Path, weeks: list, prof: dict, pb: dict):
     }]
 
     if not demo_path.exists():
-        return companies          # 只有欣銓：§08 照常渲染，模板不顯示切換器
+        return companies          # 只有欣銓：§15 照常渲染，模板不顯示切換器
 
     demo = load(demo_path)
     for c in demo["companies"]:
