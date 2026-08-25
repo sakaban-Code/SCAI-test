@@ -431,6 +431,9 @@ def build_daily_layer(root: pathlib.Path):
             "status": (r or {}).get("status", ""),
             "mode": (r or {}).get("mode", ""),
             "scanned": (r or {}).get("scanned"),
+            # 排除數要上站：站上寫「掃描 N 則」，若其中有幾則被丟掉而不講，
+            # N 與實際判級的則數就對不起來。
+            "excluded": (r or {}).get("excluded", 0),
             "at": ((r or {}).get("startedAt") or "")[11:16],
             "red": g.get("redCount", 0) if g else (r or {}).get("red", 0),
             "yellow": g.get("yellowCount", 0) if g else (r or {}).get("yellow", 0),

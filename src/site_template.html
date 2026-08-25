@@ -2774,7 +2774,7 @@ function wireDaily(){
     out.innerHTML=`<div class="dl-day">
       <div class="dl-dh"><b>${d}</b><span class="dl-tag ${tag[1]}">${tag[0]}</span>
         <span class="dl-meta">${x.how==='auto'
-          ? `Actions 自動執行 ${x.at}　掃描 ${x.scanned} 則　收據 status=${x.status}　mode=${x.mode}`
+          ? `Actions 自動執行 ${x.at}　掃描 ${x.scanned} 則${x.excluded?`（排除非新聞 ${x.excluded} 則）`:''}　收據 status=${x.status}　mode=${x.mode}`
           : '人工巡邏（收據制上線前，無執行收據）'}</span></div>
       ${x.items.length?x.items.map(it=>`<div class="dl-i">
           <span class="dl-t t-${it.tier}">${it.tier}</span>

@@ -204,6 +204,28 @@ DAILY_QUERIES = [
 ]
 
 
+# 非新聞來源：搜尋結果會混進播客、社群與看盤內容農場，它們的 snippet 常是廣告或
+# 節目簡介，命中關鍵字純屬字面巧合。清單只列**實際出現過**的來源，不預先猜測：
+#   instagram.com／threads.com  社群貼文（2026-08-22 曾抓到標題僅「Instagram」一則）
+#   finlab.finance              看盤訊號內容農場（同日「股價：可以買嗎？」）
+#   radio-taiwan.tw             播客節目頁（2026-08-26「寶島全世界」，snippet 前段是長照廣告）
+# 搜尋結果頁（非文章）可出現在任何新聞站，故以標題樣式攔（2026-08-23 工商時報）。
+EXCLUDE_HOSTS = ("instagram.com", "threads.com", "finlab.finance", "radio-taiwan.tw")
+EXCLUDE_TITLE = ("的搜尋結果",)
+
+
+def is_newsy(it):
+    """回傳 (是否採用, 排除原因)。排除只在抓取後、判級前發生，且逐則印出留痕。"""
+    host = (it.get("source") or "").lower()
+    if any(host == h or host.endswith("." + h) for h in EXCLUDE_HOSTS):
+        return False, f"非新聞來源 {host}"
+    t = it.get("title") or ""
+    for pat in EXCLUDE_TITLE:
+        if pat in t:
+            return False, f"非文章頁（標題含「{pat}」）"
+    return True, ""
+
+
 def fetch_news():
     from tavily import TavilyClient
     from urllib.parse import urlparse
@@ -231,10 +253,12 @@ def fetch_news():
 
 # ---- 落檔 ------------------------------------------------------------------
 
-def write_receipt(status, mode, scanned, red, yellow, started, error=""):
+def write_receipt(status, mode, scanned, red, yellow, started, error="", excluded=0):
     d = {"date": now_tw().date().isoformat(), "mode": mode, "status": status,
          "scanned": scanned, "red": red, "yellow": yellow,
          "startedAt": started, "finishedAt": now_iso()}
+    if excluded:
+        d["excluded"] = excluded
     if error:
         d["error"] = error[:500]
     p = ROOT / "logs" / "receipts" / f"{d['date']}.json"
@@ -272,11 +296,22 @@ def append_alerts_log(reds, sent):
 def patrol():
     mode = os.environ.get("ALERT_MODE", "shadow")
     started = now_iso()
-    scanned = n_red = n_yel = 0
+    # excluded 必須與 scanned 同層初始化：它在 try 內才賦值，但 write_receipt 在
+    # except 之後無條件呼叫——抓取失敗時反而寫不出收據，而那正是最需要收據的時候。
+    scanned = n_red = n_yel = excluded = 0
     err = ""
     try:
         items = fetch_news()
-        scanned = len(items)
+        scanned = len(items)          # 抓到幾則就是幾則，排除數另計，不動這個數字
+        kept = []
+        for it in items:
+            ok, why = is_newsy(it)
+            if ok:
+                kept.append(it)
+            else:
+                print(f"  [排除] {why}：{(it.get('title') or '')[:48]}")
+        excluded = len(items) - len(kept)
+        items = kept
         rows = read_alerts_log()
         now = now_tw()
         day_items, reds_new = [], []
@@ -304,7 +339,9 @@ def patrol():
         sent, reason = dispatch(reds_new, mode)
         for rec in reds_new:
             rec["alerted"] = sent
-        print(f"[巡邏] mode={mode} 掃描 {scanned} 則 → RED {n_red}／YELLOW {n_yel}；寄信：{reason}")
+        print(f"[巡邏] mode={mode} 掃描 {scanned} 則"
+              + (f"（排除非新聞 {excluded} 則）" if excluded else "")
+              + f" → RED {n_red}／YELLOW {n_yel}；寄信：{reason}")
         for rec in day_items:
             print(f"  {rec['tier']:6} {rec['ruleId']}  {rec['title'][:60]}")
         if reds_new:
@@ -315,7 +352,7 @@ def patrol():
     except Exception as e:
         err = f"{type(e).__name__}: {e}"
         status = "failed"
-    p = write_receipt(status, mode, scanned, n_red, n_yel, started, err)
+    p = write_receipt(status, mode, scanned, n_red, n_yel, started, err, excluded)
     print(f"[收據] {p.name} status={status}")
     if status == "failed":
         sys.exit(f"[巡邏失敗] {err}")
