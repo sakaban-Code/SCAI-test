@@ -2611,6 +2611,7 @@ function pbCovHTML(S,co){
       <div class="ch"><b>劇本覆蓋率</b>
         <span>${co?co.short:'欣銓科技'}｜${C.weeks} 週中 <b style="color:var(--accent)">${C.everFired}/${C.total}</b> 條曾觸發</span>
         ${co&&!co.real?'<span class="chip lo" title="示範企業之劇本組，於建置時以同一批真實週次重算">示範資料</span>':''}</div>
+      <div class="rl-lg">PB＝Playbook 劇本：事前寫好的「若情勢變成 X 就做 Y」，編號固定、不隨週次變動${co&&!co.real?`；${co.short}為示範企業，用自己的一組`:''}</div>
       <div class="pbc-note">${S?'沒觸發有兩種：條件還沒發生（正常），和門檻設錯（下方會標出來）。'
         :'區分「條件未發生之正確休眠」與「門檻自相矛盾之設計缺陷」；後者由本系統自行發現並公開揭露。'}</div>
       ${C.rows.map(row).join('')}
@@ -2832,6 +2833,7 @@ function predHTML(S){
   return `
   <section id="predict" data-tab="analysis">
     <div class="sh"><span class="ix">§10</span><h2>事前預測與否證條件</h2><span class="q">敢不敢先說，錯了算誰的？</span>
+      <span class="chip lo" title="Prediction 事前預測；編號依寫下的順序，不重排、不回頭改">P＝事前預測</span>
       <span class="sub">${S?'每則預測都先寫好「什麼情況算我錯」'
         :'憲法 LAYER 10 第四問落地 · 寫入日早於驗證日 · 結果只追加不覆寫'}</span></div>
     <div class="pd-bar">
