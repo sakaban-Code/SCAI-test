@@ -115,10 +115,11 @@ def main():
          '"PingFang TC","Hiragino Sans CNS","Heiti TC",-apple-system,BlinkMacSystemFont,'
          '"Segoe UI",sans-serif;', "cjk stack")
 
-    # ── 3. Chart.js 內嵌（連同 CDN 失敗時的本地備援 script 一併移除）──
+    # ── 3. Chart.js 內嵌 ──
+    # 錨點自 2026-08-25 起是「同源單行」：模板已移除 CDN 與 document.write 備援那兩行，
+    # 線上版本身就只引用 assets/chart.umd.min.js。此處把該引用換成內嵌全文。
     chart_js = (assets / "chart.umd.min.js").read_text(encoding="utf-8")
-    must('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>\n'
-         '<script>window.Chart||document.write(\'<script src="assets/chart.umd.min.js"><\\/script>\')</script>',
+    must('<script src="assets/chart.umd.min.js"></script>',
          "<script>/* Chart.js 4.4.1（內嵌，MIT）*/\n" + chart_js + "\n</script>", "chartjs")
 
     # ── 4. 圖片內嵌為 data URI ──

@@ -19,8 +19,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script>window.Chart||document.write('<script src="assets/chart.umd.min.js"><\/script>')</script>
+<!-- Chart.js 自託管（4.4.1，MIT）。原本是 CDN ＋ document.write 本地備援兩行，改為只留同源這行：
+     決賽現場網路不可控，CDN 被擋或變慢就沒有圖表，而備援那行要等 CDN 先失敗才會補救。
+     ⚠ 這一行是 src/build_offline.py 步驟 3 的錨點（must() 逐字比對且要求命中 1 次）。
+        只改這裡不改那裡，下次建離線備援檔會直接 sys.exit。兩邊必須同時改。 -->
+<script src="assets/chart.umd.min.js"></script>
 <style>
 :root{
   color-scheme:light;
