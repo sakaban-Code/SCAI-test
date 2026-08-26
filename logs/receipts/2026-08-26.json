@@ -1,10 +1,11 @@
 {
   "date": "2026-08-26",
-  "mode": "test",
+  "mode": "live",
   "status": "success",
-  "scanned": 11,
+  "scanned": 15,
   "red": 0,
-  "yellow": 1,
-  "startedAt": "2026-08-26T02:24:49+08:00",
-  "finishedAt": "2026-08-26T02:24:53+08:00"
+  "yellow": 3,
+  "startedAt": "2026-08-26T21:50:22+08:00",
+  "finishedAt": "2026-08-26T21:50:29+08:00",
+  "excluded": 1
 }
