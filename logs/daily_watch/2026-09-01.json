@@ -1,0 +1,93 @@
+{
+  "date": "2026-09-01",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "輝達大漲8.74%，AI需求放緩的疑慮為何暫時降溫？",
+      "summary": "全球先進製程與封裝技術持續推進，帶動半導體設備與封測需求同步升溫。英特爾最新14A製程的缺陷密度下降速度優於過往22奈米節點，預計2027年進入風險試產、2028年量產；台積電(2330)則聚焦2.5D、3D堆疊與小晶片（Chiplet）等異質整合技術，並持續精進散熱解決方案與應力管理，以因應封裝內的熱膨脹與翹曲挑戰。 在國際大廠擴產帶動下，設備供應商率先受惠。英特爾於美國與越南擴建EMIB先進封裝產線，推升除泡、烘烤、雷射加工等設備需求，印能科技、鈦昇、志聖與萬潤等業者已開始交機，為營運挹注動能。 封裝測試端同樣受惠於晶片大型化與異質整合趨勢。日月光投控(3711)受惠於Google TPU委外量能擴大及英特爾EMIB釋單，加上高階封測產能緊俏，報價調升5%至10%，接單表現明顯轉強。測試業務方面，京元電(2449)承接美系雲端大廠與晶片商測試訂單，系統級測試需求成長；矽格(6257)則",
+      "source": "readmo.cmoney.tw",
+      "date": "Sun, 30 Au",
+      "url": "https://readmo.cmoney.tw/article/45ffd19b-1376-4128-b282-208795c2f36e",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "先進封裝"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "先進封裝概念股每股淨值排名",
+      "summary": "台幣\n   美金\n\n股號 / 名稱 每股淨值\nAMD 超微半導體1,306.73\nAMAT 應用材料1,024.39\nAMKR 艾克爾594.92\nINTC 英特爾550.69\nGLW 康寧439.79\nLRCX 科林研發316.19\n2330 台積電248.05\n6640 均華179.18\nTSM 台積電 ADR154.12\nKLAC 科磊154.11\n3583 辛耘121.48\n3131 弘塑109.94\n2467 志聖100.34\n3711 日月光投控88.5\n6187 萬潤87.49\n3189 景碩84.39\n3037 欣興77.9\n6239 力成77.33\n8046 南電76.24\n6789 采鈺57.98\n6257 矽格52.78\n2449 京元電子51.25\n3264 欣銓41.41\n3481 群創28.17\n2409 友達20.46\n\n載入數據中...\n\n## 最新要聞\n\n",
+      "source": "statementdog.com",
+      "date": "Fri, 28 Au",
+      "url": "https://statementdog.com/tags/1468/nav",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "先進封裝"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "林睿閎證券分析師-John – Telegram",
+      "summary": "❤39👏3\n\n6.56K views\n\n林睿閎證券分析師-John\n\n林睿閎John  \n⏲發文時間：2026.8.25 週二  \n  \n🇺🇸〈美股盤後〉輝達財報前連七黑 記憶體股崩跌 費半收黑2.7%  \n  \n  \n🍎蘋果 i18Pro 傳漲價100美元 考驗果粉接受度 牽動鴻海、大立光等出貨  \n  \n  \n🔥NAND 迎來關鍵材料轉型 採用鉬材勢在必行  \n  \n  \n🏦富邦金法說報喜 H1獲利衝高  \n  \n  \n👍京元電報喜 Rubin測試Q4放量  \n\nreurl.cc\n\n〈美股盤後〉輝達財報前連七黑 記憶體股崩跌 費半收黑2.7% | 鉅亨網 - 美股雷達\n\n美股週一 (24 日) 普遍走低，晶片與記憶體類股遭到拋售，拖累主要指數表現。美債殖利率與油價同步回落，仍未能抵銷市場對AI需求、加拿大關稅及伊朗局勢的擔憂\n\n❤16\n\n5.51K views\n\n林睿閎證券分析師-Jo",
+      "source": "t.me",
+      "date": "Tue, 25 Au",
+      "url": "https://t.me/s/johnstock888?before=9734",
+      "tier": "YELLOW",
+      "ruleId": "YT-03",
+      "matched": {
+        "YT-03": {
+          "any": [
+            "法說",
+            "財報"
+          ],
+          "anyB": [
+            "輝達",
+            "京元電"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "CPO不只光通訊股！高明鐵、上銀、直得、大銀卡位設備鏈　台灣機械業搶進新藍海 | 綜合產業 | 產業 | 經濟日報",
+      "summary": "news photo\n\n### 高明鐵卡位CPO封裝量產 打破歐美日壟斷\n\nnews photo\n\n### 新 CPO 是電機股？上銀宣布切入設備零組件、直得股價急拉漲停\n\nnews photo\n\n### 國際設備商搶進PIC、CPO量產測試　光焱科技成論壇測試議題唯一台灣設備商\n\nnews photo\n\n### AI從展示走向實體應用 2026 TAIROS & Automation Taipei吸引超過30萬人次觀展\n\nnews photo\n\n### 整理包／黃仁勳概念股笑了！輝達季度財報超預期 完整台廠供應鏈名單、潛在受惠股一次看\n\nnews photo\n\n### 直得搶攻 AI 光通訊核心商機 下半年營運逐季增溫\n\nnews photo\n\n### 汎銓矽光子光損偵測設備11月亮相 五大客戶排隊搶購\n\nnews photo\n\n### 鈦昇科技SEMICON Taiwan 2026全新",
+      "source": "money.udn.com",
+      "date": "Thu, 27 Au",
+      "url": "https://money.udn.com/money/story/10871/9718528",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "矽光子"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "財報"
+          ],
+          "anyB": [
+            "輝達"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 4
+}
