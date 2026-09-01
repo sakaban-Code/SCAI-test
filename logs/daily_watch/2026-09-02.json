@@ -1,0 +1,29 @@
+{
+  "date": "2026-09-02",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "股癌 EP692 筆記 2026/08/29 AI軟體、矽光子、XPU | 麻瓜股",
+      "summary": "NVIDIA 目前已推進至 Vera Rubin，依電話會議說法，接下來將快速放量，甚至可能成為歷來放量最快的產品。晶片與模型的競爭都迭代得非常快，每一兩個月便可能出現新的領先者，不宜只看當下跑分就判定長期輸贏。Google 的 Flash 模型也是類似例子：目前即使被市場看淡，說不定後續跳過中間版本，直接推出更強的新模型，市場看法又會改變。\n\n#### 2. 從採購觀察到 buy-side 論述\n\n幾個月前曾注意到，NVIDIA 採購光通訊與雷射元件的數量似乎遠高於自身產品的直接需求。當時的判斷是，NVIDIA 可能想提前掌握更多產能，增加競爭者取得零組件的難度；後來也開始看到類似的 buy-side 論述。\n\n要完成一台 AI 伺服器，不只需要運算晶片，也需要光通訊元件、交換器、板材、封裝及組裝能力。NVIDIA 電話會議談到許多環節缺貨時，Jensen Huang 還笑稱，過去只要跟",
+      "source": "mugglestock.com",
+      "date": "Sun, 30 Au",
+      "url": "https://mugglestock.com/articles/248",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "矽光子"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 1
+}
