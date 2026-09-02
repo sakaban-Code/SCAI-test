@@ -1,0 +1,101 @@
+{
+  "date": "2026-09-03",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "股癌EP692 筆記2026/08/29 AI軟體、矽光子、XPU - 麻瓜股",
+      "summary": "| 廣達 2382 | QCT、AI Server、Vera Rubin、Rack | 廣達/QCT是NVIDIA AI伺服器與機櫃系統核心ODM。 |\n| 台光電 2383 | CCL、M9、AI Server、NVL Board | 台光電供應NVIDIA AI伺服器與高速板所需高階低損耗CCL材料。 |\n| 京元電子 2449 | Testing、GPU Test、ASIC Test、KYEC | 京元電子是AI晶片測試供應鏈，NVIDIA官方將KYEC列為台灣關鍵wafer/chip夥伴之一。 |\n| 晟銘電 3013 | Liquid Cooling Rack、Sidecar、Chassis、NVL Rack | 晟銘電偏NVIDIA AI伺服器水冷機櫃與機構件，屬機櫃/液冷結構核心。 |\n| 奇鋐 3017 | Cold Plate、Liquid Cooling、GB300、V",
+      "source": "mugglestock.com",
+      "date": "Sun, 30 Au",
+      "url": "https://mugglestock.com/articles/248",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "矽光子"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "【09/01 產業即時新聞】電子上游-IC-封測族群動能增溫，AI先進封裝題材領軍攻高-CMoney 研究員 | CMoney投資網誌",
+      "summary": "從盤面上觀察，今日漲勢並非單一個股表現，而是產業鏈全面性的受惠。不只傳統封裝大廠如日月光投控、超豐表現積極，連同測試介面廠穎崴、精測、旺矽，以及提供測試服務的京元電、欣銓等，也都有顯著漲幅。這顯示AI驅動的先進封裝趨勢已全面反映在相關供應鏈上，尤其在高階HBM與AI晶片測試環節，複雜度與需求增加，為相關業者帶來新一波成長動能與結構性機會。\n\n## 🔸追蹤量能與法說動態，留意技術位階變化。\n\n考量封測族群近期已累積一定漲幅，操作上建議投資人除了關注整體市場量能是否能維持在相對熱絡水準外，也可留意各公司即將發布的財報或法說會內容，尋找營運成長的實質依據與更具體的展望。技術面觀察，若能持續帶量突破前高，或是在關鍵均線之上盤堅整理，顯示多方力道仍存；反之若出現量價背離或未能守穩支撐，則需留意獲利了結賣壓可能浮現。\n\n## 🔸想更快掌握大戶散戶即時籌碼變化？\n\n👉🏻下載【籌碼K線】，一圖秒懂現在誰在",
+      "source": "cmnews.com.tw",
+      "date": "Tue, 01 Se",
+      "url": "https://cmnews.com.tw/article/cmoneyairesearcher-8abf5f1e-a5a6-11f1-9688-87ccba1a32c8",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "HBM",
+            "先進封裝"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "法說",
+            "財報"
+          ],
+          "anyB": [
+            "京元電",
+            "日月光"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "先進封裝概念股整理：台股名單、龍頭與美股一次看",
+      "summary": "| 環節 | 個股 | 上半年營收（億） | 本業營益率 | 上半年 EPS | 1～7 月累計年增 |\n ---  ---  --- |\n| 晶圓代工 | 台積電 2330 | 24,044.8 | 59.0% | 49.33 | ＋37.0% |\n| 檢測量測 | 致茂 2360 | 253.9 | 39.5% | 21.27 | ＋101.5% |\n| 檢測量測 | 牧德 3563 | 19.1 | 38.9% | 9.80 | ＋11.6% |\n| 探針卡 | 旺矽 6223 | 91.7 | 33.5% | 28.08 | ＋52.3% |\n| 封測 OSAT | 京元電子 2449 | 213.3 | 26.2% | 3.91 | ＋36.2% |\n| 板材 | 台光電 2383 | 803.4 | 24.7% | 42.46 | ＋89.4% |\n| 封測 OSAT | 矽格",
+      "source": "stockgod.net",
+      "date": "Wed, 02 Se",
+      "url": "https://stockgod.net/advanced-packaging-stock",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "先進封裝"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "營收"
+          ],
+          "anyB": [
+            "台積電",
+            "京元電",
+            "矽格"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "先進封裝概念股股價淨值比評價排名",
+      "summary": "股號 / 名稱 股價淨值比\n5443 均豪0.89\n3010 華立1.21\n2409 友達1.29\n8070 長華1.33\n1595 川寶1.36\n3481 群創1.75\n4755 三福化1.77\n8131 福懋科1.82\n2338 光罩2.09\nAMKR 艾克爾2.52\n3467 台灣精材2.53\n3305 昇貿2.65\n3580 友威科3.17\n6613 朋億3.32\n6239 力成3.67\n2303 聯電3.74\n3265 台星科3.94\n6257 矽格4.2\n6953 家碩4.56\nINTC 英特爾5.16\n6664 群翊5.33\n2449 京元電子5.44\n6937 天虹5.5\n6788 華景電5.57\n3264 欣銓5.73\n2467 志聖6.22\n6640 均華6.25\n3583 辛耘6.36\n4576 大銀微系統6.43\n7730 暉盛-創6.52\n3711 日月光投控6.",
+      "source": "statementdog.com",
+      "date": "Fri, 28 Au",
+      "url": "https://statementdog.com/tags/1468/pb",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "先進封裝"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 4
+}
