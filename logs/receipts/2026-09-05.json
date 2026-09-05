@@ -4,7 +4,8 @@
   "status": "success",
   "scanned": 15,
   "red": 0,
-  "yellow": 1,
-  "startedAt": "2026-09-05T00:41:44+08:00",
-  "finishedAt": "2026-09-05T00:41:48+08:00"
+  "yellow": 4,
+  "startedAt": "2026-09-05T23:44:30+08:00",
+  "finishedAt": "2026-09-05T23:44:35+08:00",
+  "excluded": 1
 }
