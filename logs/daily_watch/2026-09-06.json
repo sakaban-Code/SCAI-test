@@ -1,0 +1,171 @@
+{
+  "date": "2026-09-06",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "Inside the AI Hardware Engine – Full Semiconductor ...",
+      "summary": "not even accounting for the HBM which you need to add on top of that or not on top of that but beside it. And in fact, HBM is one of the most expensive components of the process of making an AI accelerator. And that brings us to our second choke point, which is leading edge foundry capacity. In fact, Taiwan Semiconductor Manufacturing Corporation controls an estimated 90% of sub7 nanometer class o",
+      "source": "www.youtube.com",
+      "date": "Thu, 03 Se",
+      "url": "https://www.youtube.com/watch?v=FGT7LZbZe-g",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "HBM"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "Transcript: Memory chip mania isn't going away, with Dan ...",
+      "summary": "Dan KimYeah. And to be clear, the objective of the CHIPS Act wasn’t just to hedge Taiwan risks. It was to build more semiconductors in the US because it was a strategic choice that the Congress has made. So there is significant progress. The Arizona facilities at TSMC is yielding quite well in Fab 1, and they are now at Fab 2. Intel is producing 18A chips, and that has already been introduced to t",
+      "source": "www.ft.com",
+      "date": "Fri, 04 Se",
+      "url": "https://www.ft.com/content/a467f40b-6ead-4439-b581-137a411ca5af?syn-25a6b1a6=1",
+      "tier": "YELLOW",
+      "ruleId": "YT-05",
+      "matched": {
+        "YT-05": {
+          "any": [
+            "CHIPS"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "台灣即時新聞 - Vexed.Me",
+      "summary": "美國跨黨派國會議員於今年4月初提出「硬體技術多邊協調法案」《MATCH Act》，強化美國與盟國對先進半導體製造設備的出口管制，這項法案一旦生效，全球最大半導體微影設備製造龍頭ASML將首當其衝。ASML若完全服從美國的命令，形同放棄中國市場；或者，該不顧一切拓展中國市場？根據美國國會議員提出的《MATCH Act》，在現行極紫外光曝光機（EUV）對中國禁售......中央社\n\n## 美軍襲3油輪反擊伊朗飛彈攻勢　荷莫茲控制權爭奪升級\n\n美軍中央司令部今天表示，在伊朗向包括1艘航空母艦在內的2艘美國海軍軍艦發射彈道飛彈後，美軍打擊了3艘伊朗油輪；美伊雙方爭奪全球重要航道荷莫茲海峽的戰鬥持續升級。NOWnews\n\n## 趙建銘硬凹不還2300萬！律師教陳幸妤神招 幫小孩討錢還拿回診所\n\n趙建銘硬凹不還2300萬！律師教陳幸妤神招 幫小孩討錢還拿回診所\n\n前總統陳水扁的兒子陳致中昨（5）日深夜",
+      "source": "vexed.me",
+      "date": "Sat, 05 Se",
+      "url": "https://vexed.me/realtime",
+      "tier": "RED",
+      "ruleId": "RT-01",
+      "matched": {
+        "RT-01": {
+          "any": [
+            "飛彈"
+          ]
+        },
+        "YT-01": {
+          "any": [
+            "出口管制"
+          ]
+        }
+      },
+      "alerted": true
+    },
+    {
+      "title": "〈財經週報-台股熱點〉AI 浪潮襲捲後段供應鏈 封測族群開啟新一波成長週期 - 自由財經",
+      "summary": "基金查詢\n\n財經 > 財經週報\n\n# 〈財經週報-台股熱點〉AI 浪潮襲捲後段供應鏈 封測族群開啟新一波成長週期\n\n2026/08/31 05:30\n\n加入Google首選\n\nAI 晶片需求強勁推升高階測試與先進封裝產能，封測族群吸引資金進駐，營運邁入新一波成長週期。（中央社）AI 晶片需求強勁推升高階測試與先進封裝產能，封測族群吸引資金進駐，營運邁入新一波成長週期。（中央社）\n\n記者林薏茹／專題報導\n\nAI應用持續引爆半導體需求，產業成長動能也從晶圓製造一路延伸至後段封裝測試，尤其AI晶片效能持續提升，帶動先進封裝、高階測試需求同步升溫，封測廠紛紛擴大資本支出，開啟新一波營運成長週期。\n\n封測族群上週股價強漲，以京元電（2449）走勢最強勁、單週狂飆16.4%，欣銓(3264)、矽格（6257）大漲超過一成，力成（6239）也飆漲7.2%，日月光投控（3711）則勁揚逾5%。\n\n請繼續往",
+      "source": "ec.ltn.com.tw",
+      "date": "Sun, 30 Au",
+      "url": "https://ec.ltn.com.tw/article/paper/1768811",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "先進封裝"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "資本支出"
+          ],
+          "anyB": [
+            "京元電",
+            "矽格",
+            "日月光"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "【09/01 產業即時新聞】電子上游-IC-封測族群動能增溫，AI先進封裝題材領軍攻高-CMoney 研究員 | CMoney投資網誌",
+      "summary": "從盤面上觀察，今日漲勢並非單一個股表現，而是產業鏈全面性的受惠。不只傳統封裝大廠如日月光投控、超豐表現積極，連同測試介面廠穎崴、精測、旺矽，以及提供測試服務的京元電、欣銓等，也都有顯著漲幅。這顯示AI驅動的先進封裝趨勢已全面反映在相關供應鏈上，尤其在高階HBM與AI晶片測試環節，複雜度與需求增加，為相關業者帶來新一波成長動能與結構性機會。\n\n## 🔸追蹤量能與法說動態，留意技術位階變化。\n\n考量封測族群近期已累積一定漲幅，操作上建議投資人除了關注整體市場量能是否能維持在相對熱絡水準外，也可留意各公司即將發布的財報或法說會內容，尋找營運成長的實質依據與更具體的展望。技術面觀察，若能持續帶量突破前高，或是在關鍵均線之上盤堅整理，顯示多方力道仍存；反之若出現量價背離或未能守穩支撐，則需留意獲利了結賣壓可能浮現。\n\n## 🔸想更快掌握大戶散戶即時籌碼變化？\n\n👉🏻下載【籌碼K線】，一圖秒懂現在誰在",
+      "source": "cmnews.com.tw",
+      "date": "Tue, 01 Se",
+      "url": "https://cmnews.com.tw/article/cmoneyairesearcher-8abf5f1e-a5a6-11f1-9688-87ccba1a32c8",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "HBM",
+            "先進封裝"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "法說",
+            "財報"
+          ],
+          "anyB": [
+            "京元電",
+            "日月光"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "封測族群漲幅逾4%，你現在是撿便宜還是被套牢?",
+      "summary": "DRAM 廠，以及日月光、力成、京元電等封裝測試公司。後續法說會的重點，會是客戶拉貨能見度是否從一季延伸到兩季以上。 風險面同樣存在。若輝達在下一代 GPU 採用替代記憶體架構，美光的 HBM 出貨可能受到影響；中國長鑫存儲也持續擴產，未來兩到三年的供給曲線可能比目前預期更陡。也就是說，現在的股價重定價，仍要靠後續 HBM 出貨與產品組合改善來驗證。 目前美光 52 週高點為 1,255 美元，現價 1,016 美元，距高點約低 23%。Forward P/E 約 13.05 倍，PEG 僅 0.074，顯示估值仍在重新定錨階段。接下來最重要的觀察點，是下季財報中 HBM 出貨占比，以及輝達 Blackwell Ultra 是否持續採用 HBM4；這兩項結果，將直接影響市場對 2027 年供需與估值的判斷。記憶體缺貨延伸至2027年，美光高點回檔後估值怎麼看？ [...] 投資網誌投資網誌",
+      "source": "readmo.cmoney.tw",
+      "date": "Tue, 01 Se",
+      "url": "https://readmo.cmoney.tw/article/430df38f-3318-46e8-8c2f-9d6409db3c55",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "HBM"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "法說",
+            "財報"
+          ],
+          "anyB": [
+            "輝達",
+            "京元電",
+            "日月光"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "費半重挫3.47%，高估值半導體族群受壓的主因是什麼?",
+      "summary": "週四交易中，企業軟體股普遍收高，iShares Expanded Tech-Software Sector ETF（IGV）上漲3.4%。其中，ServiceNow（NOW）股價上漲6.5%，過去一個月累計上漲近23%。Palantir（PLTR）則因美國陸軍新合約，以及與PwC擴大合作而上漲7.7%。 在網路安全族群方面，隨著人工智慧風險升溫，相關股票也同步走強。Netskope（NTSK）在公布2027財年第二季財報後上漲4.3%。公司執行長Sanjay Beri表示，持續創新與穩定的客戶需求，使Netskope One平台成為企業採用AI的重要元件。Piper Sandler也將其目標價從18美元上調至20美元，並維持超配評級。 CrowdStrike（CRWD）則因Fal.Con 2026會議受到市場關注，股價上漲5.7%。相較之下，晶片股表現分歧，Nvidia（NVDA）與Int",
+      "source": "readmo.cmoney.tw",
+      "date": "Sun, 30 Au",
+      "url": "https://readmo.cmoney.tw/article/c54421b1-918e-41a9-b33f-2b87a7782cfb",
+      "tier": "YELLOW",
+      "ruleId": "YT-03",
+      "matched": {
+        "YT-03": {
+          "any": [
+            "財報"
+          ],
+          "anyB": [
+            "Nvidia"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 1,
+  "yellowCount": 6
+}
