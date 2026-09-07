@@ -1,0 +1,57 @@
+{
+  "date": "2026-09-08",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "Inside the AI Hardware Engine – Full Semiconductor ...",
+      "summary": "not even accounting for the HBM which you need to add on top of that or not on top of that but beside it. And in fact, HBM is one of the most expensive components of the process of making an AI accelerator. And that brings us to our second choke point, which is leading edge foundry capacity. In fact, Taiwan Semiconductor Manufacturing Corporation controls an estimated 90% of sub7 nanometer class o",
+      "source": "www.youtube.com",
+      "date": "Thu, 03 Se",
+      "url": "https://www.youtube.com/watch?v=FGT7LZbZe-g",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "HBM"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "封測族群漲幅逾4%，你現在是撿便宜還是被套牢?",
+      "summary": "DRAM 廠，以及日月光、力成、京元電等封裝測試公司。後續法說會的重點，會是客戶拉貨能見度是否從一季延伸到兩季以上。 風險面同樣存在。若輝達在下一代 GPU 採用替代記憶體架構，美光的 HBM 出貨可能受到影響；中國長鑫存儲也持續擴產，未來兩到三年的供給曲線可能比目前預期更陡。也就是說，現在的股價重定價，仍要靠後續 HBM 出貨與產品組合改善來驗證。 目前美光 52 週高點為 1,255 美元，現價 1,016 美元，距高點約低 23%。Forward P/E 約 13.05 倍，PEG 僅 0.074，顯示估值仍在重新定錨階段。接下來最重要的觀察點，是下季財報中 HBM 出貨占比，以及輝達 Blackwell Ultra 是否持續採用 HBM4；這兩項結果，將直接影響市場對 2027 年供需與估值的判斷。記憶體缺貨延伸至2027年，美光高點回檔後估值怎麼看？ [...] 投資網誌投資網誌",
+      "source": "readmo.cmoney.tw",
+      "date": "Tue, 01 Se",
+      "url": "https://readmo.cmoney.tw/article/430df38f-3318-46e8-8c2f-9d6409db3c55",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "HBM"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "法說",
+            "財報"
+          ],
+          "anyB": [
+            "輝達",
+            "京元電",
+            "日月光"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 2
+}
