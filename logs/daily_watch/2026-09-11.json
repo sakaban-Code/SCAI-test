@@ -1,0 +1,46 @@
+{
+  "date": "2026-09-11",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "都是大场面！NaNa说美股(2026.09.08) - YouTube",
+      "summary": "大家好，歡迎返到娜娜話美股 今日係9月8日星期二，長週末歸來 美股股指期貨原本盤前上漲 但由於中東局勢惡化推高油價 股指回落，最終三大股指集體收跌 道指跌幅超過1 % ，表現最差 半導體板塊表現異常強勁 OpenAI 最新旗艦模型 GPT-6 Astra 嘅發佈 以及高盛今日舉行嘅 Communacopia + 科技大會 再度點燃市場對 AI 算力基礎設施嘅熱情 AI 硬件重新成為交易主線 呢次資金輪動嘅力度 比單純嘅技術性反彈要明顯得多 可以話係集體狂歡行情 油價日內走勢反復，消息面撲朔迷離 據沙特能源部今日發布嘅消息 也門胡塞武裝用導彈同無人機襲擊咗沙特阿美嘅多處能源設施同南部城市 導致多處地點起火 部分設施嘅運營暫時中斷 呢個消息瞬間引爆咗原油市場 WTI 原油期貨盤中一度上漲3.5 % 。 但隨住沙特方面試圖淡化事態 油價回落 沙特外交大臣表示 仍希望透過外交途徑解決衝突 另外，伊",
+      "source": "www.youtube.com",
+      "date": "Tue, 08 Se",
+      "url": "https://www.youtube.com/watch?v=QIwdqG9qVr0",
+      "tier": "YELLOW",
+      "ruleId": "YT-05",
+      "matched": {
+        "YT-05": {
+          "any": [
+            "能源"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "2026-09-10-國內券商報告摘要 - PressPlay",
+      "summary": "封測、設備、三五族、記憶體產業暨個股推薦報告, 力成(6239.TW) - 買進345元京元電子(2449.TW) - 買進345元矽格(6257. ... 矽為矽光子及高頻測試關鍵設備供應商。 5",
+      "source": "www.pressplay.cc",
+      "date": "Sat, 05 Se",
+      "url": "https://www.pressplay.cc/project/26D3B7CB703046D426A38932D06ED7E9/articles/C8D5AB39D6F6260D182B0C3397C343AD",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "矽光子"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 2
+}
