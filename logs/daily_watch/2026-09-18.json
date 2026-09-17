@@ -1,0 +1,29 @@
+{
+  "date": "2026-09-18",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "ASML Vs. Taiwan Semiconductor Manufacturing: One Is More Misunderstood - AOL.com",
+      "summary": "* ASML's $45B backlog and TSMC's 67.7% gross margin reveal monopoly-grade AI infrastructure businesses investors routinely mislabel as a tool vendor and a foundry. * C.C. Wei admitted TSMC's CoWoS packaging capacity is so tight it's actively limiting Nvidia and AMD AI accelerator customer growth. * After a 10% weekly drop, ASML trades at forward P/E 28 as the sole global supplier of both EUV and i",
+      "source": "www.aol.com",
+      "date": "Wed, 16 Se",
+      "url": "https://www.aol.com/articles/asml-vs-taiwan-semiconductor-manufacturing-134011000.html",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "CoWoS"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 1
+}
