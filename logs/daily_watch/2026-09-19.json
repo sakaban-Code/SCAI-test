@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-19",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "股癌EP696 筆記2026/09/12 iPhone Duo、Oracle、電力 - 麻瓜股",
+      "summary": "Google TPU / TPU Cloud   光寶科   台達電   鴻海   台積電   智邦   金像電   廣達   台光電   京元電子   聯發科   欣興   景碩   日月光投控   台燿   緯穎   南電   緯創   創意   世芯-KY   臻鼎-KY   康舒   群電   GOOGL   AVGO   MRVL   SNPS   CDNS   NVDA   Samsung Electronics   SK hynix   BX   AMD   ASIC   智原   M31   意騰-KY   安國   巨有科技   瑞昱   聯詠   力成   矽力\\-KY   神盾   芯鼎   QCOM   CLS   TSLA   HBM／HBM4 AI記憶體供應鏈   力積電   力旺   旺矽   精測   南茂   MU   AMZN   先進封裝設備（CoWo",
+      "source": "mugglestock.com",
+      "date": "Sun, 13 Se",
+      "url": "https://mugglestock.com/articles/252",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "HBM",
+            "先進封裝"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 1
+}
