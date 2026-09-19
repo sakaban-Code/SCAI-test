@@ -1,0 +1,59 @@
+{
+  "date": "2026-09-20",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "AI算力真正的瓶頸，已經轉向先進封裝｜思潮行者的道路",
+      "summary": "測試端同樣不能忽略。京元電（2449）8月營收年增31.6%，欣銓（3264）年增46.6%，精測（6510）、旺矽（6223）與穎崴（6515）也同步創高，反映AI新平台出貨帶動測試與探針卡需求。不過新廠開出初期通常會先增加折舊，毛利率未必立即改善；若AI客戶設計變更、晶圓或封裝交期延後，測試產能利用率也會出現短期落差。\n\n我對這一輪台股AI投資的排序是：先看台積電掌握的先進製程與封裝平台，再看日月光投控承接的外溢封裝，接著才是設備、測試與耗材中具備高黏著度的公司。GPU仍然是主流，但AI ASIC與CPU的增量更值得追蹤；設備股有較高彈性，估值與營收認列風險也相對更高。\n\n接下來我會盯三件事：CoWoS實際月產能能否落在不同估計區間的高檔、HBM4e與ABF載板供給是否拖慢出貨，以及日月光與設備商擴產後的良率和毛利率。只要AI資本支出沒有明顯降溫，先進封裝仍是台灣半導體最具能見度的主線",
+      "source": "vocus.cc",
+      "date": "Wed, 16 Se",
+      "url": "https://vocus.cc/article/6aaa7f0efd89780001bf8fbe",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "HBM",
+            "CoWoS",
+            "先進封裝"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "營收"
+          ],
+          "anyB": [
+            "台積電",
+            "京元電",
+            "日月光"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "股癌EP696 筆記2026/09/12 iPhone Duo、Oracle、電力 - 麻瓜股",
+      "summary": "Google TPU / TPU Cloud   光寶科   台達電   鴻海   台積電   智邦   金像電   廣達   台光電   京元電子   聯發科   欣興   景碩   日月光投控   台燿   緯穎   南電   緯創   創意   世芯-KY   臻鼎-KY   康舒   群電   GOOGL   AVGO   MRVL   SNPS   CDNS   NVDA   Samsung Electronics   SK hynix   BX   AMD   ASIC   智原   M31   意騰-KY   安國   巨有科技   瑞昱   聯詠   力成   矽力\\-KY   神盾   芯鼎   QCOM   CLS   TSLA   HBM／HBM4 AI記憶體供應鏈   力積電   力旺   旺矽   精測   南茂   MU   AMZN   先進封裝設備（CoWo",
+      "source": "mugglestock.com",
+      "date": "Sun, 13 Se",
+      "url": "https://mugglestock.com/articles/252",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "HBM",
+            "先進封裝"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 2
+}
