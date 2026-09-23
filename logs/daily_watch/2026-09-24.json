@@ -1,0 +1,67 @@
+{
+  "date": "2026-09-24",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "IC 封測產業深度研究：AI 時代，摩爾定律的下一戰為何發生在晶片背面？｜股票研究室",
+      "summary": "Amkor 正在亞利桑那建立先進封裝與測試基地，並與台積電形成在地合作。\n NVIDIA 與 Amkor 於 2026 年宣布多年期、15 億美元的美國封裝合作。Reuters：NVIDIA–Amkor 美國封裝協議\n 京元電子宣布規劃最高 14 億美元的美國測試投資，顯示純測試也進入在地化階段。Reuters：京元電子美國投資計畫\n\n區域化會提高成本與折舊，但也可能帶來政府補助、在地溢價、長約與更高客戶黏著度。真正的勝負關鍵是產能是否有客戶承諾，而不是廠房面積。\n\n## 七、競爭格局：誰控制標準、誰負責量產、誰賺設備錢？\n\n### 1. 全球主要平台型業者 [...] 10. imec：3D Integration\n11. Reuters：NVIDIA–Amkor U.S. packaging agreement\n12. Reuters：KYEC plans U.S. test faci",
+      "source": "vocus.cc",
+      "date": "Wed, 23 Se",
+      "url": "https://vocus.cc/article/6aaeb186fd89780001852639",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "先進封裝"
+          ]
+        },
+        "YT-04": {
+          "any": [
+            "在地化",
+            "亞利桑那"
+          ]
+        },
+        "YT-05": {
+          "any": [
+            "補助"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "不當縮小版日月光，台灣「封測小巨人」狂吃 AI 外溢訂單的突圍之道｜封測日報 2026-09-21",
+      "summary": "台積電 CoWoS 擴產（2025 年目標月產能翻倍至逾 5 萬片）若順利落地，部分外溢訂單可能被台積電收回，中小封測廠的 AI 外溢紅利將面臨邊際遞減壓力，能否在此期間建立客戶黏性與技術門檻是關鍵。\n\n產能與報價 ▲ 偏多 \n\n### AI 先進封裝產能缺口恐達 20%！訂單外溢封測廠，矽光子與 CPO 概念發酵\n\n來源：Google News – 封測 ·\n\n產業重要性●●●●○4/5 · 重大訊號\n\n2330 台積電 ▲1.44% $2460.03711 日月光投控 ▲3.91% $638.02449 京元電子 ▲10.00% $291.56239 力成科技 ▲3.46% $284.06515 穎崴科技 ▲5.15% $6435.06223 旺矽科技 —2317 鴻海精密 ─0.00% $250.5NVDA NVIDIA ▲1.34% $222.27AVGO Broadcom ▲2.",
+      "source": "witology.com.tw",
+      "date": "Mon, 21 Se",
+      "url": "https://witology.com.tw/daily-osat/2026-09-21",
+      "tier": "RED",
+      "ruleId": "RT-07",
+      "matched": {
+        "RT-07": {
+          "any": [
+            "京元電"
+          ],
+          "anyB": [
+            "重大"
+          ]
+        },
+        "YT-02": {
+          "any": [
+            "先進封裝",
+            "矽光子"
+          ]
+        }
+      },
+      "alerted": false,
+      "dedup": "72h 內已通報，不重發"
+    }
+  ],
+  "redCount": 1,
+  "yellowCount": 1
+}
