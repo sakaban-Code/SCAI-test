@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-07",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "矽光子檢測設備MSS HG推進商業化，汎銓(6830)的營運模式 ...",
+      "summary": "矽格(6257)盤中報價259.5元，漲幅約9.73%，成為電子–半導體族群焦點之一。市場關注集中在AI、ASIC、矽光子與高速運算相關高階測試需求，以及公司在這些板塊營收比重提升所",
+      "source": "readmo.cmoney.tw",
+      "date": "Wed, 30 Se",
+      "url": "https://readmo.cmoney.tw/article/b27c0980-4f94-498c-91dc-d529fc35f25a",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "矽光子"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "營收"
+          ],
+          "anyB": [
+            "矽格"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "交易不是下注，而是經營；每一筆交易，都是一次商業決策",
+      "summary": "際財報能否超越已偏高的市場預期… 欣興(3037)則涵蓋NVIDIA、Google TPU V9 與AMD 等高階應用。 欣銓、華邦電、日月光投控、智邦、",
+      "source": "www.pressplay.cc",
+      "date": "Fri, 02 Oc",
+      "url": "https://www.pressplay.cc/project/590FCE5CECE6FCC83C7356C0B098C32D/articles/4C4BA5D4444838B48BD86D4493A3E000",
+      "tier": "YELLOW",
+      "ruleId": "YT-03",
+      "matched": {
+        "YT-03": {
+          "any": [
+            "財報"
+          ],
+          "anyB": [
+            "日月光"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 2
+}
