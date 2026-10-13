@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-14",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "SK 海力士來台釋千億大單，找上力成、和碩代工，挹注兩台廠營運熱轉｜封測日報 2026-10-08",
+      "summary": "2330 台灣積體電路製造 ▼1.16% $2555.03711 日月光投控 ▼1.50% $721.06239 力成科技 ▼0.33% $306.52449 京元電子 ▼1.67% $294.53264 欣銓科技 —8150 南茂科技 ▼1.17% $127.06257 矽格股份 ▼0.72% $276.0AMKR Amkor Technology ▼2.27% $53.39600584 JCET長電科技 ▼2.16% $64.28NVDA NVIDIA ▲0.14% $239.24AMD AMD ▲2.80% $649.426857 愛德萬測試 Advantest ▼0.70% $41000.0\n\n台積電 CoWoS 拚22萬片！日月光等 OSAT 同步擴軍，法人再上修 EPS 目標價：明年再撒800億美元\n\n#### 關鍵事件 [...] Solidigm是SK海力士於2021年以約",
+      "source": "witology.com.tw",
+      "date": "Thu, 08 Oc",
+      "url": "https://witology.com.tw/daily-osat/2026-10-08",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "CoWoS"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "AI 太熱 封測業迎最強漲價潮 日月光、京元電等大進補 | 產業熱點 | 產業 | 經濟日報",
+      "summary": "### AI巨頭砸錢「圈產能」 亞馬遜入股金像電 台灣供應鏈升級戰略資產\n news photo\n\n  ### 台星科法說報喜、開盤一字漲停 AI ASIC 需求強、買盤大力按讚\n news photo\n\n  ### 矽格、台星科 看旺明年\n news photo\n\n  ### 輝達稱霸1兆美元 AI 晶片市場 客戶、對手四路夾攻\n news photo\n\n  ### 矽格客戶提前綁定測試產能 台星科看好AI ASIC動能\n\n上一篇\n\n光寶斥資110億 德州新廠動了 配合客戶需求擴產 搶賺AI財\n\n下一篇\n\n台塑攻半導體擬擴大美國製造 坐擁德州地理優勢 支持客戶擴產\n\n### 相關 [...] 經濟日報 記者李孟珊／台北報導\n\n半導體封測業迎來「史上最強漲價潮」。業界傳出，由於AI晶片測試時間持續拉長，加上雲端大咖紛紛推出自研晶片，近期封測市場產能嚴重供不應求，業者「隨時都在漲價」，漲幅上",
+      "source": "money.udn.com",
+      "date": "Mon, 12 Oc",
+      "url": "https://money.udn.com/money/story/5612/9808264?from=edn_newest_index",
+      "tier": "YELLOW",
+      "ruleId": "YT-03",
+      "matched": {
+        "YT-03": {
+          "any": [
+            "法說"
+          ],
+          "anyB": [
+            "輝達",
+            "京元電",
+            "矽格",
+            "日月光"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "台股隨國際股市同步回檔，光學、航運、塑化、金融強勢守月線 | 財訊快報 | LINE TODAY",
+      "summary": "台股也受國際股市影響下跌，尤其記憶體股，南亞科( 2408 )毛利率達85.7%，其實與美光相差不多，但股價卻下跌，拖累華邦電( 2344 )、旺宏( 2337 )、群聯( 8299 )等記憶體族群。台積電( 2330 )股價拉回，就看15日法說會結果。由於 Lumentum、COHR大跌，台灣相關的光纖股眾達( 4977 )、波若威( 3163 )、聯亞( 3081 )等等強力壓回；探針族群旺矽( 6223 )、穎崴( 6515 )、精測( 6510 )、雍智( 6683 )也出快速拉回，兩大族群拉回可注意買點。同樣情況也出現在封測族群，包括日月光( 3711 )、京元電子( 2449 )、欣銓( 3264 )、力成( 6239 )、矽格( 6257 )等等。最強勢光學股以大立光( 3008 )、玉晶光( 3406 )、中揚光( 6668 )、今國光( 6209 )等為主，持續上攻。 [",
+      "source": "today.line.me",
+      "date": "Tue, 13 Oc",
+      "url": "https://today.line.me/tw/v3/article/j7p209a",
+      "tier": "YELLOW",
+      "ruleId": "YT-03",
+      "matched": {
+        "YT-03": {
+          "any": [
+            "法說"
+          ],
+          "anyB": [
+            "台積電",
+            "京元電",
+            "矽格",
+            "日月光"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "美啟動關稅法337調查 鴻海.台達電.廣達中招 | 科技 | 非凡新聞",
+      "summary": "跳過廣告...\n\n>>前往節目頁\n\n 複製連結\n 分享\n 分享\n 下載\n\n關鍵字搜尋\n\n## 若您的Internet Explorer瀏覽器無法正常瀏覽，建議您使用Microsoft Edge或其它瀏覽器。\n\nGoogle Chrome   \n瀏覽器下載 Firefox   \n瀏覽器下載 Microsoft Edge  \n瀏覽器下載\n\n為提供您更多優質的內容，本網站採用cookie分析技術，持續優化您的用戶體驗。若您繼續瀏覽本網站，即視為您已同意本網站的隱私權政策。\n\n即時新聞\n\n\n  - 股市女王\n  - 續勢東昇\n  - 股市杰帥\n  - 股市獲利王\n  - 華爾街大師\n  - 展翅高飛\n  - 股市將軍\n  - 理財金錢道\n  - 股市好好玩\n  + 電視節目表\n\n  + 非凡電視台\n  + 非凡商業台\n  + 直播\n\n  + 新聞台直播\n  + 商業台直播\n\n美啟動關稅法337調查",
+      "source": "news.ustv.com.tw",
+      "date": "Sun, 11 Oc",
+      "url": "https://news.ustv.com.tw/newsdetail/20261012A045",
+      "tier": "YELLOW",
+      "ruleId": "YT-01",
+      "matched": {
+        "YT-01": {
+          "any": [
+            "關稅"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 4
+}
