@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-18",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "华尔街又下狠手！NaNa说美股(2026.10.12)",
+      "summary": "[3:05] 反彈又無法重新站返12600點上方 就話明賣方仍然佔據主動\n[3:12] 調整可能進一步擴大 美股 Q3財報季喺本周正式拉開帷幕\n[3:19] 華爾街對第三季度整體業績保持樂觀 部分機構預計 標普500成分股 Q3盈利同比增速可能達到30 % 甚至更高\n[3:29] 科技嘅股特別係盈利貢獻 將會係決定整體業績能否兌現嘅重要因素 明天\n[3:37] 摩根大通、高盛、富國銀行、花旗等大型銀行將會陸續公布業績\n[3:43] 隨後係 ASML 同台積電等半導體產業鏈核心公司嘅報告 本周只係財報季嘅開場\n[3:52] 10月26日當週先係重頭戲 屆時，7巨頭將紮堆披露業績\n[4:00] 大摩同高盛管理層相對\n[4:08] 因此市場需要確認因此市場嘅 表態業 Q2嘅強勁增長係咪能夠延續\n[4:15] 據最新期權成交嘅數據顯示 未平倉 PUT 單同 Call 嘅沽購比最高嘅銀行股係富國銀行",
+      "source": "www.youtube.com",
+      "date": "Mon, 12 Oc",
+      "url": "https://www.youtube.com/watch?v=udtkcHXHFTU",
+      "tier": "YELLOW",
+      "ruleId": "YT-03",
+      "matched": {
+        "YT-03": {
+          "any": [
+            "財報"
+          ],
+          "anyB": [
+            "台積電",
+            "ASML"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "In-Depth Analysis of Asian Data Center Newcomer: DODC DayOne!",
+      "summary": "[4:57] 那么房东和二房东本质上是在做不同的生意 DayOne 的楼是按三十年折旧\n[5:04] 机电设备十到二十年折旧 而 GPU 呢折旧年限一般只有四到六年 最近呢可能延长了\n[5:12] 但是依然不如楼房和机电设备折旧长 DayOne 和客户是按照兆瓦数签约\n[5:20] 兆瓦数乘以每月的服务费再加上原价转嫁的电费 这样估算下来，收入里大约百分之六十吧\n[5:28] 是服务费，百分之四十是电费 特别强调，虽然 DayOne 不承担 GPU 折旧的风险\n[5:35] 但租户的风险比如出口管制 最后也会传导到房东的身上 了解了 DayOne 的商业模式\n[5:43] 知道他具体在卖什么 接下来我们来看 DayOne 的历史 稍微去查询一下 DayOne 的历史的朋友都可以了解到\n[5:52] DayOne 的诞生来自于一家中国的港股上市 公司万国数据 GDS\n[6:00] 二零零一年",
+      "source": "www.youtube.com",
+      "date": "Mon, 12 Oc",
+      "url": "https://www.youtube.com/watch?v=CHUb-J0Uplk",
+      "tier": "YELLOW",
+      "ruleId": "YT-01",
+      "matched": {
+        "YT-01": {
+          "any": [
+            "出口管制"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 2
+}
