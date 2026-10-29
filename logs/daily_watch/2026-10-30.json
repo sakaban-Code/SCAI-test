@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-30",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "台灣AI龍頭地圖出爐！28大關鍵產業鏈一次看懂　台積電、緯穎到大量誰是真正AI贏家？ - 理財周刊",
+      "summary": "如果說日月光代表的是「封裝＋測試規模龍頭」，那麼京元電子（2449）則是AI晶片專業測試的重要指標股。京元電本身即以半導體測試為核心，公司資料顯示其為全球最大的專業晶片測試廠之一，主要服務涵蓋晶圓測試、成品測試、Burn-In預燒測試與System Level Test（SLT），並已將GPU、ASIC、CPU與高速網通晶片列為高階AI測試的重要應用。\n\nAI晶片功耗與電晶體數快速增加，也讓測試時間、功率與設備複雜度大幅提升。特別是高階GPU與AI ASIC，除了傳統Final Test之外，還需要更高功率的Burn-In與SLT測試，以確認晶片在高負載環境下的穩定性，這使京元電成為AI算力升級過程中的直接受惠者。公司2026年上半年營收約213.3億元、年增36.1%，毛利率39.6%，較去年同期增加5個百分點；營業利益年增51.4%，上半年EPS為3.91元。EPS年比較受到2025年",
+      "source": "www.moneyweekly.com.tw",
+      "date": "Wed, 28 Oc",
+      "url": "https://www.moneyweekly.com.tw/ArticleData/Info/Article/258521",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "SLT"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "營收"
+          ],
+          "anyB": [
+            "台積電",
+            "京元電"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "Amkor 採用客戶預付款模式，加速全球先進封裝產能擴張｜封測日報 2026-10-28",
+      "summary": "Amkor 擴張對台灣封測廠（如日月光）有威脅嗎？\n\n短期威脅有限，因為先進封裝需求整體仍在擴張，市場夠大；但中長期而言，Amkor 透過預付款鎖定客戶的模式若成功，將壓縮日月光等台廠從同一批客戶手中搶單的機會，競爭格局恐逐漸向寡頭集中。\n\n測試介面設備 ▲ 偏多 \n\n### 摩根大通首次覆蓋測試介面產業，給予穎崴「買進」評等\n\n來源：Google News – 探針卡/測試介面 ·\n\n產業重要性●●●○○3/5 · 值得關注\n\n6515 穎崴科技 ▼0.42% $4775.0JPM 摩根大通 ▲0.74% $334.046223 旺矽科技 —6510 精測電子 —6857 愛德萬 Advantest ▲2.51% $34710.02449 京元電子 ▲2.48% $269.03264 欣銓科技 —6257 矽格 ─0.00% $232.0\n\n摩根大通首次覆蓋測試介面產業，給予穎崴「買進」",
+      "source": "witology.com.tw",
+      "date": "Wed, 28 Oc",
+      "url": "https://witology.com.tw/daily-osat/2026-10-28",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "先進封裝"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "輝達先進封裝大變革 中介層躍關鍵戰略物資 聯電、力積電成當紅炸子雞 | 產業熱點 | 產業 | 經濟日報",
+      "summary": "### 台股重量級法說會登場！聯發科、台達電、聯電上陣 AI 需求能變獲利？\n news photo\n\n  ### 台郡為何突然又紅了？輝達點名 PTFE 之外 還藏兩大 AI 伺服器布局\n news photo\n\n  ### CPO真正卡關竟在「測試」！ 光電同測成量產瓶頸 鴻勁、旺矽、致茂搶商機\n news photo\n\n  ### 台積電法說四大焦點穩定軍心 多線並進 護城河愈挖愈深、愈築愈寬\n news photo\n\n  ### 從手機軟板跨進AI伺服器！它押MetaLink、高頻材料 搶NVIDIA新平台商機\n news photo\n\n  ### 輝達點名台廠擴產！欣興、京元電、矽品入列 這家CPO產能要衝30倍\n news photo\n\n  ### 聯電攜愛普 攻 AI 伺服器供電 進擊先進封裝電源整合市場\n news photo\n\n  ### 聯電攜愛普科技推進 AI 與高效",
+      "source": "money.udn.com",
+      "date": "Tue, 27 Oc",
+      "url": "https://money.udn.com/money/story/5612/9838563",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "先進封裝"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "法說"
+          ],
+          "anyB": [
+            "台積電",
+            "輝達",
+            "京元電"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 3
+}
