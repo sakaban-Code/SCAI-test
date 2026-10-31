@@ -1,0 +1,100 @@
+{
+  "date": "2026-11-01",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "AI Semiconductor Market Size and YoY Growth Rate, 2026-2033",
+      "summary": "The GPU-Based segment is estimated to capture 41.0% of the market share in 2026. Development of advanced packaging and chiplet-based architectures is majorly driving the growth of the segment. On May 21, 2026, Advanced Micro Devices announced that it will invest more than USD 10 billion in the semiconductor ecosystem in Taiwan. The initiative supports strategic partnerships and expanded advanced p",
+      "source": "www.coherentmarketinsights.com",
+      "date": "Wed, 28 Oc",
+      "url": "https://www.coherentmarketinsights.com/industry-reports/ai-semiconductor-market",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "chiplet"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "台灣AI龍頭地圖出爐！28大關鍵產業鏈一次看懂　台積電、緯穎到大量誰是真正AI贏家？ - 理財周刊",
+      "summary": "如果說日月光代表的是「封裝＋測試規模龍頭」，那麼京元電子（2449）則是AI晶片專業測試的重要指標股。京元電本身即以半導體測試為核心，公司資料顯示其為全球最大的專業晶片測試廠之一，主要服務涵蓋晶圓測試、成品測試、Burn-In預燒測試與System Level Test（SLT），並已將GPU、ASIC、CPU與高速網通晶片列為高階AI測試的重要應用。\n\nAI晶片功耗與電晶體數快速增加，也讓測試時間、功率與設備複雜度大幅提升。特別是高階GPU與AI ASIC，除了傳統Final Test之外，還需要更高功率的Burn-In與SLT測試，以確認晶片在高負載環境下的穩定性，這使京元電成為AI算力升級過程中的直接受惠者。公司2026年上半年營收約213.3億元、年增36.1%，毛利率39.6%，較去年同期增加5個百分點；營業利益年增51.4%，上半年EPS為3.91元。EPS年比較受到2025年",
+      "source": "www.moneyweekly.com.tw",
+      "date": "Wed, 28 Oc",
+      "url": "https://www.moneyweekly.com.tw/ArticleData/Info/Article/258521",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "SLT"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "營收"
+          ],
+          "anyB": [
+            "台積電",
+            "京元電"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "Amkor 採用客戶預付款模式，加速全球先進封裝產能擴張｜封測日報 2026-10-28",
+      "summary": "Amkor 擴張對台灣封測廠（如日月光）有威脅嗎？\n\n短期威脅有限，因為先進封裝需求整體仍在擴張，市場夠大；但中長期而言，Amkor 透過預付款鎖定客戶的模式若成功，將壓縮日月光等台廠從同一批客戶手中搶單的機會，競爭格局恐逐漸向寡頭集中。\n\n測試介面設備 ▲ 偏多 \n\n### 摩根大通首次覆蓋測試介面產業，給予穎崴「買進」評等\n\n來源：Google News – 探針卡/測試介面 ·\n\n產業重要性●●●○○3/5 · 值得關注\n\n6515 穎崴科技 ▼0.42% $4775.0JPM 摩根大通 ▲0.74% $334.046223 旺矽科技 —6510 精測電子 —6857 愛德萬 Advantest ▲2.51% $34710.02449 京元電子 ▲2.48% $269.03264 欣銓科技 —6257 矽格 ─0.00% $232.0\n\n摩根大通首次覆蓋測試介面產業，給予穎崴「買進」",
+      "source": "witology.com.tw",
+      "date": "Wed, 28 Oc",
+      "url": "https://witology.com.tw/daily-osat/2026-10-28",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "先進封裝"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "林睿閎證券分析師-John – Telegram",
+      "summary": "再來看到封測，今天投信上市第一名日月光投控(3711)大買4,755張，上櫃第一名頎邦(6147)也買超2,102張，昨天美國封測大廠Amkor財報開獎優於預期，加上NVIDIA預付款卡位未來先進封裝產能，日月光明天法說，除了市場傳出封測報價調漲10%～30%，更重要的是AI／HPC先進封裝LEAP持續放量，法人估明年營收有機會接近今年的兩倍📈  \n  \n力成則同時吃到記憶體＋先進封裝，Q3營收253.34億元、毛利率24%雙創歷史新高，封裝與測試稼動率都超過90%，短線受惠DRAM、NAND，2027年還有AMD AI晶片FOPLP、高階RDL、CPO與2.5D／3D等新業務，今年記憶體、明年再接AI先進封裝  \n  \n頎邦主要是1.6T光通訊帶來的金凸塊需求，隨單通道升級到200G，PD、TIA、Driver等晶片對高精度互連要求提高，法人估2027年光通訊營收有機會成長超過3倍，再加",
+      "source": "t.me",
+      "date": "Thu, 29 Oc",
+      "url": "https://t.me/s/johnstock888?before=10237",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "先進封裝"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "法說",
+            "財報",
+            "營收"
+          ],
+          "anyB": [
+            "日月光",
+            "Amkor"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 4
+}
