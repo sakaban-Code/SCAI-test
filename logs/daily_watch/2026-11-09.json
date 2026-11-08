@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-09",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "矽格、南電、京元電第3季獲利走高 AI晶片封測載板需求助攻 | 個股情報 | 股市 | 聯合新聞網",
+      "summary": "晶圓測試廠京元電前3季歸屬母公司業主淨利74.22億元，每股純益5.78元，其中第3季稅後獲利26.44億元，僅次於2025年首季、創單季次高，每股純益1.87元。\n\n在AI晶片大廠輝達（NVIDIA）支持下，京元電先前公告美國全資子公司AeternZ投資美國德州設立半導體測試產能。輝達先前宣布將向京元電提供11億美元（約新台幣357億元）的產能預訂預付款，支持京元電在美國建置新的測試設施及設備，目標2027年4月開始大規模量產。\n\n矽格 封測 京元電 晶片 南電 半導體\n\n## 登入後開始簽到\n\n## 會員來簽到\n\n您即將前往會員中心  \n登入簽到送 LINE POINTS 🪙\n\n每日打卡送 LINE POINTS  \n玩遊戲再抽7-11禮券🧧\n\n立即登入 立即前往\n\n## 延伸閱讀\n\n## AI ASIC與矽光子的測試黑馬：欣銓\n\n## AI ASIC＋矽光子雙成長股：矽格\n\n## 銳",
+      "source": "udn.com",
+      "date": "Thu, 05 No",
+      "url": "https://udn.com/news/story/7252/9860120?from=udn-ch1_breaknews-1-0-news",
+      "tier": "YELLOW",
+      "ruleId": "YT-02",
+      "matched": {
+        "YT-02": {
+          "any": [
+            "矽光子"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "京元電子10月營收44.26億元創新高，年增29.5% - HaoEnjoyLife",
+      "summary": "京元電 10 月 13 日公告，董事會通過和輝達旗下 NVIDIA International 簽訂客戶預付款協議（優分析）。輝達先付款，支持京元電與美國全資子公司 AeternZ Semiconductor Testing 在美國建置測試產能，並為輝達預留測試資源；之後用實際提供的測試服務逐步抵減。\n\n公告沒有寫預付款金額。\n\n京元電美國設廠相關公告\n\n| 日期 | 公司 | 內容 | 金額 |\n ---  --- |\n| 7/10 | 京元電 | 董事會通過在美國投資設廠 | 上限 14 億美元 |\n| 10/13 | 京元電 | 和 NVIDIA International 簽訂客戶預付款協議 | 公告未揭露 |\n| 10/29 | 子公司 AeternZ | 取得德州沃斯堡（Fort Worth）土地與建物 | 7,935 萬美元 |\n\n資料來源：公開資訊觀測站重大訊息、優分析 [",
+      "source": "www.haoenjoylife.com",
+      "date": "Fri, 06 No",
+      "url": "https://www.haoenjoylife.com/articles/1a4772d5-d692-4465-b22b-b8143e0ba09d",
+      "tier": "RED",
+      "ruleId": "RT-07",
+      "matched": {
+        "RT-07": {
+          "any": [
+            "京元電"
+          ],
+          "anyB": [
+            "重大"
+          ]
+        },
+        "YT-03": {
+          "any": [
+            "營收"
+          ],
+          "anyB": [
+            "輝達",
+            "京元電"
+          ]
+        },
+        "YT-04": {
+          "any": [
+            "美國設廠"
+          ]
+        }
+      },
+      "alerted": true
+    }
+  ],
+  "redCount": 1,
+  "yellowCount": 1
+}
