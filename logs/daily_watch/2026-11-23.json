@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-23",
+  "checked": [
+    "semiconductor Taiwan export controls chip news",
+    "台灣 半導體 台積電 出口管制 停電 地震 缺水",
+    "欣銓 京元電 矽格 測試廠 Nvidia 財報"
+  ],
+  "items": [
+    {
+      "title": "Why are AI stocks bleeding out? What exactly happened? Is this crash justified? | M View AI Produ...",
+      "summary": "[5:25] 更麻煩的是 這件事情偏偏發生在 CoreWeave 這些 Neocloud 的融資 成本大幅上升之後。\n[5:31] 當外部融資開始變困難 原本最重要的產業資金 支持者又可能變得更加保守 這兩個利空就會相互強化。\n[5:40] 所以，黃仁勳出事造成的影響 絕對不只是 NVIDIA 自己的股價 而是整個 AI 基礎設施的投資循環 都可能因此受到衝擊。\n[5:50] 第四個重拳 則是川普政府開始進一步 限制海外 AI 算力市場 甚至威脅要對海外 資料中心課徵重稅。\n[5:59] 11 月 19 日 美國政府正式實施新版的 AI 晶片出口管制規定 針對中國等受限制國家的企業 透過第三國資料中心租用\n[6:08] 大量先進 AI 算力的模式 加強了出口許可的要求。 這件事情其實相當重要。\n[6:14] 過去美國雖然限制 NVIDIA 的 高階 AI GPU 直接出口中國 但中國企業仍",
+      "source": "www.youtube.com",
+      "date": "Sat, 21 No",
+      "url": "https://www.youtube.com/watch?v=4B-p_RU6mJ4",
+      "tier": "YELLOW",
+      "ruleId": "YT-01",
+      "matched": {
+        "YT-01": {
+          "any": [
+            "出口管制",
+            "出口許可"
+          ]
+        }
+      },
+      "alerted": false
+    },
+    {
+      "title": "產能開出後營運怎麼看？",
+      "summary": "輝達(NVIDIA)公布最新財報與財測優於市場預期，並宣布擴大與台灣供應鏈的長期合作承諾，其中京元電子(2449)、台積電(2330)與鴻海(2317)等公司受到市場關注。輝達也提供京元電子11億美元預付款，用於支持AI相關測試設備建置。 就營運面來看，京元電子為全球IC測試龍頭廠之一，受惠AI GPU及TPU測試時數拉長與需求走強，2026年10月合併營收達44.26億元，月增8.72%，年增29.47%，並連續多月創下歷史新高，顯示基本面仍具動能。 不過，籌碼面與技術面近期波動明顯。11月18日三大法人合計賣超1,715張，其中外資賣超1,405張、投信賣超380張；主力雖單日買超2,929張，但近20個交易日主力買賣超比率仍落在負值區間，反映整體操作偏向減碼。股價方面，京元電子昨日爆量攻上194元漲停，今日盤中回檔至175元附近，短線波動加劇。 技術面上，京元電子股價自10月中旬高點",
+      "source": "readmo.cmoney.tw",
+      "date": "Thu, 19 No",
+      "url": "https://readmo.cmoney.tw/article/6776c65c-44ee-4db8-bb61-0cff5b5a8251",
+      "tier": "YELLOW",
+      "ruleId": "YT-03",
+      "matched": {
+        "YT-03": {
+          "any": [
+            "財報",
+            "營收"
+          ],
+          "anyB": [
+            "台積電",
+            "輝達",
+            "京元電"
+          ]
+        }
+      },
+      "alerted": false
+    }
+  ],
+  "redCount": 0,
+  "yellowCount": 2
+}
